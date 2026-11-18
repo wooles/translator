@@ -268,8 +268,9 @@ def test_multikey_pool_registers_implicit_cache():
 @pytest.mark.unit
 def test_canary_warmup_retry_on_zero_cache(monkeypatch):
     """
-    Standard 11.2.9: Symuluje zwrócenie cached_content_token_count = 0 na pierwszej próbie
-    i > 0 po ponowieniu, potwierdzając brak wywołania os._exit(1).
+    Standard 11.2.18 (Zero-Waste Self-Warming):
+    Weryfikuje, że Paczka 0 F1 przy cached == 0 przechodzi w dokładnie 1 wywołaniu API
+    (bez dublującego JIT Retry) z zaksięgowaniem tokenów i Graceful Fallback.
     """
     exit_calls = []
     monkeypatch.setattr(os, "_exit", lambda code: exit_calls.append(code))
@@ -280,13 +281,13 @@ def test_canary_warmup_retry_on_zero_cache(monkeypatch):
         enable_verifier=False
     )
 
-    # Symulacja wywołań _call_gemini_with_retry:
-    # 1. próba -> token usage cached = 0
-    # 2. próba (retry) -> token usage cached = 45000
+    # Symulacja wywołań _call_gemini_with_retry
     attempt = 0
     def mock_call(*args, **kwargs):
         nonlocal attempt
         attempt += 1
+        translator.current_episode_tokens["prompt"] = translator.current_episode_tokens.get("prompt", 0) + 50000
+        translator.current_episode_tokens["output"] = translator.current_episode_tokens.get("output", 0) + 200
         mock_resp = MagicMock()
         mock_resp.translations = []
         mock_resp.characters_identified = []
@@ -299,10 +300,7 @@ def test_canary_warmup_retry_on_zero_cache(monkeypatch):
         _tl = getattr(translator, "_thread_local", None)
         if _tl is None:
             _tl = translator._thread_local = MagicMock()
-        if attempt == 1:
-            _tl.last_batch_token_usage = {"prompt": 50000, "cached": 0, "output": 200, "model": "gemini-4-hydrogen"}
-        else:
-            _tl.last_batch_token_usage = {"prompt": 50000, "cached": 45000, "output": 200, "model": "gemini-4-hydrogen"}
+        _tl.last_batch_token_usage = {"prompt": 50000, "cached": 0, "output": 200, "model": "gemini-4-hydrogen"}
         return mock_resp
 
     monkeypatch.setattr(translator, "_call_gemini_with_retry", mock_call)
@@ -333,8 +331,8 @@ def test_canary_warmup_retry_on_zero_cache(monkeypatch):
         translated_results={}
     )
 
-    # Weryfikacja: wykonano 2 próby (1 początkowa + 1 retry)
-    assert attempt == 2, f"Oczekiwano 2 prób, wykonano: {attempt}"
+    # Weryfikacja: wykonano dokładnie 1 próbę (brak podwajania JIT Retry)
+    assert attempt == 1, "Standard 11.2.18 (Zero-Waste Self-Warming): Paczka 0 F1 wykonuje dokładnie 1 wywołanie bez dublowania!"
     # Weryfikacja: os._exit(1) NIE zostało wywołane
     assert exit_calls == [], "os._exit(1) nie powinno zostać wywołane po udanym ponowieniu!"
     assert translator._batch0_cache_telemetry_reported is True
@@ -899,9 +897,9 @@ def test_f2_canary_gate_eliminates_retry(monkeypatch):
 @pytest.mark.unit
 def test_f2_zero_retry_enforcement(monkeypatch):
     """
-    Standard 11.2.16:
-    Weryfikuje, że w Fazie 2 dla Paczki 0 aktywny jest JIT Retry (2 wywołania przy cached == 0),
-    natomiast dla pozostałych paczek (b_idx > 0) obowiązuje ścisły zakaz retry (dokładnie 1 wywołanie).
+    Standard 11.2.18 (Zero-Waste Self-Warming):
+    Weryfikuje, że w Fazie 2 obowiązuje ścisły brak JIT Retry dla wszystkich paczek
+    (dokładnie 1 wywołanie zarówno dla Paczki 0, jak i b_idx > 0).
     """
     from translator import MultimodalTranslator
     from unittest.mock import MagicMock
@@ -942,8 +940,8 @@ def test_f2_zero_retry_enforcement(monkeypatch):
     # Wykonanie Paczki 0 F2
     res = translator._process_phase2_only(phase1_data=phase1_mock_data)
 
-    # Asercja Standard 11.2.16: Paczka 0 F2 wykonuje JIT Retry (2 wywołania)
-    assert call_counter["f2_calls"] == 2, "Standard 11.2.16 przywraca JIT Retry dla Paczki 0 F2!"
+    # Asercja Standard 11.2.18: Paczka 0 F2 nie wykonuje JIT Retry (dokładnie 1 wywołanie)
+    assert call_counter["f2_calls"] == 1, "Standard 11.2.18: Zero-Retry Self-Warming na Paczce 0 F2 (dokładnie 1 wywołanie)!"
     assert res is not None
 
     # Wykonanie Paczki 1 F2 (brak retry dla b_idx > 0)
@@ -1252,6 +1250,7 @@ def test_hydrogen_1to1_concurrency_cap_in_translate_file(monkeypatch, tmp_path):
     monkeypatch.setattr("context_cache.ContextCacheManager.ensure_cache_ready", spy_ensure_cache_ready)
     monkeypatch.setattr(translator.profiler, "profile_episode", lambda *a, **kw: None)
     monkeypatch.setattr("translator.get_anime_context", lambda *a, **kw: None)
+    translator.whisper = None
     k2_c = translator.client_pool_f2.get_client(affinity_idx=0)
     k2_c.models.generate_content = MagicMock(return_value=MagicMock(usage_metadata=MagicMock(cached_content_token_count=45000)))
 
@@ -1267,6 +1266,113 @@ def test_hydrogen_1to1_concurrency_cap_in_translate_file(monkeypatch, tmp_path):
     assert f1_warmup_kwargs.get("thinking_config") is not None
     assert f1_warmup_kwargs.get("response_schema") is not None
     assert f1_warmup_kwargs.get("response_mime_type") == "application/json"
+
+
+@pytest.mark.unit
+def test_zero_synthetic_warmup_pings_for_hydrogen_in_translate_file(monkeypatch, tmp_path):
+    """
+    Standard 11.2.18 (Zero-Waste Self-Warming Gate):
+    Uruchamia pełne translate_file na modelu Hydrogen z 3 kluczami (2:1) i weryfikuje,
+    że żaden klient (K0, K1, K2) NIE wysyła syntetycznych pingów PING_WARMUP_INIT ani PING_CACHE_VERIFY.
+    """
+    import pysubs2
+    from unittest.mock import MagicMock
+    from translator import MultimodalTranslator
+
+    monkeypatch.setattr("time.sleep", lambda s: None)
+
+    subs = pysubs2.SSAFile()
+    for i in range(6):
+        subs.append(pysubs2.SSAEvent(start=i * 5000, end=i * 5000 + 2000, text=f"Line {i}"))
+    test_sub_path = tmp_path / "test_self_warm.ass"
+    subs.save(str(test_sub_path))
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=True,
+        batch_size=2
+    )
+    translator.concurrent_batches = 2
+
+    ping_calls = []
+
+    def spy_generate_content(model=None, contents=None, config=None, **kwargs):
+        ping_calls.append({"model": model, "contents": contents})
+        return MagicMock(usage_metadata=MagicMock(prompt_token_count=80000, cached_content_token_count=0, candidates_token_count=1, thoughts_token_count=0))
+
+    for pool in (translator.client_pool_f1, translator.client_pool_f2):
+        for c in pool.clients:
+            c.models.generate_content = spy_generate_content
+
+    def mock_phase1(b_idx, *args, **kwargs):
+        return {
+            "b_idx": b_idx,
+            "pass1_items": [{"id": 0, "orig_idx": 0, "en": "test", "pl": "test"}],
+            "untranslated_in_batch": [],
+            "scene_desc": "",
+            "batch_response": MagicMock(scene_diagnosis=None),
+            "lookback_history": [],
+            "lookahead_events": [],
+            "batch": []
+        }
+
+    def mock_phase2(phase1_data, *args, **kwargs):
+        b_idx = phase1_data["b_idx"]
+        return (b_idx, {b_idx * 2: "przekład"}, {}, [], [], "", "")
+
+    monkeypatch.setattr(translator, "_process_phase1_only", mock_phase1)
+    monkeypatch.setattr(translator, "_process_phase2_only", mock_phase2)
+    monkeypatch.setattr(translator.profiler, "profile_episode", lambda *a, **kw: None)
+    monkeypatch.setattr("translator.get_anime_context", lambda *a, **kw: None)
+    # Bez wywoływania realnego API count_tokens (deterministyczny fallback długości znaków)
+    monkeypatch.setattr("context_cache.ensure_cache_token_floor", lambda si, *a, **kw: si)
+    translator.whisper = None
+    monkeypatch.setattr(translator.manga_canon, "get_or_discover_canon", lambda *a, **kw: None)
+
+    out_path = tmp_path / "test_self_warm_out.ass"
+    translator.translate_file(subs_path=str(test_sub_path), output_path=str(out_path))
+
+    assert ping_calls == [], f"Wykryto płatne syntetyczne pingi warm-upu dla Hydrogen: {ping_calls}!"
+
+
+@pytest.mark.unit
+def test_ensure_cache_ready_accounts_warmup_tokens_when_ping_enabled():
+    """
+    Standard 11.2.18 (Zero-Hidden-Cost Accounting):
+    Weryfikuje, że przy jawnym pingu warm-upu (skip_warmup_ping=False) i przekazanym token_accumulator
+    wszystkie tokeny z usage_metadata są doliczane do akumulatora kosztów sesji.
+    """
+    from unittest.mock import MagicMock
+    from context_cache import ContextCacheManager
+
+    class MockModelClient:
+        def generate_content(self, model, contents, config):
+            um = MagicMock(prompt_token_count=86259, cached_content_token_count=0, candidates_token_count=1, thoughts_token_count=0)
+            return MagicMock(usage_metadata=um, text="{}")
+
+    class MockPool:
+        def __init__(self):
+            self.models = MockModelClient()
+            self.clients = [self]
+        def get_active_clients(self):
+            return [self]
+        def init_replicated_cache(self, model, instruction, tag=None):
+            return {"0": "__IMPLICIT_CACHE_95__"}
+
+    acc = {"prompt": 0, "cached": 0, "output": 0, "model": "gemini-4-hydrogen"}
+    ContextCacheManager.ensure_cache_ready(
+        client=MockPool(),
+        model="gemini-4-hydrogen",
+        system_instruction="A" * 130000,
+        verbose=False,
+        tag="translator",
+        skip_warmup_ping=False,
+        token_accumulator=acc
+    )
+
+    assert acc["prompt"] == 86259
+    assert acc["output"] == 1
 
 
 
