@@ -398,11 +398,16 @@ class ContextCacheManager:
         tag: Optional[str] = None,
         thinking_config: Optional[Any] = None,
         response_schema: Optional[Any] = None,
-        response_mime_type: Optional[str] = None
+        response_mime_type: Optional[str] = None,
+        skip_warmup_ping: bool = False,
+        token_accumulator: Optional[Dict[str, Any]] = None,
+        token_lock: Optional[Any] = None
     ) -> Optional[str]:
         """
         Gwarantuje aktywację bufora serwerowego z pełną symetrią sygnatury dekodera (H4 + H5 fix).
-        Rozgrzewa bufor z identycznym thinking_config i response_schema jak realne zapytanie produkcyjne.
+        W Standardzie 11.2.18 (Zero-Waste Self-Warming) obsługuje flagę skip_warmup_ping=True
+        dla modeli Hydrogen (0.00 PLN narzutu na puste pingi) oraz pełne księgowanie
+        usage_metadata do token_accumulator, gdy jawny ping rozgrzewający jest włączony.
         """
         if not client or not system_instruction:
             return None
@@ -420,8 +425,8 @@ class ContextCacheManager:
 
         if hasattr(client, "init_replicated_cache"):
             mapping = client.init_replicated_cache(model, padded_instruction, tag=prompt_tag)
-            # Rozgrzewka implicit cache z pełną sygnaturą dekodera (Thinking + JSON Schema)
-            if is_gemini_4_or_hydrogen_model(model):
+            # Rozgrzewka implicit cache z pełną sygnaturą dekodera (pomijana przy skip_warmup_ping=True)
+            if is_gemini_4_or_hydrogen_model(model) and not skip_warmup_ping:
                 active_clients = client.get_active_clients() if hasattr(client, "get_active_clients") else [client]
                 for idx, c in enumerate(active_clients):
                     try:
@@ -438,17 +443,37 @@ class ContextCacheManager:
                             cfg_kwargs["response_mime_type"] = response_mime_type
 
                         warmup_cfg = types.GenerateContentConfig(**cfg_kwargs)
-                        c.models.generate_content(
+                        warmup_resp = c.models.generate_content(
                             model=model,
                             contents=["PING_WARMUP_INIT"],
                             config=warmup_cfg
                         )
+                        # Standard 11.2.18: Jawne księgowanie tokenów pingu warm-upu (zero ukrytych kosztów)
+                        um = getattr(warmup_resp, "usage_metadata", None)
+                        if token_accumulator is not None and um is not None:
+                            p_cnt = getattr(um, "prompt_token_count", 0) or 0
+                            c_cnt = getattr(um, "cached_content_token_count", 0) or 0
+                            cands = getattr(um, "candidates_token_count", 0) or 0
+                            thoughts = getattr(um, "thoughts_token_count", 0) or 0
+                            out_cnt = cands + thoughts
+                            if token_lock is not None:
+                                with token_lock:
+                                    token_accumulator["prompt"] = token_accumulator.get("prompt", 0) + p_cnt
+                                    token_accumulator["cached"] = token_accumulator.get("cached", 0) + c_cnt
+                                    token_accumulator["output"] = token_accumulator.get("output", 0) + out_cnt
+                                    token_accumulator["model"] = model
+                            else:
+                                token_accumulator["prompt"] = token_accumulator.get("prompt", 0) + p_cnt
+                                token_accumulator["cached"] = token_accumulator.get("cached", 0) + c_cnt
+                                token_accumulator["output"] = token_accumulator.get("output", 0) + out_cnt
+                                token_accumulator["model"] = model
                         logger.info(f"[Context Cache Sequential Warmup]: Pomyślnie rozgrzano bufor dla klucza #{idx} ({model}, {prompt_tag}).")
                     except Exception as e:
                         logger.debug(f"[Context Cache Warmup]: Błąd mikro-rozgrzewki klucza #{idx}: {e}")
             first_name = next(iter(mapping.values()), None)
             if verbose and first_name:
-                print(f"  [Context Cache]: Zablokowano i rozgrzano rabat serwerowy dla {model} ({prompt_tag}) na {len(mapping)} kluczach API.")
+                mode_lbl = "tryb Self-Warming (0 pingów)" if (is_gemini_4_or_hydrogen_model(model) and skip_warmup_ping) else "z rozgrzewką"
+                print(f"  [Context Cache]: Zablokowano rabat serwerowy dla {model} ({prompt_tag}, {mode_lbl}) na {len(mapping)} wpisach puli.")
             return first_name or "cached_ready"
 
         if hasattr(client, "clients") and client.clients:
