@@ -2167,7 +2167,7 @@ class MultimodalTranslator:
             err_msg = (
                 "\n"
                 "========================================================================================\n"
-                f"  🛑 [Context Cache HALT / INC-AVT-057]: Bezpiecznik Fail-Closed zatrzymał proces! Serwer zwrócił 0 tokenów cache! {reason_line}\n"
+                f"  🛑 [Context Cache HALT / INC-AVT-057]: Bezpiecznik Fail-Closed zatrzymał proces! {reason_line}\n"
                 f"     Koszt sesji: {cost_disp} (Limit bezpieczeństwa: {HARD_BUDGET_LIMIT_PLN:.2f} PLN).\n"
                 f"     Paczka {b_idx} ({phase}). Natychmiastowe zatrzymanie via os._exit(1).\n"
                 "========================================================================================\n"
@@ -2188,7 +2188,8 @@ class MultimodalTranslator:
             )
 
         if cached_tokens >= 32768:
-            if b_idx == 0 or getattr(self, "verbose", False):
+            # Standard 11.2.19: Potwierdzenie rabatu na Paczce 0 oraz Paczce 1 (pierwsze trafienie po Self-Warming INIT)
+            if b_idx in (0, 1) or getattr(self, "verbose", False):
                 print(f"\n  💰 [Context Cache AKTYWNY]: Serwer potwierdził CachedContent ({phase}, paczka {b_idx}): {cached_tokens} tokenów (Rabat -95% aktywny) [Context Cache ACTIVE].")
             logger.info(f"[Context Cache CONFIRMED]: Server confirmed CachedContent token count for {phase} batch {b_idx}: {cached_tokens} (-95% input discount active)")
             # Standard 11.2.17: Globalny audyt budżetu również dla paczek z aktywnym cache (likwidacja martwego pola)
@@ -2220,16 +2221,30 @@ class MultimodalTranslator:
             current_net_pln = _compute_session_net_pln()
             if current_net_pln is None or current_net_pln > HARD_BUDGET_LIMIT_PLN:
                 cost_disp = f"{current_net_pln:.2f} PLN" if current_net_pln is not None else "NIEZNANY (AWARIA KALKULATORA LUB BRAK TELEMETRII)"
-                _trigger_hard_halt(cost_disp, "Zerowy bilans tokenów podręcznych.")
+                _trigger_hard_halt(cost_disp, f"Serwer zwrócił 0 tokenów cache{'!'}")
 
-            # 3. Graceful Fallback: Gdy koszt został poprawnie zweryfikowany i mieści się w limicie <= 6.00 PLN
-            warn_msg = (
-                f"\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Wykryto 0 tokenów cache ({phase}, paczka {b_idx}).\n"
-                f"     Bieżący zweryfikowany koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN.\n"
-                f"     Kontynuacja przetwarzania w trybie Graceful Fallback."
+            # 3. Standard 11.2.19: Rozróżnienie planowego Self-Warming INIT (Paczka 0 Hydrogen) od nieoczekiwanego WARN
+            from model_resolver import is_gemini_4_or_hydrogen_model
+            active_phase_model = (
+                getattr(getattr(self, "verifier", None), "model", getattr(self, "model_phase2", self.model))
+                if phase == "phase2"
+                else getattr(self, "model_phase1", self.model)
             )
-            print(warn_msg)
-            logger.warning(f"[Context Cache WARN / INC-AVT-057]: 0 cache on {phase} b_idx {b_idx}. Cost: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN. Graceful fallback active.")
+            if b_idx == 0 and is_gemini_4_or_hydrogen_model(active_phase_model):
+                init_msg = (
+                    f"\n  ℹ️ [Context Cache INIT / Self-Warming]: Paczka {b_idx} ({phase}) inicjalizuje bufor TPU na dedykowanym kluczu.\n"
+                    f"     Bieżący zweryfikowany koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN (kolejne paczki z rabatem -95%)."
+                )
+                print(init_msg)
+                logger.info(f"[Context Cache INIT / Self-Warming]: Planned cold-start on {phase} b_idx {b_idx}. Cost: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN.")
+            else:
+                warn_msg = (
+                    f"\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Wykryto 0 tokenów cache ({phase}, paczka {b_idx}).\n"
+                    f"     Bieżący zweryfikowany koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN.\n"
+                    f"     Kontynuacja przetwarzania w trybie Graceful Fallback."
+                )
+                print(warn_msg)
+                logger.warning(f"[Context Cache WARN / INC-AVT-057]: 0 cache on {phase} b_idx {b_idx}. Cost: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN. Graceful fallback active.")
 
     def _audit_batch0_context_cache(self, cached_tokens: int) -> None:
         """Wstecznie kompatybilna delegacja dla Paczki 0."""
@@ -3901,7 +3916,10 @@ class MultimodalTranslator:
                     global_rate_limiter.acquire()
                     pool_f1 = getattr(self, "client_pool_f1", None) or getattr(self, "client_pool", None)
                     if pool_f1:
-                        active_c = pool_f1.get_client(affinity_idx=batch_idx)
+                        # Standard 11.2.19: Konsolidacja F1 na kluczu głównym K0 dla Hydrogen (eliminacja 2. cold-startu na K1).
+                        # Gdy K0 wejdzie w cooldown (429/503), get_client(affinity_idx=0) automatycznie przełącza ruch na K1.
+                        effective_f1_affinity = 0 if is_hydrogen else batch_idx
+                        active_c = pool_f1.get_client(affinity_idx=effective_f1_affinity)
                     else:
                         active_c = self.client
                     last_used_client = active_c
@@ -6761,14 +6779,16 @@ class MultimodalTranslator:
 
                 if remaining_tasks:
                     from model_resolver import is_gemini_4_or_hydrogen_model
+                    f1_is_hydrogen = is_gemini_4_or_hydrogen_model(self.model_phase1)
                     f1_pool_size = (
                         len(self.client_pool_f1.clients)
                         if getattr(self, "client_pool_f1", None) and getattr(self.client_pool_f1, "clients", None)
                         else max(1, active_keys_count)
                     )
-                    if is_gemini_4_or_hydrogen_model(self.model_phase1):
-                        # Standard 11.2.17: Rygor 1:1 per klucz API dla Hydrogen (eliminacja eksmisji KV w TPU)
-                        max_workers_f1 = max(1, min(self.concurrent_batches, f1_pool_size, len(remaining_tasks)))
+                    if f1_is_hydrogen:
+                        # Standard 11.2.19: Konsolidacja F1 na 1 aktywnym kluczu K0 dla Hydrogen (K1 jako rezerwa failover).
+                        # Oszczędza -0.49 PLN netto na eliminacji cold-startu K1 i wyklucza kolizje wątków w TPU.
+                        max_workers_f1 = 1
                     else:
                         max_workers_f1 = max(1, min(self.concurrent_batches, len(remaining_tasks)))
 
@@ -6816,7 +6836,10 @@ class MultimodalTranslator:
                                     pbar.write(f" 🔴 [Niepowodzenie Fazy 1 Paczki]: {format_friendly_api_error(e)}")
                                     pbar.refresh()
                     else:
-                        print(f"\n  [Kolejka Paczek / Faza 1]: Canary zweryfikowany pomyślnie. Sekwencyjny drafting Fazy 1 (1 paczka na raz / rotacja {active_keys_count} kluczy)...")
+                        if f1_is_hydrogen:
+                            print(f"\n  [Kolejka Paczek / Faza 1]: Canary F1 zakończony. Sekwencyjny drafting Fazy 1 na ugruntowanym K0 (rezerwa failover: {max(0, f1_pool_size - 1)} klucz)...")
+                        else:
+                            print(f"\n  [Kolejka Paczek / Faza 1]: Canary zweryfikowany pomyślnie. Sekwencyjny drafting Fazy 1 (1 paczka na raz / rotacja {active_keys_count} kluczy)...")
                         for loop_i, (b_idx, batch, untranslated) in enumerate(remaining_tasks):
                             if cancel_check and cancel_check():
                                 print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
