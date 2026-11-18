@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-17 — Standard 11.2.15 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.15 (Zero-Variance Baseline / JIT Retry Depuration & Active K2 Confirmation)`
-- **Commit certyfikacji kodu:** `0e42387` (`0e4238740fca8467eb5097486e92ea7945d94723`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-18 — Standard 11.2.16 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.16 (Decoupled Phase-1 Canary & Fail-Closed Budget Guard)`
+- **Commit certyfikacji kodu:** `bef0e51` (`bef0e51da1b22033d609f18896fc16b5856888ca`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -33,20 +33,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.12:** `88e771f` (Commit 1), `6875bdb` (Commit 2), `518ea55` (Commit 3)
 - **Commity Standardu 11.2.13:** `b08c42e` (Commit 1), `d3fe0ec` (Commit 2), `7414ae2` (Commit 3)
 - **Commity Standardu 11.2.14:** `6f25edc` (Commit 1), `61b1a9f` (Commit 2), `402f86a` (Commit 3)
-- **Commity Standardu 11.2.15:**
-  * Commit 1 (`0e42387`): `fix(pipeline): eliminate Phase 2 JIT retry and implement active K2 confirmation probe loop (11.2.15)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 2 (`74f65b4`): `test(pipeline): assert strict zero-retry enforcement in Phase 2 under cold-start condition (11.2.15)`
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.15 — Zero-Variance Baseline and active K2 probe confirmation`
-- **Status 11.2.15:** `CERTIFIED / CLOSED (2026-11-17)`
+- **Commity Standardu 11.2.15:** `0e42387` (Commit 1), `74f65b4` (Commit 2), `ba52095` (Commit 3)
+- **Commity Standardu 11.2.16:**
+  * Commit 1 (`bef0e51`): `fix(pipeline): remove monolithic canary gate, implement fail-closed graceful fallback and restore F2 Batch 0 JIT retry (11.2.16)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 2 (`6d65ba0`): `test(pipeline): add non-tautological canary trap and fail-closed budget guard tests (11.2.16)`
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.16 — pure decoupled phases and fail-closed budget safety net`
+- **Status 11.2.16:** `CERTIFIED / CLOSED (2026-11-18)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
-- **Stan metryk:** `395 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `466 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (395/395 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.15` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.15: Zero-Variance Baseline — fizyczna eliminacja JIT Retry z Fazy 2, aktywna pętla weryfikacji bufora K2 na barierze fazowej, 0 ponowień na 100% paczek oraz twardy sufit bilingowy 4.85 PLN netto [nominalnie 4.31 PLN])
+- **Stan metryk:** `398 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `469 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (398/398 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.16` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.16: Decoupled Phase-1 Canary & Fail-Closed Budget Guard — usunięcie archaicznego monolitycznego Canary Gate z `translate_file` / `translate_subtitles`, wdrożenie czysto sekwencyjnego Pre-flightu Fazy 1 z zapisem do `phase1_outputs[0]`, przywrócenie obwodu asekuracyjnego JIT Warmup Retry dla Paczki 0 Fazy 2, bezpiecznik Fail-Closed z Graceful Fallback w `_audit_batch_context_cache` przy sufitowym limicie 6.00 PLN netto i koszcie nominalnym ~4.27 PLN netto [max ~4.76 PLN netto]).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest -q` (393 passed w tests/, 71 passed i 153 deselected w test_system.py)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (398 passed w tests/)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -557,13 +558,33 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
 
 ## 🏛️ ARB-066 / INC-AVT-064: Standard 11.2.15 — Zero-Variance Baseline / Fizyczna Eliminacja JIT Retry z Fazy 2 i Aktywna Sonda K2
 
-- **Status:** `RESOLVED (Standard 11.2.15, commity 0e42387, 74f65b4, HEAD)`
+- **Status:** `RESOLVED (Standard 11.2.15, commity 0e42387, 74f65b4, ba52095)`
 - **Zidentyfikowano:** W Standardzie 11.2.14 Paczka 0 Fazy 2 zachowywała aktywny obwód `JIT Warmup Retry`. Przy chwilowym opóźnieniu propagacji indeksu TPU sentinela odrzucała poprawny szkic Paczki 0 i zmuszała model do powtórnej generacji po 1.2 s, generując podwójny koszt tokenów wyjściowych (~3 765 tokenów CoT) i podnosząc koszt pesymistyczny do 4.96 PLN netto. Dodatkowo, re-warm K2 był operacją pasywną bez odpytania telemetrii o stan bufora.
 - **Komponenty Naprawy:**
   1. `translator.py:_process_phase2_only`: Całkowite, fizyczne usunięcie bloku ponowień JIT Retry. Wykluczono jakąkolwiek możliwość wykonania podwójnego zapytania API dla paczek Fazy 2 (dokładnie 1 wywołanie per paczka w 100% przypadków).
   2. `translator.py:translate_subtitles`: Wdrożenie aktywnej pętli potwierdzenia ugruntowania K2 (Zero-Variance Confirmation Loop) na barierze fazowej — wysyłanie mikro-odpytania telemetrycznego (`max_output_tokens=1`) sprawdzającego `cached_content_token_count >= 32768` (do 3 prób w takcie 1.0 s) przed zwolnieniem blokady wykonawczej Fazy 2.
   3. `tests/test_context_cache_guard.py`: Dedykowany test jednostkowy `test_f2_zero_retry_enforcement` weryfikujący ścisłe wykonanie dokładnie 1 wywołania `verify_batch` nawet przy `cached == 0` (24/24 tests passing).
   4. Determinizm kosztowy i twardy sufit: Nominalny koszt odcinka wynosi **4.31 PLN netto** (~5.30 PLN brutto), a w skrajnym przypadku zimnego startu Paczki 0 koszt wynosi maksymalnie **4.85 PLN netto** (~5.96 PLN brutto, margines bezpieczeństwa 19.2% poniżej limitu 6.00 PLN).
+
+
+## 🏛️ ARB-067 / INC-AVT-065: Standard 11.2.16 — Decoupled Phase-1 Canary, Fail-Closed Graceful Fallback i Determinizm Kosztowy
+
+- **Status:** `RESOLVED (Standard 11.2.16, commity bef0e51, 6d65ba0, HEAD)`
+- **Zidentyfikowano:**
+  1. Archaiczny monolit Canary Gate w `translate_file` / `translate_subtitles`: Pre-flight Paczki 0 wywoływał `_process_single_batch`, który sztucznie uruchamiał Fazę 2 przed zakończeniem Fazy 1 pozostałych paczek, wywołując cross-phase cache thrashing na TPU. Następnie Faza 1 przetwarzała paczkę 0 powtórnie, marnując tokeny i czas.
+  2. Zbyt agresywny i ślepy bezpiecznik `_audit_batch_context_cache`: Bezwarunkowe `os._exit(1)` przy `cached_tokens == 0` bez sprawdzania realnego kosztu sesji uniemożliwiało dokończenie tłumaczenia, nawet gdy całkowity koszt mieścił się w bezpiecznym marginesie $\le 6.00$ PLN netto.
+  3. Brak odporności F2 na chwilowe opóźnienia indeksacji snapshotu TPU na serwerach Google po barierze fazowej.
+- **Komponenty Naprawy:**
+  1. `translator.py:translate_subtitles`: Całkowite usunięcie archaicznego bloku monolitycznego pre-flightu `_process_single_batch`. Wdrożenie sekwencyjnego **Phase-1 Canary Gate** (`_process_phase1_only(0, ...)`), którego rezultat jest bezpośrednio zapisywany do `phase1_outputs[0]`, całkowicie eliminując sztuczne wywołanie F2 przed barierą oraz dublowanie zapytań F1.
+  2. `translator.py:_audit_batch_context_cache`: Implementacja bezpiecznika **Fail-Closed z Graceful Fallback**:
+     - Wykrycie `cached_tokens == 0` inkrementuje licznik `uncached_batches` i odpytuje `PricingGuard.calculate_actual_cost_breakdown`.
+     - Jeśli koszt sesji jest niemożliwy do zweryfikowania (brak telemetrii tokenowej) LUB przekracza twardy sufit `HARD_BUDGET_LIMIT_PLN = 6.00 PLN`, następuje natychmiastowe zatrzymanie potoku via `os._exit(1)` oraz podniesienie `ContextCacheDiscountError`.
+     - Jeśli zweryfikowany koszt netto mieści się w limicie ($\le 6.00$ PLN), potok kontynuuje pracę w trybie **Graceful Fallback**, emitując czytelne ostrzeżenie `[Context Cache WARN / INC-AVT-057]`.
+     - Pełna obsługa nadrzędnej flagi operatorskiej `AVT_ALLOW_UNCACHED_BILLING="1"`.
+  3. `translator.py:_process_phase2_only`: Przywrócenie obwodu **JIT Warmup Retry** wyłącznie dla Paczki 0 Fazy 2 (`if p2_cached == 0 and b_idx == 0:` z pauzą 1.2 s), gwarantując bezbłędne ugruntowanie bufora redaktora w TPU bez ryzyka kaskadowych ponowień na paczkach 1–12.
+  4. `tests/test_context_cache_guard.py`: Wdrożenie 3 nietrywialnych testów jednostkowych: `test_archaic_canary_gate_removed_from_translate_file`, `test_f2_graceful_fallback_on_zero_cache`, `test_hard_halt_on_cost_exceeded` (27/27 tests passing, łącznie 398/398 passing w `tests/`).
+  5. Determinizm finansowy: Nominalny koszt odcinka wynosi **4.27 PLN netto** (~5.25 PLN brutto), a w pesymistycznym przypadku pojedynczego retry na F2 Paczce 0 koszt wynosi maksymalnie **4.76 PLN netto** (~5.85 PLN brutto, margines bezpieczeństwa 20.7% poniżej limitu 6.00 PLN).
+
 
 
 
