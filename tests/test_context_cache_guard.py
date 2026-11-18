@@ -1088,6 +1088,187 @@ def test_hard_halt_on_cost_exceeded(monkeypatch):
     assert exit_code_captured == 1, "Twardy HALT musi natychmiast zatrzymać proces przy przekroczeniu sufitu 6.00 PLN!"
 
 
+@pytest.mark.unit
+def test_f1_no_silent_jit_retry_on_non_canary_batches(monkeypatch):
+    """
+    Standard 11.2.17: Weryfikuje, że w Fazie 1 dla paczek niebędących bramką Canary (b_idx > 0)
+    zwrócenie cached == 0 NIE uruchamia cichego JIT Warmup Retry (dokładnie 1 wywołanie API).
+    """
+    from translator import MultimodalTranslator
+    from unittest.mock import MagicMock
+    import pysubs2
+
+    monkeypatch.setenv("AVT_ALLOW_UNCACHED_BILLING", "1")
+    monkeypatch.setattr("time.sleep", lambda s: None)
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=False
+    )
+
+    call_count = {"f1": 0}
+
+    def mock_call(*args, **kwargs):
+        call_count["f1"] += 1
+        resp = MagicMock()
+        resp.translations = []
+        resp.characters_identified = []
+        resp.visual_events = []
+        resp.typesetting_notes = []
+        resp.speaker_identifications = []
+        resp.raw_thoughts = ""
+        resp.model_dump.return_value = {}
+        _tl = getattr(translator, "_thread_local", None)
+        if _tl is None:
+            _tl = translator._thread_local = MagicMock()
+        _tl.last_batch_token_usage = {"prompt": 90000, "cached": 0, "output": 1200, "model": "gemini-4-hydrogen"}
+        return resp
+
+    monkeypatch.setattr(translator, "_call_gemini_with_retry", mock_call)
+
+    ev = pysubs2.SSAEvent(text="Test line", start=0, end=1000, style="Default", name="Speaker")
+    batch_item = (1, ev, "Test line", "")
+
+    translator._process_phase1_only(
+        b_idx=1,
+        batch=[batch_item],
+        untranslated_in_batch=[batch_item],
+        batches=[[batch_item], [batch_item]],
+        video_path=None,
+        is_ass=True,
+        anime_meta=None,
+        episode_profile=None,
+        anime_context_str="",
+        episode_profile_str="",
+        series_bible_str="",
+        manga_canon_str="",
+        combined_glossary={},
+        all_user_rules=[],
+        history=[],
+        pbar=MagicMock(),
+        translated_results={}
+    )
+
+    assert call_count["f1"] == 1, f"Paczka b_idx=1 w F1 nie może uruchamiać cichego JIT Retry (wykryto {call_count['f1']} wywołań)!"
+
+
+@pytest.mark.unit
+def test_global_budget_halt_even_on_cache_hit(monkeypatch):
+    """
+    Standard 11.2.17: Weryfikuje likwidację martwego pola bezpiecznika.
+    Gdy łączny koszt sesji przekracza 6.00 PLN netto, _audit_batch_context_cache
+    wyzwala twardy HALT (os._exit(1)) NAWET gdy bieżąca paczka zwróciła cached_tokens >= 32768.
+    """
+    import os
+    from translator import MultimodalTranslator, ContextCacheDiscountError
+
+    monkeypatch.delenv("AVT_ALLOW_UNCACHED_BILLING", raising=False)
+    exit_calls = []
+    monkeypatch.setattr(os, "_exit", lambda code: exit_calls.append(code))
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=False
+    )
+    # Symulacja wcześniejszego spalenia budżetu (> 6.00 PLN)
+    translator.current_episode_tokens = {
+        "prompt": 2500000,
+        "cached": 0,
+        "output": 500000,
+        "model": "gemini-4-hydrogen"
+    }
+
+    try:
+        translator._audit_batch_context_cache(b_idx=2, cached_tokens=86000, phase="phase1")
+    except ContextCacheDiscountError:
+        pass
+
+    assert exit_calls == [1], "Globalny bezpiecznik musi zatrzymać proces przy koszcie > 6.00 PLN nawet przy cache hit!"
+
+
+@pytest.mark.unit
+def test_hydrogen_1to1_concurrency_cap_in_translate_file(monkeypatch, tmp_path):
+    """
+    Standard 11.2.17 (Non-Tautological Concurrency Gate):
+    Uruchamia translate_file z 3 kluczami (2:1) i concurrent_batches=6 na modelu Hydrogen.
+    Weryfikuje, że F1 używa max_workers <= 2 (nigdy 6), a F2 działa ściśle sekwencyjnie (brak puli > 1 na K2).
+    """
+    import concurrent.futures
+    import pysubs2
+    from unittest.mock import MagicMock
+    from translator import MultimodalTranslator
+
+    monkeypatch.setattr("time.sleep", lambda s: None)
+
+    subs = pysubs2.SSAFile()
+    for i in range(10):
+        subs.append(pysubs2.SSAEvent(start=i * 5000, end=i * 5000 + 2000, text=f"Line {i}"))
+    test_sub_path = tmp_path / "test_concurrency.ass"
+    subs.save(str(test_sub_path))
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=True,
+        batch_size=2
+    )
+    translator.concurrent_batches = 6
+
+    recorded_pool_workers = []
+    real_executor = concurrent.futures.ThreadPoolExecutor
+
+    class SpyThreadPoolExecutor(real_executor):
+        def __init__(self, max_workers=None, *args, **kwargs):
+            recorded_pool_workers.append(max_workers)
+            super().__init__(max_workers=max_workers, *args, **kwargs)
+
+    def mock_phase1(b_idx, *args, **kwargs):
+        return {
+            "b_idx": b_idx,
+            "pass1_items": [{"id": 0, "orig_idx": 0, "en": "test", "pl": "test"}],
+            "untranslated_in_batch": [],
+            "scene_desc": "",
+            "batch_response": MagicMock(scene_diagnosis=None),
+            "lookback_history": [],
+            "lookahead_events": [],
+            "batch": []
+        }
+
+    def mock_phase2(phase1_data, *args, **kwargs):
+        b_idx = phase1_data["b_idx"]
+        return (b_idx, {b_idx * 2: "przekład"}, {}, [], [], "", "")
+
+    f1_warmup_kwargs = {}
+    def spy_ensure_cache_ready(*args, **kwargs):
+        if kwargs.get("tag") == "translator":
+            f1_warmup_kwargs.update(kwargs)
+        return True
+
+    monkeypatch.setattr(concurrent.futures, "ThreadPoolExecutor", SpyThreadPoolExecutor)
+    monkeypatch.setattr(translator, "_process_phase1_only", mock_phase1)
+    monkeypatch.setattr(translator, "_process_phase2_only", mock_phase2)
+    monkeypatch.setattr("context_cache.ContextCacheManager.ensure_cache_ready", spy_ensure_cache_ready)
+    monkeypatch.setattr(translator.profiler, "profile_episode", lambda *a, **kw: None)
+    monkeypatch.setattr("translator.get_anime_context", lambda *a, **kw: None)
+    k2_c = translator.client_pool_f2.get_client(affinity_idx=0)
+    k2_c.models.generate_content = MagicMock(return_value=MagicMock(usage_metadata=MagicMock(cached_content_token_count=45000)))
+
+    out_path = tmp_path / "test_concurrency_out.ass"
+    translator.translate_file(subs_path=str(test_sub_path), output_path=str(out_path))
+
+    # Asercja 1: Żadna pula F1/F2 nie może przekroczyć liczby kluczy w podpuli (max 2 dla F1, brak >1 dla F2)
+    assert recorded_pool_workers, "Oczekiwano uruchomienia ThreadPoolExecutor w Fazie 1!"
+    assert all(w <= 2 for w in recorded_pool_workers if w is not None), f"Przekroczono limit 1:1 kluczy! Wykryto max_workers={recorded_pool_workers}"
+    # Dokładnie jedno użycie puli wielowątkowej (dla F1); F2 na 1 kluczu K2 idzie ścieżką sekwencyjną!
+    assert len(recorded_pool_workers) == 1, f"Faza 2 na 1 kluczu K2 powinna działać sekwencyjnie bez ThreadPoolExecutor! Wykryto pule: {recorded_pool_workers}"
+    # Asercja 2: Warm-up F1 przekazał symetryczną sygnaturę dekodera
+    assert f1_warmup_kwargs.get("thinking_config") is not None
+    assert f1_warmup_kwargs.get("response_schema") is not None
+    assert f1_warmup_kwargs.get("response_mime_type") == "application/json"
+
+
 
 
 
