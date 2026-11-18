@@ -2139,19 +2139,71 @@ class MultimodalTranslator:
 
     def _audit_batch_context_cache(self, b_idx: int, cached_tokens: int, phase: str = "phase1") -> None:
         """
-        Uniwersalny audyt telemetrii Context Cache per-batch (INC-AVT-057, Standard 11.2.10 Filar B).
+        Uniwersalny audyt telemetrii Context Cache i globalnego budżetu per-batch (INC-AVT-057, Standard 11.2.17).
         Potwierdza rabat -95% przy cached_tokens >= 32768, ostrzega przy partial hit,
-        lub wyzwala natychmiastowy Kill-Switch Procesu (os._exit(1)) przy 0 tokenach cache.
+        stosuje Graceful Fallback przy cached == 0 w granicach budżetu oraz wyzwala twardy Kill-Switch
+        (os._exit(1)) przy przekroczeniu sufitu 6.00 PLN niezależnie od statusu cache bieżącej paczki.
         """
+        HARD_BUDGET_LIMIT_PLN = 6.00
+        allow_uncached = os.getenv("AVT_ALLOW_UNCACHED_BILLING", "0").strip().lower() in ("1", "true", "yes")
+
+        def _compute_session_net_pln() -> Optional[float]:
+            try:
+                from pricing_guard import PricingGuard
+                f1_st = getattr(self, "current_episode_tokens", {}) or {}
+                f2_st = getattr(getattr(self, "verifier", None), "current_episode_tokens", {}) or {}
+                if f1_st.get("prompt", 0) == 0 and f2_st.get("prompt", 0) == 0:
+                    return None
+                cost_summary = PricingGuard.calculate_actual_cost_breakdown(f1_st, f2_st)
+                raw_net = cost_summary.get("net_pln")
+                if isinstance(raw_net, (int, float)):
+                    return float(raw_net)
+                return None
+            except Exception as pe:
+                logger.error(f"[Context Cache Audit] Błąd krytyczny kalkulacji kosztu PricingGuard: {pe}")
+                return None
+
+        def _trigger_hard_halt(cost_disp: str, reason_line: str) -> None:
+            err_msg = (
+                "\n"
+                "========================================================================================\n"
+                f"  🛑 [Context Cache HALT / INC-AVT-057]: Bezpiecznik Fail-Closed zatrzymał proces! Serwer zwrócił 0 tokenów cache! {reason_line}\n"
+                f"     Koszt sesji: {cost_disp} (Limit bezpieczeństwa: {HARD_BUDGET_LIMIT_PLN:.2f} PLN).\n"
+                f"     Paczka {b_idx} ({phase}). Natychmiastowe zatrzymanie via os._exit(1).\n"
+                "========================================================================================\n"
+            )
+            sys.stderr.write(err_msg)
+            sys.stderr.flush()
+            logger.error(f"[Context Cache HALT / INC-AVT-057]: Fail-Closed trigger ({phase} batch {b_idx}): cost={cost_disp} > limit={HARD_BUDGET_LIMIT_PLN:.2f} PLN. Halting via os._exit(1).")
+            try:
+                from context_cache import ContextCacheManager
+                client_to_clean = getattr(self, "client", None)
+                if client_to_clean:
+                    ContextCacheManager.cleanup_all_active_caches(client_to_clean)
+            except Exception as e:
+                logger.debug(f"[Context Cache] Czyszczenie pamięci podręcznej zakończone wyjątkiem: {e}")
+            os._exit(1)
+            raise ContextCacheDiscountError(
+                f"Brak aktywnego rabatu Context Cache (-95%) lub przekroczenie limitu bezpieczeństwa na {phase} (paczka {b_idx}). Tłumaczenie przerwane."
+            )
+
         if cached_tokens >= 32768:
             if b_idx == 0 or getattr(self, "verbose", False):
                 print(f"\n  💰 [Context Cache AKTYWNY]: Serwer potwierdził CachedContent ({phase}, paczka {b_idx}): {cached_tokens} tokenów (Rabat -95% aktywny) [Context Cache ACTIVE].")
             logger.info(f"[Context Cache CONFIRMED]: Server confirmed CachedContent token count for {phase} batch {b_idx}: {cached_tokens} (-95% input discount active)")
+            # Standard 11.2.17: Globalny audyt budżetu również dla paczek z aktywnym cache (likwidacja martwego pola)
+            if not allow_uncached:
+                current_net_pln = _compute_session_net_pln()
+                if current_net_pln is not None and current_net_pln > HARD_BUDGET_LIMIT_PLN:
+                    _trigger_hard_halt(f"{current_net_pln:.2f} PLN", "Przekroczono globalny sufit budżetu sesji.")
         elif 0 < cached_tokens < 32768:
             logger.warning(f"[Context Cache PARTIAL_HIT]: Server confirmed partial CachedContent ({phase}, paczka {b_idx}): {cached_tokens} tokenów (< 32768).")
+            if not allow_uncached:
+                current_net_pln = _compute_session_net_pln()
+                if current_net_pln is not None and current_net_pln > HARD_BUDGET_LIMIT_PLN:
+                    _trigger_hard_halt(f"{current_net_pln:.2f} PLN", "Przekroczono globalny sufit budżetu sesji (partial hit).")
         elif cached_tokens == 0:
             # 1. Master Override: Ręczne obejście operatorskie
-            allow_uncached = os.getenv("AVT_ALLOW_UNCACHED_BILLING", "0").strip().lower() in ("1", "true", "yes")
             if allow_uncached:
                 print(
                     f"\n  ⚠️ [Context Cache BYPASS / INC-AVT-057] [Context Cache WARN / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! ({phase}, paczka {b_idx})\n"
@@ -2164,51 +2216,13 @@ class MultimodalTranslator:
                 self.uncached_batches = 0
             self.uncached_batches += 1
 
-            # 2. Bezpiecznik Fail-Closed: Inicjalizacja brakiem wartości
-            current_net_pln: Optional[float] = None
-            try:
-                from pricing_guard import PricingGuard
-                f1_st = getattr(self, "current_episode_tokens", {})
-                if not f1_st or f1_st.get("prompt", 0) == 0:
-                    current_net_pln = None
-                else:
-                    f2_st = getattr(getattr(self, "verifier", None), "current_episode_tokens", {})
-                    cost_summary = PricingGuard.calculate_actual_cost_breakdown(f1_st, f2_st)
-                    raw_net = cost_summary.get("net_pln")
-                    if isinstance(raw_net, (int, float)):
-                        current_net_pln = float(raw_net)
-            except Exception as pe:
-                logger.error(f"[Context Cache Audit] Błąd krytyczny kalkulacji kosztu PricingGuard: {pe}")
-
-            HARD_BUDGET_LIMIT_PLN = 6.00
-
-            # 3. Rygor Fail-Closed: Brak możliwości weryfikacji kosztu LUB przekroczenie sufitu 6.00 PLN wyzwala twardy HALT
+            # 2. Bezpiecznik Fail-Closed: Brak telemetrii LUB koszt > 6.00 PLN wyzwala twardy HALT
+            current_net_pln = _compute_session_net_pln()
             if current_net_pln is None or current_net_pln > HARD_BUDGET_LIMIT_PLN:
                 cost_disp = f"{current_net_pln:.2f} PLN" if current_net_pln is not None else "NIEZNANY (AWARIA KALKULATORA LUB BRAK TELEMETRII)"
-                err_msg = (
-                    "\n"
-                    "========================================================================================\n"
-                    f"  🛑 [Context Cache HALT / INC-AVT-057]: Bezpiecznik Fail-Closed zatrzymał proces! Serwer zwrócił 0 tokenów cache!\n"
-                    f"     Koszt sesji: {cost_disp} (Limit bezpieczeństwa: {HARD_BUDGET_LIMIT_PLN:.2f} PLN).\n"
-                    f"     Wykryto 0 tokenów cache na paczce {b_idx} ({phase}). Natychmiastowe zatrzymanie via os._exit(1).\n"
-                    "========================================================================================\n"
-                )
-                sys.stderr.write(err_msg)
-                sys.stderr.flush()
-                logger.error(f"[Context Cache HALT / INC-AVT-057]: Fail-Closed trigger: cost={cost_disp} > limit={HARD_BUDGET_LIMIT_PLN:.2f} PLN. Halting via os._exit(1).")
-                try:
-                    from context_cache import ContextCacheManager
-                    client_to_clean = getattr(self, "client", None)
-                    if client_to_clean:
-                        ContextCacheManager.cleanup_all_active_caches(client_to_clean)
-                except Exception as e:
-                    logger.debug(f"[Context Cache] Czyszczenie pamięci podręcznej zakończone wyjątkiem: {e}")
-                os._exit(1)
-                raise ContextCacheDiscountError(
-                    f"Brak aktywnego rabatu Context Cache (-95%) na {phase} (paczka {b_idx}). Tłumaczenie przerwane w celu ochrony budżetu."
-                )
+                _trigger_hard_halt(cost_disp, "Zerowy bilans tokenów podręcznych.")
 
-            # 4. Graceful Fallback: Gdy koszt został poprawnie zweryfikowany i mieści się w limicie <= 6.00 PLN
+            # 3. Graceful Fallback: Gdy koszt został poprawnie zweryfikowany i mieści się w limicie <= 6.00 PLN
             warn_msg = (
                 f"\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Wykryto 0 tokenów cache ({phase}, paczka {b_idx}).\n"
                 f"     Bieżący zweryfikowany koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN.\n"
@@ -4465,10 +4479,12 @@ class MultimodalTranslator:
         _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
         cached_tokens = _last_tu.get("cached", 0) if _last_tu else 0
 
-        if cached_tokens == 0:
+        # Standard 11.2.17: JIT Warmup Retry w Fazie 1 aktywny WYŁĄCZNIE dla bramki Canary (b_idx == 0).
+        # Blokada cichego dublowania wywołań dla paczek 1..N (eliminacja ukrytego wycieku budżetu F1).
+        if cached_tokens == 0 and b_idx == 0:
             from model_resolver import is_gemini_4_or_hydrogen_model
             if is_gemini_4_or_hydrogen_model(self.model_phase1):
-                logger.info(f"[Context Cache Canary]: Wykryto 0 tokenów cache na paczce {b_idx}. JIT Warmup Retry po 1.2s...")
+                logger.warning(f"[Context Cache Canary F1]: Wykryto 0 tokenów cache na paczce Canary {b_idx}. JIT Warmup Retry po 1.2s...")
                 time.sleep(1.2)
                 retry_resp = self._call_gemini_with_retry(
                     contents=contents,
@@ -6550,11 +6566,24 @@ class MultimodalTranslator:
         if untranslated_count > 0:
             # Pre-warming and Context Cache Hard Protection across all client pool keys (guarantees -90% discount)
             from context_cache import ContextCacheManager, ensure_cache_token_floor
+            from model_resolver import build_thinking_config, is_gemini_4_or_hydrogen_model
             logger.info("[Context Cache]: Weryfikacja progu tokenów i rozgrzewanie pamięci podręcznej...")
             print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache z pełną wiedzą odcinka...")
             pool_or_c1 = getattr(self, "client_pool_f1", None) or getattr(self, "client_pool", None) or self.client
             self.system_prompt = ensure_cache_token_floor(self.system_prompt, pool_or_c1, self.model_phase1)
-            c1 = ContextCacheManager.ensure_cache_ready(pool_or_c1, self.model_phase1, self.system_prompt, tag="translator")
+            # Standard 11.2.17: Symetryczna sygnatura dekodera dla warm-upu F1 (Thinking + JSON Schema)
+            f1_warmup_budget = self.resolve_f1_thinking_budget(len(raw_entries))
+            f1_thinking = build_thinking_config(self.model_phase1, f1_warmup_budget)
+            f1_schema = LeanBatchTranslationResponse if is_gemini_4_or_hydrogen_model(self.model_phase1) else BatchTranslationResponse
+            c1 = ContextCacheManager.ensure_cache_ready(
+                client=pool_or_c1,
+                model=self.model_phase1,
+                system_instruction=self.system_prompt,
+                tag="translator",
+                thinking_config=f1_thinking,
+                response_schema=f1_schema,
+                response_mime_type="application/json"
+            )
             if not c1:
                 raise RuntimeError(
                     f"KATEGORYCZNA BLOKADA FINANSOWA: Nie udało się aktywować serwerowego Context Cache dla {self.model_phase1}. "
@@ -6758,11 +6787,22 @@ class MultimodalTranslator:
                 time.sleep(1.5)
 
                 if remaining_tasks:
-                    max_workers_f1 = min(self.concurrent_batches, len(remaining_tasks))
+                    from model_resolver import is_gemini_4_or_hydrogen_model
+                    f1_pool_size = (
+                        len(self.client_pool_f1.clients)
+                        if getattr(self, "client_pool_f1", None) and getattr(self.client_pool_f1, "clients", None)
+                        else max(1, active_keys_count)
+                    )
+                    if is_gemini_4_or_hydrogen_model(self.model_phase1):
+                        # Standard 11.2.17: Rygor 1:1 per klucz API dla Hydrogen (eliminacja eksmisji KV w TPU)
+                        max_workers_f1 = max(1, min(self.concurrent_batches, f1_pool_size, len(remaining_tasks)))
+                    else:
+                        max_workers_f1 = max(1, min(self.concurrent_batches, len(remaining_tasks)))
 
                     # --- ETAP 1: FAZA 1 DRAFTING (Równoległy drafting na K0, K1 dla pozostałych paczek) ---
                     if max_workers_f1 > 1:
-                        print(f"\n  [Kolejka Paczek / Faza 1]: Canary zweryfikowany pomyślnie. Równoległy drafting Fazy 1 ({max_workers_f1} paczek w locie / {active_keys_count} aktywnych kluczy API)...")
+                        f1_disp_keys = f1_pool_size if is_gemini_4_or_hydrogen_model(self.model_phase1) else active_keys_count
+                        print(f"\n  [Kolejka Paczek / Faza 1]: Canary zweryfikowany pomyślnie. Równoległy drafting Fazy 1 ({max_workers_f1} paczek w locie / {f1_disp_keys} aktywnych kluczy API)...")
                         import concurrent.futures
                         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers_f1) as executor_f1:
                             fut_to_bidx_f1 = {
@@ -6937,8 +6977,18 @@ class MultimodalTranslator:
                     else:
                         remaining_f2_keys = []
 
-                    # 2. Współbieżne przetworzenie pozostałych paczek (K2 w 100% zindeksowany w TPU)
-                    max_workers_f2 = min(2, len(remaining_f2_keys)) if self.concurrent_batches > 1 else 1
+                    # 2. Przetworzenie pozostałych paczek Fazy 2 (Standard 11.2.17: rygor 1:1 na kluczu K2 dla Hydrogen)
+                    from model_resolver import is_gemini_4_or_hydrogen_model
+                    f2_model_name = getattr(getattr(self, "verifier", None), "model", self.model_phase2)
+                    f2_pool_size = (
+                        len(self.client_pool_f2.clients)
+                        if getattr(self, "client_pool_f2", None) and getattr(self.client_pool_f2, "clients", None)
+                        else 1
+                    )
+                    if is_gemini_4_or_hydrogen_model(f2_model_name):
+                        max_workers_f2 = max(1, min(self.concurrent_batches, f2_pool_size, len(remaining_f2_keys))) if remaining_f2_keys else 0
+                    else:
+                        max_workers_f2 = min(2, len(remaining_f2_keys)) if self.concurrent_batches > 1 else 1
                     if remaining_f2_keys:
                         if max_workers_f2 > 1:
                             print(f"  [Kolejka Paczek / Faza 2]: Rozpoczynanie redakcji Fazy 2 na ugruntowanym K2 ({max_workers_f2} paczek w locie)...")
