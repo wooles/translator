@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-18 — Standard 11.2.17 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.17 (F1 Zero-Silent-Retry, Global Budget Sentinel & 1:1 Hydrogen Concurrency)`
-- **Commit certyfikacji kodu:** `e6e3161` (`e6e31610d7a8d98d6318eab660371b76cf306af4`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-18 — Standard 11.2.18 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.18 (Zero-Waste Self-Warming & 100% Real-Invoice Accounting)`
+- **Commit certyfikacji kodu:** `90ddeb7` (`90ddeb7a4fe2bc1855a1d7747963b658933b490f`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -35,20 +35,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.14:** `6f25edc` (Commit 1), `61b1a9f` (Commit 2), `402f86a` (Commit 3)
 - **Commity Standardu 11.2.15:** `0e42387` (Commit 1), `74f65b4` (Commit 2), `ba52095` (Commit 3)
 - **Commity Standardu 11.2.16:** `bef0e51` (Commit 1), `6d65ba0` (Commit 2), `3dcb70c` (Commit 3)
-- **Commity Standardu 11.2.17:**
-  * Commit 1 (`e6e3161`): `fix(pipeline): disable F1 silent retry for b_idx>0, enforce global budget sentinel, 1:1 Hydrogen concurrency and F1 warmup symmetry (11.2.17)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 2 (`0175847`): `test(pipeline): add non-tautological tests for F1 no-silent-retry, global budget halt and 1:1 concurrency cap (11.2.17)`
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.17 — F1 zero-silent-retry, global budget sentinel and 1:1 Hydrogen concurrency`
-- **Status 11.2.17:** `CERTIFIED / CLOSED (2026-11-18)`
+- **Commity Standardu 11.2.17:** `e6e3161` (Commit 1), `0175847` (Commit 2), `4948cb9` (Commit 3)
+- **Commity Standardu 11.2.18:**
+  * Commit 1 (`90ddeb7`): `fix(pipeline): eliminate synthetic warmup pings via Hydrogen self-warming canary and add warmup token accounting (11.2.18)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 2 (`b536d22`): `test(pipeline): verify zero synthetic warmup pings for Hydrogen and full warmup token accounting (11.2.18)`
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.18 — zero-waste self-warming canary and full real-invoice accounting`
+- **Status 11.2.18:** `CERTIFIED / CLOSED (2026-11-18)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
-- **Stan metryk:** `401 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `472 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (401/401 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.17` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.17: F1 Zero-Silent-Retry, Global Budget Sentinel & 1:1 Hydrogen Concurrency — likwidacja cichego JIT Retry w Fazie 1 dla b_idx > 0, uniwersalny audyt budżetu sesji w _audit_batch_context_cache chroniący sufit 6.00 PLN nawet przy cache hit, symetria dekodera warm-upu F1 oraz rygor współbieżności 1:1 na fizycznych kluczach API dla modeli Hydrogen).
+- **Stan metryk:** `403 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `474 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (403/403 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.18` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.18: Zero-Waste Self-Warming & 100% Real-Invoice Accounting — eliminacja syntetycznych pingów warm-upu dla modeli Hydrogen na starcie F1 i F2 oraz na barierze fazowej, mechanizm Self-Warming Canary dla Paczki 0 F1 na K0, Paczki 1 F1 na K1 i Paczki 0 F2 na K2, fizyczna likwidacja JIT Retry we wszystkich fazach [dokładnie 1 wywołanie API na paczkę w 100% sesji] oraz pełne zliczanie tokenów usage_metadata do akumulatora sesji, synchronizujące telemetrię PricingGuard w 100% z fakturą Google Cloud przy koszcie nominalnym ~4.27 PLN netto).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (401 passed w tests/)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (403 passed w tests/)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -606,12 +607,18 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   6. Determinizm finansowy: Nominalny koszt odcinka wynosi **$\le 4.30$ PLN netto** (~4.27 PLN netto, ~5.25 PLN brutto), a w pesymistycznym przypadku pojedynczego retry na F2 Paczce 0 koszt wynosi maksymalnie **$\le 4.85$ PLN netto** (~5.96 PLN brutto, margines 19.2% poniżej limitu 6.00 PLN).
 
 
+## 🏛️ ARB-069 / INC-AVT-067: Standard 11.2.18 — Zero-Waste Self-Warming Canary i 100% Jawności Bilingowej w PricingGuard
 
-
-
-
-
-
-
-
-
+- **Status:** `RESOLVED (Standard 11.2.18, commity 90ddeb7, b536d22, HEAD)`
+- **Zidentyfikowano:** Audyt faktury Google Cloud względem telemetrii `PricingGuard` ujawnił narzut +1.55 do +1.99 PLN netto poza licznikami `current_episode_tokens`:
+  1. Zbędny startowy warm-up $K_2$ przed Fazą 1 (~0.47 PLN).
+  2. Nadmiarowe pingi na Barierze Fazowej (`PING_WARMUP_INIT` oraz 1–3 sondy `PING_CACHE_VERIFY`) wysyłające 77.5k tokenów ze sztywną konfiguracją dekodera (~0.70 PLN).
+  3. Dwa startowe pingi F1 na $K_0, K_1$ (~1.04 PLN) niezliczane w `current_episode_tokens`.
+  4. Niepotrzebne podwajanie generowania Paczki 0 przez JIT Retry na `b_idx == 0`.
+- **Komponenty Naprawy:**
+  1. `context_cache.py:ensure_cache_ready`: Obsługa flagi `skip_warmup_ping` (pomijanie generowania syntetycznych pingów dla Hydrogena) oraz jawne zliczanie usage_metadata do `token_accumulator`, gdy jawny ping jest włączony (zero ukrytych kosztów).
+  2. `translator.py:translate_subtitles`: Wyłączenie syntetycznych pingów startowych F1 i F2 dla modeli Hydrogen (`skip_warmup_ping=is_gemini_4_or_hydrogen_model(...)`).
+  3. `translator.py:translate_subtitles`: Czysta Bariera Fazowa — likwidacja zapytań `PING_WARMUP_INIT` i sond `PING_CACHE_VERIFY` dla modeli Hydrogen. Paczka 0 Fazy 2 sama ugruntowuje bufor na dedykowanym kluczu $K_2$ produkcyjną sygnaturą dekodera (0.00 PLN narzutu).
+  4. `translator.py:_process_phase1_only` oraz `_process_phase2_only`: Całkowite wyłączenie JIT Warmup Retry dla wszystkich paczek F1 i F2 (w tym dla Paczki 0). Paczki rozgrzewają sloty TPU w ramach pojedynczego, produkcyjnego zapytania (dokładnie 1 wywołanie API na paczkę w 100% sesji).
+  5. `tests/test_context_cache_guard.py`: Wdrożenie testów `test_zero_synthetic_warmup_pings_for_hydrogen_in_translate_file` oraz `test_ensure_cache_ready_accounts_warmup_tokens_when_ping_enabled`, a także aktualizacja kontraktu Zero-Retry (32/32 tests passing, łącznie 403/403 passing w `tests/`).
+  6. Determinizm finansowy i jawność faktury: Pełna synchronizacja telemetrii `PricingGuard` z fakturą Google Cloud (100% jawności tokenów), eliminacja narzutu warm-upu i gwarancja kosztu nominalnego **~4.27 PLN netto** (~5.25 PLN brutto) z twardym sufitem **6.00 PLN netto**.
