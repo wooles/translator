@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-18 — Standard 11.2.18 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.18 (Zero-Waste Self-Warming & 100% Real-Invoice Accounting)`
-- **Commit certyfikacji kodu:** `90ddeb7` (`90ddeb7a4fe2bc1855a1d7747963b658933b490f`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-19 — Standard 11.2.19 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.19 (Single-Key Primary F1 with K1 Failover & Clean Self-Warming Telemetry)`
+- **Commit certyfikacji kodu:** `be13cb6` (`be13cb63a43627d3c018265a7e189d5351a5477c`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -36,20 +36,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.15:** `0e42387` (Commit 1), `74f65b4` (Commit 2), `ba52095` (Commit 3)
 - **Commity Standardu 11.2.16:** `bef0e51` (Commit 1), `6d65ba0` (Commit 2), `3dcb70c` (Commit 3)
 - **Commity Standardu 11.2.17:** `e6e3161` (Commit 1), `0175847` (Commit 2), `4948cb9` (Commit 3)
-- **Commity Standardu 11.2.18:**
-  * Commit 1 (`90ddeb7`): `fix(pipeline): eliminate synthetic warmup pings via Hydrogen self-warming canary and add warmup token accounting (11.2.18)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 2 (`b536d22`): `test(pipeline): verify zero synthetic warmup pings for Hydrogen and full warmup token accounting (11.2.18)`
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.18 — zero-waste self-warming canary and full real-invoice accounting`
-- **Status 11.2.18:** `CERTIFIED / CLOSED (2026-11-18)`
+- **Commity Standardu 11.2.18:** `90ddeb7` (Commit 1), `b536d22` (Commit 2), `8d80bf1` (Commit 3)
+- **Commity Standardu 11.2.19:**
+  * Commit 1 (`be13cb6`): `fix(pipeline): consolidate Hydrogen F1 on primary key K0 with K1 failover and separate planned Self-Warming INIT from WARN (11.2.19)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 2 (`9f8ea35`): `test(pipeline): verify Hydrogen K0 primary pinning with K1 failover and Self-Warming INIT telemetry (11.2.19)`
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.19 — single-key primary F1 with K1 failover and clean self-warming telemetry`
+- **Status 11.2.19:** `CERTIFIED / CLOSED (2026-11-19)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
-- **Stan metryk:** `403 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `474 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (403/403 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.18` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.18: Zero-Waste Self-Warming & 100% Real-Invoice Accounting — eliminacja syntetycznych pingów warm-upu dla modeli Hydrogen na starcie F1 i F2 oraz na barierze fazowej, mechanizm Self-Warming Canary dla Paczki 0 F1 na K0, Paczki 1 F1 na K1 i Paczki 0 F2 na K2, fizyczna likwidacja JIT Retry we wszystkich fazach [dokładnie 1 wywołanie API na paczkę w 100% sesji] oraz pełne zliczanie tokenów usage_metadata do akumulatora sesji, synchronizujące telemetrię PricingGuard w 100% z fakturą Google Cloud przy koszcie nominalnym ~4.27 PLN netto).
+- **Stan metryk:** `405 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `476 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (405/405 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.19` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.19: Single-Key Primary F1 with K1 Failover & Clean Self-Warming Telemetry — konsolidacja Fazy 1 na pojedynczym kluczu podstawowym $K_0$ dla modeli Hydrogen z automatycznym failoverem na $K_1$ via `effective_f1_affinity = 0 if is_hydrogen else batch_idx`, sekwencyjny drafting Fazy 1 `max_workers_f1 = 1` eliminujący drugi cold-start i oszczędzający $-0.49$ PLN netto / $-0.60$ PLN brutto, rozróżnienie planowego `Self-Warming INIT` [`logger.info`] na Paczce 0 od nieoczekiwanego `Context Cache WARN` [`logger.warning`], potwierdzenie rabatu -95% na Paczkach 0 i 1 oraz precyzyjne komunikaty `Context Cache HALT` bez wprowadzających w błąd odwołań do zerowego bilansu tokenów przy przekroczeniu limitu budżetowego 6.00 PLN).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (403 passed w tests/)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (405 passed w tests/)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -622,3 +623,25 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   4. `translator.py:_process_phase1_only` oraz `_process_phase2_only`: Całkowite wyłączenie JIT Warmup Retry dla wszystkich paczek F1 i F2 (w tym dla Paczki 0). Paczki rozgrzewają sloty TPU w ramach pojedynczego, produkcyjnego zapytania (dokładnie 1 wywołanie API na paczkę w 100% sesji).
   5. `tests/test_context_cache_guard.py`: Wdrożenie testów `test_zero_synthetic_warmup_pings_for_hydrogen_in_translate_file` oraz `test_ensure_cache_ready_accounts_warmup_tokens_when_ping_enabled`, a także aktualizacja kontraktu Zero-Retry (32/32 tests passing, łącznie 403/403 passing w `tests/`).
   6. Determinizm finansowy i jawność faktury: Pełna synchronizacja telemetrii `PricingGuard` z fakturą Google Cloud (100% jawności tokenów), eliminacja narzutu warm-upu i gwarancja kosztu nominalnego **~4.27 PLN netto** (~5.25 PLN brutto) z twardym sufitem **6.00 PLN netto**.
+
+
+## 🏛️ ARB-070 / INC-AVT-068: Standard 11.2.19 — Single-Key Primary F1 with K1 Failover & Clean Self-Warming Telemetry
+
+- **Status:** `RESOLVED (Standard 11.2.19, commity be13cb6, 9f8ea35, HEAD)`
+- **Zidentyfikowano:**
+  1. Zbędny drugi cold-start w Fazie 1 (~0.49 PLN netto): W Standardzie 11.2.18 Faza 1 rozdzielała ruch round-robin pomiędzy $K_0$ i $K_1$ (`affinity_idx = batch_idx`). Ponieważ bufor TPU jest przypisany do konkretnego klucza API, Paczka 0 rozgrzewała bufor na $K_0$, a Paczka 1 trafiała na zimny slot na $K_1$, wywołując drugi pełny cold-start (~80k tokenów wejściowych bez rabatu, +0.49 PLN netto / +0.60 PLN brutto).
+  2. Niejednoznaczna telemetria `_audit_batch_context_cache`: Planowy, zamierzony cold-start Paczki 0 w trybie Self-Warming generował mylące ostrzeżenie `⚠️ [Context Cache WARN]`, które sugerowało awarię lub spadek rabatu, mimo że było to zaplanowane zachowanie systemu (Self-Warming INIT).
+  3. Brak potwierdzenia rabatu na Paczce 1: Komunikat `💰 [Context Cache AKTYWNY]` był drukowany wyłącznie na Paczce 0, na której dla modeli Hydrogen bufor jest dopiero rozgrzewany (`cached == 0`). Paczka 1 — będąca pierwszym realnym potwierdzeniem rabatu -95% — nie emitowała zielonego statusu w konsoli bez flagi `--verbose`.
+  4. Mylący tekst błędu w `_trigger_hard_halt`: Gdy proces był zatrzymywany z powodu przekroczenia limitu 6.00 PLN na paczce z aktywnym cache, komunikat zawsze twierdził, że "Serwer zwrócił 0 tokenów cache!", mimo że tokeny podręczne były obecne.
+- **Komponenty Naprawy:**
+  1. `translator.py:_call_gemini_with_retry`: Konsolidacja Fazy 1 na kluczu podstawowym $K_0$ (`effective_f1_affinity = 0 if is_hydrogen else batch_idx`). Paczki F1 dla modeli Hydrogen są kierowane na ugruntowany slot $K_0$. W przypadku błędu 429/503 na $K_0$, `MultiKeyClientPool.get_client` automatycznie przełącza ruch na klucz rezerwowy $K_1$ w trybie failover.
+  2. `translator.py:translate_subtitles`: Sekwencyjny drafting Fazy 1 dla modeli Hydrogen (`max_workers_f1 = 1`). Wyklucza to kolizje wątków i eksmisje slotów KV w TPU, zapewniając 100% retencję cache na $K_0$.
+  3. `translator.py:_audit_batch_context_cache`:
+     - Rozróżnienie planowego `ℹ️ [Context Cache INIT / Self-Warming]` (`logger.info`) na Paczce 0 dla modeli Hydrogen od nieoczekiwanego spadku cache `⚠️ [Context Cache WARN]` (`logger.warning`) na paczkach $b\_idx > 0$.
+     - Emisja `💰 [Context Cache AKTYWNY]` na Paczkach 0 i 1 (`b_idx in (0, 1)`), dając operatorowi natychmiastowe potwierdzenie aktywacji rabatu -95% już na pierwszej paczce po rozgrzaniu.
+     - Oczyszczenie szablonu `_trigger_hard_halt` — usunięcie sztywnego dopisku o zerze tokenów, dzięki czemu powód zatrzymania jest precyzyjnie przekazywany przez argument `reason_line`.
+  4. `tests/test_context_cache_guard.py`:
+     - Aktualizacja asercji w `test_hydrogen_1to1_concurrency_cap_in_translate_file` (`recorded_pool_workers == []`).
+     - Dodanie testu `test_hydrogen_f1_pins_primary_key_k0_with_automatic_k1_failover` weryfikującego stałe affinity K0 i poprawny failover na K1 po 429.
+     - Dodanie testu `test_planned_self_warming_init_vs_unexpected_warn_and_batch1_confirm` weryfikującego rozróżnienie INIT od WARN oraz emisję statusu aktywnego cache na Paczkach 0 i 1.
+  5. Determinizm finansowy: Eliminacja drugiego cold-startu F1 oszczędza **-0.49 PLN netto** (-0.60 PLN brutto). Całkowity koszt odcinka wynosi **3.78 PLN netto** (~4.65 PLN brutto), a w pesymistycznym przypadku (failover na K1) nie przekracza **4.27 PLN netto** (~5.25 PLN brutto, 28.8% margines poniżej sufitu 6.00 PLN).
