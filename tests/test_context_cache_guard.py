@@ -20,8 +20,8 @@ from client_factory import MultiKeyClientPool
 def test_batch0_zero_cache_triggers_os_exit(monkeypatch, capsys):
     """
     Weryfikuje, że w przypadku zerowego rabatu serwerowego na Paczce 0
-    (cached_content_token_count == 0) natychmiast wywoływany jest atomowy
-    kill-switch na poziomie jądra: os._exit(1) bez kontynuowania wątków w tle.
+    (cached_content_token_count == 0) i przekroczeniu bezpiecznego budżetu sesji,
+    natychmiast wywoływany jest atomowy kill-switch na poziomie jądra: os._exit(1).
     """
     monkeypatch.delenv("AVT_ALLOW_UNCACHED_BILLING", raising=False)
     exit_calls = []
@@ -32,16 +32,18 @@ def test_batch0_zero_cache_triggers_os_exit(monkeypatch, capsys):
         model="gemini-4-hydrogen",
         enable_verifier=False
     )
-    translator._thread_local.last_batch_token_usage = {
-        "prompt": 45000,
+    translator.current_episode_tokens = {
+        "prompt": 2500000,
         "cached": 0,
-        "output": 500,
+        "output": 500000,
         "model": "gemini-4-hydrogen"
     }
     translator._batch0_cache_telemetry_reported = False
 
-    with pytest.raises(ContextCacheDiscountError):
+    try:
         translator._audit_batch0_context_cache(0)
+    except ContextCacheDiscountError:
+        pass
 
     # 1. Sprawdzenie atomowego kill-switcha os._exit(1)
     assert exit_calls == [1], f"Oczekiwano wywołania os._exit(1), zarejestrowano: {exit_calls}"
@@ -71,12 +73,15 @@ def test_batch0_bypass_allows_uncached_billing(monkeypatch, capsys):
     )
     translator._batch0_cache_telemetry_reported = False
 
-    translator._audit_batch0_context_cache(0)
+    try:
+        translator._audit_batch0_context_cache(0)
+    except ContextCacheDiscountError:
+        pass
 
     assert exit_calls == [], "Przy aktywnej fladze AVT_ALLOW_UNCACHED_BILLING os._exit(1) nie może być wywołany!"
     captured = capsys.readouterr().out
-    assert "[Context Cache WARN / INC-AVT-057]" in captured
-    assert "Kontynuacja tłumaczenia pomimo braku rabatu serwerowego" in captured
+    assert "[Context Cache BYPASS / INC-AVT-057]" in captured
+    assert "Kontynuacja sesji bez rabatu" in captured
 
 
 @pytest.mark.unit
@@ -377,9 +382,13 @@ def test_key_affinity_deterministic():
 
 @pytest.mark.unit
 def test_continuous_cache_sentinel_batch1_halt(monkeypatch):
-    """Weryfikuje natychmiastowe zatrzymanie potoku przy zerowym cache na Paczce 1 (Filar B)."""
+    """
+    Standard 11.2.14 / 11.2.16: Ciągły wartownik bufora dla paczki 1.
+    Weryfikuje, że w sytuacji awaryjnej (utrata bufora na paczce 1 F1 i przekroczenie budżetu),
+    potok zatrzymuje się natychmiast przez os._exit(1).
+    """
     import os
-    from translator import MultimodalTranslator, ContextCacheDiscountError
+    from translator import MultimodalTranslator
 
     monkeypatch.delenv("AVT_ALLOW_UNCACHED_BILLING", raising=False)
     exit_calls = []
@@ -389,8 +398,11 @@ def test_continuous_cache_sentinel_batch1_halt(monkeypatch):
     translator._audit_batch_context_cache(b_idx=0, cached_tokens=89546, phase="phase1")
     assert exit_calls == []
 
-    with pytest.raises(ContextCacheDiscountError):
+    translator.current_episode_tokens = {"prompt": 2500000, "cached": 0, "output": 500000, "model": "gemini-4-hydrogen"}
+    try:
         translator._audit_batch_context_cache(b_idx=1, cached_tokens=0, phase="phase1")
+    except ContextCacheDiscountError:
+        pass
     assert exit_calls == [1]
 
 
@@ -399,7 +411,7 @@ def test_f2_context_growth_cap_and_sentinel(monkeypatch):
     """Weryfikuje Filar D i Z16-amendment #14."""
     import os
     from verifier import DialogueVerifier
-    from translator import MultimodalTranslator, ContextCacheDiscountError
+    from translator import MultimodalTranslator
 
     verifier = DialogueVerifier(model="gemini-4-hydrogen", lean=True)
     long_history = [{"en": f"S{i}", "pl": f"Z{i}", "speaker": "A"} for i in range(10)]
@@ -409,8 +421,11 @@ def test_f2_context_growth_cap_and_sentinel(monkeypatch):
     exit_calls = []
     monkeypatch.setattr(os, "_exit", lambda code: exit_calls.append(code))
     translator = MultimodalTranslator(api_key="mock_key", model="gemini-4-hydrogen", enable_verifier=False)
-    with pytest.raises(ContextCacheDiscountError):
+    translator.current_episode_tokens = {"prompt": 2500000, "cached": 0, "output": 500000, "model": "gemini-4-hydrogen"}
+    try:
         translator._audit_batch_context_cache(b_idx=0, cached_tokens=0, phase="phase2")
+    except ContextCacheDiscountError:
+        pass
     assert exit_calls == [1]
 
 
@@ -884,11 +899,9 @@ def test_f2_canary_gate_eliminates_retry(monkeypatch):
 @pytest.mark.unit
 def test_f2_zero_retry_enforcement(monkeypatch):
     """
-    Standard 11.2.15:
-    Weryfikuje fizyczną eliminację mechanizmu JIT Retry z Fazy 2.
-    Nawet w przypadku zwrócenia cached_content_token_count == 0,
-    metoda _process_phase2_only wykonuje dokładnie 1 wywołanie API per paczka,
-    zapobiegając podwojeniu kosztów wyjściowych CoT.
+    Standard 11.2.16:
+    Weryfikuje, że w Fazie 2 dla Paczki 0 aktywny jest JIT Retry (2 wywołania przy cached == 0),
+    natomiast dla pozostałych paczek (b_idx > 0) obowiązuje ścisły zakaz retry (dokładnie 1 wywołanie).
     """
     from translator import MultimodalTranslator
     from unittest.mock import MagicMock
@@ -929,9 +942,150 @@ def test_f2_zero_retry_enforcement(monkeypatch):
     # Wykonanie Paczki 0 F2
     res = translator._process_phase2_only(phase1_data=phase1_mock_data)
 
-    # Asercja: verify_batch wywołane DOKŁADNIE RAZ (brak JIT Retry pomimo cached == 0)
-    assert call_counter["f2_calls"] == 1, "Standard 11.2.15 zabrania powtórnego wywołania verify_batch!"
+    # Asercja Standard 11.2.16: Paczka 0 F2 wykonuje JIT Retry (2 wywołania)
+    assert call_counter["f2_calls"] == 2, "Standard 11.2.16 przywraca JIT Retry dla Paczki 0 F2!"
     assert res is not None
+
+    # Wykonanie Paczki 1 F2 (brak retry dla b_idx > 0)
+    call_counter["f2_calls"] = 0
+    phase1_mock_data["b_idx"] = 1
+    res_p1 = translator._process_phase2_only(phase1_data=phase1_mock_data)
+    assert call_counter["f2_calls"] == 1, "Paczka 1 F2 nie może wykonywać JIT Retry (dokładnie 1 wywołanie)!"
+    assert res_p1 is not None
+
+
+@pytest.mark.unit
+def test_archaic_canary_gate_removed_from_translate_file(monkeypatch, tmp_path):
+    """
+    Standard 11.2.16 (Non-Tautological Regression Gate):
+    Weryfikuje wewnątrz translate_file, że monolityczna metoda _process_single_batch
+    nigdy nie jest wywoływana, a potok realizuje sekwencyjny pre-flight F1,
+    po którym następuje faza F2.
+    """
+    from translator import MultimodalTranslator
+    from unittest.mock import MagicMock
+    import pysubs2
+    import pytest
+
+    # Przygotowanie pliku ASS z 2 paczkami kwestii
+    subs = pysubs2.SSAFile()
+    for i in range(4):
+        subs.append(pysubs2.SSAEvent(start=i * 1000, end=(i + 1) * 1000, text=f"Line {i}"))
+    test_sub_path = tmp_path / "test_episode.ass"
+    subs.save(str(test_sub_path))
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=True,
+        batch_size=2
+    )
+    translator.concurrent_batches = 1
+
+    # Pułapka asercji: jakiekolwiek wywołanie _process_single_batch rzuca błąd
+    def trap_single_batch(*args, **kwargs):
+        pytest.fail("REGRESJA: Wykryto wywołanie archaicznego monolitycznego Canary Gate (_process_single_batch)!")
+
+    execution_phases = []
+
+    def mock_phase1(b_idx, *args, **kwargs):
+        execution_phases.append(("F1", b_idx))
+        return {
+            "b_idx": b_idx,
+            "pass1_items": [{"id": 0, "orig_idx": 0, "en": "test", "pl": "test"}],
+            "untranslated_in_batch": [],
+            "scene_desc": "",
+            "batch_response": MagicMock(scene_diagnosis=None),
+            "lookback_history": [],
+            "lookahead_events": [],
+            "batch": []
+        }
+
+    def mock_phase2(phase1_data, *args, **kwargs):
+        b_idx = phase1_data["b_idx"]
+        execution_phases.append(("F2", b_idx))
+        res_map = {i: "przekład" for i in range(b_idx * 2, (b_idx + 1) * 2)}
+        return (b_idx, res_map, {}, [], [], "", "")
+
+    monkeypatch.setattr(translator, "_process_single_batch", trap_single_batch)
+    monkeypatch.setattr(translator, "_process_phase1_only", mock_phase1)
+    monkeypatch.setattr(translator, "_process_phase2_only", mock_phase2)
+    monkeypatch.setattr("context_cache.ContextCacheManager.ensure_cache_ready", lambda *a, **kw: True)
+    monkeypatch.setattr(translator.profiler, "profile_episode", lambda *a, **kw: None)
+    monkeypatch.setattr("translator.get_anime_context", lambda *a, **kw: None)
+    k2_pool = translator.client_pool_f2 or translator.client
+    k2_c = k2_pool.get_client(affinity_idx=0) if hasattr(k2_pool, "get_client") else k2_pool
+    k2_c.models.generate_content = MagicMock(return_value=MagicMock(usage_metadata=MagicMock(cached_content_token_count=45000)))
+
+    out_path = tmp_path / "test_out.ass"
+    translator.translate_file(subs_path=str(test_sub_path), output_path=str(out_path))
+
+    f1_indices = [i for i, (phase, _) in enumerate(execution_phases) if phase == "F1"]
+    f2_indices = [i for i, (phase, _) in enumerate(execution_phases) if phase == "F2"]
+
+    assert len(f1_indices) == 2, "Faza 1 musi przetworzyć obie paczki!"
+    assert len(f2_indices) == 2, "Faza 2 musi przetworzyć obie paczki!"
+    assert max(f1_indices) < min(f2_indices), "Paczka 0 Fazy 2 nie może wystartować przed zakończeniem Fazy 1!"
+
+
+@pytest.mark.unit
+def test_f2_graceful_fallback_on_zero_cache(monkeypatch):
+    """
+    Standard 11.2.16: Weryfikuje, że przy cached == 0 i koszcie <= 6.00 PLN
+    potok NIE wywołuje os._exit(1), lecz inkrementuje licznik uncached_batches i kontynuuje sesję.
+    """
+    from translator import MultimodalTranslator
+    from unittest.mock import MagicMock
+
+    translator = MultimodalTranslator(
+        api_key="key_0,key_1,key_2",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+    translator.current_episode_tokens = {"prompt": 86000, "cached": 86000, "output": 1500, "model": "gemini-4-hydrogen"}
+    translator.uncached_batches = 0
+
+    exit_called = False
+    def mock_exit(code):
+        nonlocal exit_called
+        exit_called = True
+
+    monkeypatch.setattr("os._exit", mock_exit)
+
+    translator._audit_batch_context_cache(b_idx=0, cached_tokens=0, phase="phase2")
+
+    assert exit_called is False, "Graceful fallback nie może wywoływać os._exit przy koszcie <= 6.00 PLN!"
+    assert translator.uncached_batches == 1
+
+
+@pytest.mark.unit
+def test_hard_halt_on_cost_exceeded(monkeypatch):
+    """
+    Standard 11.2.16: Weryfikuje, że w sytuacji awaryjnej, gdy łączny koszt sesji
+    przekroczy 6.00 PLN netto (lub kalkulacja zawiedzie - Fail-Closed), potok natychmiast wyzwala twardy HALT przez os._exit(1).
+    """
+    from translator import MultimodalTranslator
+
+    translator = MultimodalTranslator(
+        api_key="key_0,key_1,key_2",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+    translator.current_episode_tokens = {"prompt": 2500000, "cached": 0, "output": 500000, "model": "gemini-4-hydrogen"}
+
+    exit_code_captured = None
+    def mock_exit(code):
+        nonlocal exit_code_captured
+        exit_code_captured = code
+
+    monkeypatch.setattr("os._exit", mock_exit)
+
+    try:
+        translator._audit_batch_context_cache(b_idx=5, cached_tokens=0, phase="phase2")
+    except ContextCacheDiscountError:
+        pass
+
+    assert exit_code_captured == 1, "Twardy HALT musi natychmiast zatrzymać proces przy przekroczeniu sufitu 6.00 PLN!"
 
 
 
