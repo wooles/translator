@@ -2150,42 +2150,72 @@ class MultimodalTranslator:
         elif 0 < cached_tokens < 32768:
             logger.warning(f"[Context Cache PARTIAL_HIT]: Server confirmed partial CachedContent ({phase}, paczka {b_idx}): {cached_tokens} tokenów (< 32768).")
         elif cached_tokens == 0:
+            # 1. Master Override: Ręczne obejście operatorskie
             allow_uncached = os.getenv("AVT_ALLOW_UNCACHED_BILLING", "0").strip().lower() in ("1", "true", "yes")
             if allow_uncached:
                 print(
-                    f"\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! ({phase}, paczka {b_idx})\n"
-                    "     Wykryto flagę AVT_ALLOW_UNCACHED_BILLING=1. Kontynuacja tłumaczenia pomimo braku rabatu serwerowego."
+                    f"\n  ⚠️ [Context Cache BYPASS / INC-AVT-057] [Context Cache WARN / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! ({phase}, paczka {b_idx})\n"
+                    "     Wykryto flagę AVT_ALLOW_UNCACHED_BILLING=1. Kontynuacja sesji bez rabatu (Kontynuacja tłumaczenia pomimo braku rabatu serwerowego)."
                 )
-                logger.warning(f"[Context Cache BYPASS / INC-AVT-057]: AVT_ALLOW_UNCACHED_BILLING aktywny. Kontynuacja tłumaczenia {phase} paczka {b_idx} pomimo braku rabatu serwerowego.")
+                logger.warning(f"[Context Cache BYPASS / INC-AVT-057]: Flaga AVT_ALLOW_UNCACHED_BILLING aktywna. Kontynuacja {phase} paczka {b_idx}.")
                 return
 
-            err_msg = (
-                "\n"
-                "========================================================================================\n"
-                f"  🛑 [Context Cache HALT / INC-AVT-057]: Serwer zwrócił 0 tokenów cache! Rabat serwerowy NIEAKTYWNY ({phase}, paczka {b_idx}).\n"
-                "     Kontynuacja tłumaczenia odcinka spowodowałaby naliczenie pełnej stawki 100% (~10-20 PLN zamiast ~0.50 PLN).\n"
-                "     Tłumacz natychmiast zatrzymuje pracę na poziomie jądra (os._exit(1)) w celu ochrony budżetu i eliminacji zombie workers.\n\n"
-                "     Diagnostyka:\n"
-                "     - Upewnij się, że długość promptu systemowego przekracza próg 32 768 tokenów (ensure_cache_token_floor).\n"
-                "     - Sprawdź status Google Context Caching API i powiązanie kluczy API w MultiKeyPool.\n"
-                "     - Aby wymusić tłumaczenie bez rabatu, uruchom z flagą: AVT_ALLOW_UNCACHED_BILLING=1\n"
-                "========================================================================================\n"
-            )
-            sys.stderr.write(err_msg)
-            sys.stderr.flush()
-            logger.error(f"[Context Cache HALT / INC-AVT-057]: Google API returned 0 cached tokens for {phase} batch {b_idx}! Halting execution immediately via os._exit(1).")
-            try:
-                from context_cache import ContextCacheManager
-                client_to_clean = getattr(self, "client", None)
-                if client_to_clean:
-                    ContextCacheManager.cleanup_all_active_caches(client_to_clean)
-            except Exception as e:
-                logger.debug(f"[Context Cache] Czyszczenie pamięci podręcznej zakończone wyjątkiem: {e}")
+            if not hasattr(self, "uncached_batches"):
+                self.uncached_batches = 0
+            self.uncached_batches += 1
 
-            os._exit(1)
-            raise ContextCacheDiscountError(
-                f"Brak aktywnego rabatu Context Cache (-95%) na {phase} (paczka {b_idx}). Tłumaczenie przerwane w celu ochrony budżetu."
+            # 2. Bezpiecznik Fail-Closed: Inicjalizacja brakiem wartości
+            current_net_pln: Optional[float] = None
+            try:
+                from pricing_guard import PricingGuard
+                f1_st = getattr(self, "current_episode_tokens", {})
+                if not f1_st or f1_st.get("prompt", 0) == 0:
+                    current_net_pln = None
+                else:
+                    f2_st = getattr(getattr(self, "verifier", None), "current_episode_tokens", {})
+                    cost_summary = PricingGuard.calculate_actual_cost_breakdown(f1_st, f2_st)
+                    raw_net = cost_summary.get("net_pln")
+                    if isinstance(raw_net, (int, float)):
+                        current_net_pln = float(raw_net)
+            except Exception as pe:
+                logger.error(f"[Context Cache Audit] Błąd krytyczny kalkulacji kosztu PricingGuard: {pe}")
+
+            HARD_BUDGET_LIMIT_PLN = 6.00
+
+            # 3. Rygor Fail-Closed: Brak możliwości weryfikacji kosztu LUB przekroczenie sufitu 6.00 PLN wyzwala twardy HALT
+            if current_net_pln is None or current_net_pln > HARD_BUDGET_LIMIT_PLN:
+                cost_disp = f"{current_net_pln:.2f} PLN" if current_net_pln is not None else "NIEZNANY (AWARIA KALKULATORA LUB BRAK TELEMETRII)"
+                err_msg = (
+                    "\n"
+                    "========================================================================================\n"
+                    f"  🛑 [Context Cache HALT / INC-AVT-057]: Bezpiecznik Fail-Closed zatrzymał proces! Serwer zwrócił 0 tokenów cache!\n"
+                    f"     Koszt sesji: {cost_disp} (Limit bezpieczeństwa: {HARD_BUDGET_LIMIT_PLN:.2f} PLN).\n"
+                    f"     Wykryto 0 tokenów cache na paczce {b_idx} ({phase}). Natychmiastowe zatrzymanie via os._exit(1).\n"
+                    "========================================================================================\n"
+                )
+                sys.stderr.write(err_msg)
+                sys.stderr.flush()
+                logger.error(f"[Context Cache HALT / INC-AVT-057]: Fail-Closed trigger: cost={cost_disp} > limit={HARD_BUDGET_LIMIT_PLN:.2f} PLN. Halting via os._exit(1).")
+                try:
+                    from context_cache import ContextCacheManager
+                    client_to_clean = getattr(self, "client", None)
+                    if client_to_clean:
+                        ContextCacheManager.cleanup_all_active_caches(client_to_clean)
+                except Exception as e:
+                    logger.debug(f"[Context Cache] Czyszczenie pamięci podręcznej zakończone wyjątkiem: {e}")
+                os._exit(1)
+                raise ContextCacheDiscountError(
+                    f"Brak aktywnego rabatu Context Cache (-95%) na {phase} (paczka {b_idx}). Tłumaczenie przerwane w celu ochrony budżetu."
+                )
+
+            # 4. Graceful Fallback: Gdy koszt został poprawnie zweryfikowany i mieści się w limicie <= 6.00 PLN
+            warn_msg = (
+                f"\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Wykryto 0 tokenów cache ({phase}, paczka {b_idx}).\n"
+                f"     Bieżący zweryfikowany koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN.\n"
+                f"     Kontynuacja przetwarzania w trybie Graceful Fallback."
             )
+            print(warn_msg)
+            logger.warning(f"[Context Cache WARN / INC-AVT-057]: 0 cache on {phase} b_idx {b_idx}. Cost: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN. Graceful fallback active.")
 
     def _audit_batch0_context_cache(self, cached_tokens: int) -> None:
         """Wstecznie kompatybilna delegacja dla Paczki 0."""
@@ -5381,8 +5411,31 @@ class MultimodalTranslator:
             p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
             p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
 
-            # Standard 11.2.15 (Zero-Variance Baseline): Fizyczna eliminacja JIT Retry z Fazy 2.
-            # Wyklucza ryzyko podwójnego generowania wyjścia CoT. Każda paczka F2 wykonuje dokładnie 1 wywołanie API.
+            # Standard 11.2.16: JIT Warmup Retry dla bramki Canary Paczki 0 Fazy 2
+            if p2_cached == 0 and b_idx == 0:
+                from model_resolver import is_gemini_4_or_hydrogen_model
+                if is_gemini_4_or_hydrogen_model(getattr(self.verifier, "model", "")):
+                    logger.warning(f"[Context Cache F2 Sentinel]: Wykryto 0 tokenów cache w Fazie 2 na paczce Canary 0. JIT Warmup Retry po 1.2s...")
+                    time.sleep(1.2)
+                    refined_lines = self.verifier.verify_batch(
+                        batch_items=pass1_items,
+                        scene_summary=scene_desc or "",
+                        episode_profile_str=episode_profile_str,
+                        user_feedback_str=user_feedback_str,
+                        glossary_str=glossary_str,
+                        focused_rules_str=phase2_focused_rules,
+                        series_bible_str=scoped_series_bible_str,
+                        manga_canon_str=manga_canon_str,
+                        history_context=lookback_history,
+                        lookahead_events=lookahead_events,
+                        character_registry=self.character_registry,
+                        scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
+                        batch_idx=f2_affinity_idx
+                    )
+                    _vtl = getattr(self.verifier, "_thread_local", None)
+                    p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
+                    p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
+
             self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=p2_cached, phase="phase2")
             for r in refined_lines:
                 orig_it = next((it for it in pass1_items if it.get("id") == r.id), None)
@@ -6226,6 +6279,7 @@ class MultimodalTranslator:
         if ref_season is not None and title_season is None and series_title:
             series_title = f"{series_title} S{ref_season}"
 
+        from series_memory import SeriesBible
         if not getattr(self, "series_bible", None):
             self.series_bible = SeriesBible(anime_title=series_title)
         # Pre-populate global Character Registry from persistent Series Bible
@@ -6580,12 +6634,12 @@ class MultimodalTranslator:
         batches = create_adaptive_batches(
             raw_entries,
             base_batch_size=self.batch_size,
-            max_batch_size=min(32, self.batch_size + 8),
-            min_scene_batch=16,
-            min_leap_batch=12,
+            max_batch_size=min(32, self.batch_size + 8) if self.batch_size >= 8 else self.batch_size,
+            min_scene_batch=16 if self.batch_size >= 16 else self.batch_size,
+            min_leap_batch=12 if self.batch_size >= 12 else self.batch_size,
             leap_threshold_ms=8000,
             scene_threshold_ms=3800,
-            coalesce_tail=True
+            coalesce_tail=(self.batch_size >= 8)
         )
 
         total_lines = len(raw_entries)
@@ -6664,15 +6718,16 @@ class MultimodalTranslator:
 
             if tasks_to_run:
                 active_keys_count = len(self.client_pool.get_active_clients()) if hasattr(self, "client_pool") and self.client_pool else 1
+                phase1_outputs: Dict[int, Dict[str, Any]] = {}
                 
-                # --- INC-AVT-057: SEKWENCYJNY PRE-FLIGHT PACZKI 0 (CANARY GATE) ---
+                # --- STANDARD 11.2.16: SEKWENCYJNY PRE-FLIGHT FAZY 1 (CANARY GATE) ---
                 canary_task = tasks_to_run[0]
                 canary_b_idx, canary_batch, canary_untranslated = canary_task
                 remaining_tasks = tasks_to_run[1:]
 
-                print(f"\n  [Canary Gate]: Uruchamianie sekwencyjnego pre-flightu (Paczka {canary_b_idx} / Canary Run) w celu weryfikacji rabatu serwerowego...")
+                print(f"\n  [Canary Gate F1]: Uruchamianie sekwencyjnego pre-flightu Fazy 1 (Paczka {canary_b_idx} / Canary Run) w celu weryfikacji rabatu serwerowego...")
                 try:
-                    canary_output = self._process_single_batch(
+                    p1_canary_data = self._process_phase1_only(
                         b_idx=canary_b_idx,
                         batch=canary_batch,
                         untranslated_in_batch=canary_untranslated,
@@ -6691,24 +6746,11 @@ class MultimodalTranslator:
                         pbar=pbar,
                         translated_results=translated_results
                     )
-                    self._record_batch_results(
-                        batch_output=canary_output,
-                        translated_results=translated_results,
-                        translated_regions=translated_regions,
-                        translated_typesetting=translated_typesetting,
-                        translated_addressees=translated_addressees,
-                        translated_speakers=translated_speakers,
-                        episode_whisper_transcriptions=episode_whisper_transcriptions,
-                        history=history,
-                        checkpoint_path=checkpoint_path,
-                        pbar=pbar,
-                        progress_callback=progress_callback,
-                        total_lines=total_lines
-                    )
+                    phase1_outputs[canary_b_idx] = p1_canary_data
                 except ContextCacheDiscountError:
                     raise
                 except Exception as e:
-                    pbar.write(f" 🔴 [Niepowodzenie Paczki Kanarkowej {canary_b_idx}]: {format_friendly_api_error(e)}")
+                    pbar.write(f" 🔴 [Niepowodzenie Paczki Kanarkowej {canary_b_idx} Fazy 1]: {format_friendly_api_error(e)}")
                     pbar.refresh()
                     raise
 
@@ -6716,11 +6758,9 @@ class MultimodalTranslator:
                 time.sleep(1.5)
 
                 if remaining_tasks:
-                    active_keys_count = len(self.client_pool.get_active_clients()) if hasattr(self, "client_pool") and self.client_pool else 1
                     max_workers_f1 = min(self.concurrent_batches, len(remaining_tasks))
-                    phase1_outputs: Dict[int, Dict[str, Any]] = {}
 
-                    # --- ETAP 1: FAZA 1 DRAFTING (Równoległy drafting na K0, K1) ---
+                    # --- ETAP 1: FAZA 1 DRAFTING (Równoległy drafting na K0, K1 dla pozostałych paczek) ---
                     if max_workers_f1 > 1:
                         print(f"\n  [Kolejka Paczek / Faza 1]: Canary zweryfikowany pomyślnie. Równoległy drafting Fazy 1 ({max_workers_f1} paczek w locie / {active_keys_count} aktywnych kluczy API)...")
                         import concurrent.futures
@@ -6797,156 +6837,125 @@ class MultimodalTranslator:
                                 pbar.write(f" 🔴 [Niepowodzenie Fazy 1 Paczki]: {format_friendly_api_error(e)}")
                                 pbar.refresh()
 
-                    # --- STANDARD 11.2.15: BARIERA FAZOWA Z AKTYWNĄ SONDĄ UGRUNTOWANIA K2 ---
-                    if phase1_outputs:
-                        logger.info("[PHASE BARRIER] Faza 1 zakończona dla wszystkich paczek. Inicjalizacja aktywnego ugruntowania bufora K2...")
-                        print(f"\n  [Phase Barrier]: Faza 1 zakończona pomyślnie ({len(phase1_outputs)} paczek). Inicjalizacja aktywnego ugruntowania bufora K2...")
-                        if self.enable_verifier and hasattr(self, "verifier") and self.verifier:
-                            time.sleep(1.0)
-                            from context_cache import ContextCacheManager
-                            from model_resolver import build_thinking_config, is_gemini_4_or_hydrogen_model
-                            from verifier import LeanRefinedBatchResponse, RefinedBatchResponse
+                # --- STANDARD 11.2.15/11.2.16: BARIERA FAZOWA Z AKTYWNĄ SONDĄ UGRUNTOWANIA K2 ---
+                if phase1_outputs:
+                    logger.info("[PHASE BARRIER] Faza 1 zakończona dla wszystkich paczek. Inicjalizacja aktywnego ugruntowania bufora K2...")
+                    print(f"\n  [Phase Barrier]: Faza 1 zakończona pomyślnie ({len(phase1_outputs)} paczek). Inicjalizacja aktywnego ugruntowania bufora K2...")
+                    if self.enable_verifier and hasattr(self, "verifier") and self.verifier:
+                        time.sleep(1.0)
+                        from context_cache import ContextCacheManager
+                        from model_resolver import build_thinking_config, is_gemini_4_or_hydrogen_model
+                        from verifier import LeanRefinedBatchResponse, RefinedBatchResponse
 
-                            is_hydrogen = is_gemini_4_or_hydrogen_model(self.verifier.model)
-                            effective_schema = LeanRefinedBatchResponse if is_hydrogen else RefinedBatchResponse
-                            f2_warmup_budget = getattr(self.verifier, "thinking_budget", 2048)
-                            f2_thinking = build_thinking_config(self.verifier.model, f2_warmup_budget)
+                        is_hydrogen = is_gemini_4_or_hydrogen_model(self.verifier.model)
+                        effective_schema = LeanRefinedBatchResponse if is_hydrogen else RefinedBatchResponse
+                        f2_warmup_budget = getattr(self.verifier, "thinking_budget", 2048)
+                        f2_thinking = build_thinking_config(self.verifier.model, f2_warmup_budget)
 
-                            pool_k2 = self.client_pool_f2 if hasattr(self, "client_pool_f2") and self.client_pool_f2 else (getattr(self.verifier, "client_pool", None) or self.client)
-                            k2_client = pool_k2.get_client(affinity_idx=0) if hasattr(pool_k2, "get_client") else pool_k2
+                        pool_k2 = self.client_pool_f2 if hasattr(self, "client_pool_f2") and self.client_pool_f2 else (getattr(self.verifier, "client_pool", None) or self.client)
+                        k2_client = pool_k2.get_client(affinity_idx=0) if hasattr(pool_k2, "get_client") else pool_k2
 
-                            # 1. Inicjalizacja bufora weryfikatora na dedykowanym kluczu K2
-                            try:
-                                ContextCacheManager.ensure_cache_ready(
-                                    client=pool_k2,
-                                    model=self.verifier.model,
-                                    system_instruction=self.verifier.system_prompt,
-                                    tag="verifier",
-                                    verbose=True,
-                                    thinking_config=f2_thinking,
-                                    response_schema=effective_schema,
-                                    response_mime_type="application/json"
-                                )
-                            except Exception as warm_err:
-                                logger.warning(f"[RE-WARM WARN] Niepowodzenie re-warmu K2: {warm_err}")
+                        # 1. Inicjalizacja bufora weryfikatora na dedykowanym kluczu K2
+                        try:
+                            ContextCacheManager.ensure_cache_ready(
+                                client=pool_k2,
+                                model=self.verifier.model,
+                                system_instruction=self.verifier.system_prompt,
+                                tag="verifier",
+                                verbose=True,
+                                thinking_config=f2_thinking,
+                                response_schema=effective_schema,
+                                response_mime_type="application/json"
+                            )
+                        except Exception as warm_err:
+                            logger.warning(f"[RE-WARM WARN] Niepowodzenie re-warmu K2: {warm_err}")
 
-                            # 2. Aktywna pętla weryfikacji ugruntowania TPU (Zero-Variance Confirmation Loop)
-                            k2_confirmed = False
-                            for ping_attempt in range(1, 4):
-                                if cancel_check and cancel_check():
-                                    break
-                                time.sleep(1.0)
-                                try:
-                                    from google.genai import types
-                                    probe_cfg_kwargs = {
-                                        "system_instruction": self.verifier.system_prompt,
-                                        "max_output_tokens": 1,
-                                        "temperature": 0.0,
-                                        "thinking_config": f2_thinking,
-                                        "response_schema": effective_schema,
-                                        "response_mime_type": "application/json"
-                                    }
-                                    probe_resp = k2_client.models.generate_content(
-                                        model=self.verifier.model,
-                                        contents=["PING_CACHE_VERIFY"],
-                                        config=types.GenerateContentConfig(**probe_cfg_kwargs)
-                                    )
-                                    c_cnt = getattr(getattr(probe_resp, "usage_metadata", None), "cached_content_token_count", 0) or 0
-                                    if c_cnt >= 32768:
-                                        logger.info(f"[Phase Barrier]: Ugruntowanie K2 potwierdzone telemetrią TPU (próba {ping_attempt}, {c_cnt:,} tok cache).")
-                                        print(f"  [Context Cache K2]: Serwer potwierdził aktywny rabat TPU ({c_cnt:,} tokenów).")
-                                        k2_confirmed = True
-                                        break
-                                except Exception as probe_err:
-                                    logger.debug(f"[Phase Barrier]: Sonda telemetrii K2 próba {ping_attempt}: {probe_err}")
-
-                            if not k2_confirmed:
-                                logger.warning("[Phase Barrier]: Brak potwierdzenia telemetrii w 3 próbach - przejście do Fazy 2 z domyślnym ugruntowaniem.")
-                            time.sleep(0.5)
-
-                        # --- STANDARD 11.2.14: ETAP 2 - FAZA 2 REDAKCJA (F2 SEQUENTIAL CANARY GATE NA K2) ---
-                        sorted_p1_keys = sorted(phase1_outputs.keys())
-
-                        # 1. Sekwencyjny Pre-flight Fazy 2 (Paczka 0 jako F2 Canary Gate)
-                        if sorted_p1_keys:
+                        # 2. Aktywna pętla weryfikacji ugruntowania TPU (Zero-Variance Confirmation Loop)
+                        k2_confirmed = False
+                        for ping_attempt in range(1, 4):
                             if cancel_check and cancel_check():
-                                print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
-                                remaining_f2_keys = []
-                            else:
-                                canary_f2_bidx = sorted_p1_keys[0]
-                                logger.info(f"[Canary Gate F2]: Uruchamianie sekwencyjnego ugruntowania K2 (Paczka {canary_f2_bidx} / F2 Canary Run)...")
-                                print(f"\n  [Canary Gate F2]: Uruchamianie sekwencyjnego ugruntowania K2 (Paczka {canary_f2_bidx} / F2 Canary Run)...")
-                                canary_f2_output = self._process_phase2_only(phase1_data=phase1_outputs[canary_f2_bidx])
-                                self._record_batch_results(
-                                    batch_output=canary_f2_output,
-                                    translated_results=translated_results,
-                                    translated_regions=translated_regions,
-                                    translated_typesetting=translated_typesetting,
-                                    translated_addressees=translated_addressees,
-                                    translated_speakers=translated_speakers,
-                                    episode_whisper_transcriptions=episode_whisper_transcriptions,
-                                    history=history,
-                                    checkpoint_path=checkpoint_path,
-                                    pbar=pbar,
-                                    progress_callback=progress_callback,
-                                    total_lines=total_lines
+                                break
+                            time.sleep(1.0)
+                            try:
+                                from google.genai import types
+                                probe_cfg_kwargs = {
+                                    "system_instruction": self.verifier.system_prompt,
+                                    "max_output_tokens": 1,
+                                    "temperature": 0.0,
+                                    "thinking_config": f2_thinking,
+                                    "response_schema": effective_schema,
+                                    "response_mime_type": "application/json"
+                                }
+                                probe_resp = k2_client.models.generate_content(
+                                    model=self.verifier.model,
+                                    contents=["PING_CACHE_VERIFY"],
+                                    config=types.GenerateContentConfig(**probe_cfg_kwargs)
                                 )
-                                # Pauza ugruntowująca snapshot TPU po realnym payloadzie F2
-                                time.sleep(1.0)
-                                remaining_f2_keys = sorted_p1_keys[1:]
-                        else:
-                            remaining_f2_keys = []
+                                c_cnt = getattr(getattr(probe_resp, "usage_metadata", None), "cached_content_token_count", 0) or 0
+                                if c_cnt >= 32768:
+                                    logger.info(f"[Phase Barrier]: Ugruntowanie K2 potwierdzone telemetrią TPU (próba {ping_attempt}, {c_cnt:,} tok cache).")
+                                    print(f"  [Context Cache K2]: Serwer potwierdził aktywny rabat TPU ({c_cnt:,} tokenów).")
+                                    k2_confirmed = True
+                                    break
+                            except Exception as probe_err:
+                                logger.debug(f"[Phase Barrier]: Sonda telemetrii K2 próba {ping_attempt}: {probe_err}")
 
-                        # 2. Współbieżne przetworzenie pozostałych paczek (K2 w 100% zindeksowany w TPU)
-                        max_workers_f2 = min(2, len(remaining_f2_keys)) if self.concurrent_batches > 1 else 1
-                        if remaining_f2_keys:
-                            if max_workers_f2 > 1:
-                                print(f"  [Kolejka Paczek / Faza 2]: Rozpoczynanie redakcji Fazy 2 na ugruntowanym K2 ({max_workers_f2} paczek w locie)...")
-                                with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers_f2) as executor_f2:
-                                    fut_to_bidx_f2 = {
-                                        executor_f2.submit(
-                                            self._process_phase2_only,
-                                            phase1_data=phase1_outputs[b_idx]
-                                        ): b_idx
-                                        for b_idx in remaining_f2_keys
-                                    }
-                                    for future in concurrent.futures.as_completed(fut_to_bidx_f2):
-                                        if cancel_check and cancel_check():
-                                            print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
-                                            break
-                                        try:
-                                            batch_output = future.result()
-                                            self._record_batch_results(
-                                                batch_output=batch_output,
-                                                translated_results=translated_results,
-                                                translated_regions=translated_regions,
-                                                translated_typesetting=translated_typesetting,
-                                                translated_addressees=translated_addressees,
-                                                translated_speakers=translated_speakers,
-                                                episode_whisper_transcriptions=episode_whisper_transcriptions,
-                                                history=history,
-                                                checkpoint_path=checkpoint_path,
-                                                pbar=pbar,
-                                                progress_callback=progress_callback,
-                                                total_lines=total_lines
-                                            )
-                                        except ContextCacheDiscountError:
-                                            for f in fut_to_bidx_f2:
-                                                f.cancel()
-                                            raise
-                                        except Exception as e:
-                                            pbar.write(f" 🔴 [Niepowodzenie Fazy 2 Paczki]: {format_friendly_api_error(e)}")
-                                            pbar.refresh()
-                            else:
-                                print(f"  [Kolejka Paczek / Faza 2]: Płynna redakcja Fazy 2 na ugruntowanym K2 (1 paczka na raz)...")
-                                for loop_i, b_idx in enumerate(remaining_f2_keys):
+                        if not k2_confirmed:
+                            logger.warning("[Phase Barrier]: Brak potwierdzenia telemetrii w 3 próbach - przejście do Fazy 2 z domyślnym ugruntowaniem.")
+                        time.sleep(0.5)
+
+                    # --- STANDARD 11.2.14: ETAP 2 - FAZA 2 REDAKCJA (F2 SEQUENTIAL CANARY GATE NA K2) ---
+                    sorted_p1_keys = sorted(phase1_outputs.keys())
+
+                    # 1. Sekwencyjny Pre-flight Fazy 2 (Paczka 0 jako F2 Canary Gate)
+                    if sorted_p1_keys:
+                        if cancel_check and cancel_check():
+                            print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
+                            remaining_f2_keys = []
+                        else:
+                            canary_f2_bidx = sorted_p1_keys[0]
+                            logger.info(f"[Canary Gate F2]: Uruchamianie sekwencyjnego ugruntowania K2 (Paczka {canary_f2_bidx} / F2 Canary Run)...")
+                            print(f"\n  [Canary Gate F2]: Uruchamianie sekwencyjnego ugruntowania K2 (Paczka {canary_f2_bidx} / F2 Canary Run)...")
+                            canary_f2_output = self._process_phase2_only(phase1_data=phase1_outputs[canary_f2_bidx])
+                            self._record_batch_results(
+                                batch_output=canary_f2_output,
+                                translated_results=translated_results,
+                                translated_regions=translated_regions,
+                                translated_typesetting=translated_typesetting,
+                                translated_addressees=translated_addressees,
+                                translated_speakers=translated_speakers,
+                                episode_whisper_transcriptions=episode_whisper_transcriptions,
+                                history=history,
+                                checkpoint_path=checkpoint_path,
+                                pbar=pbar,
+                                progress_callback=progress_callback,
+                                total_lines=total_lines
+                            )
+                            # Pauza ugruntowująca snapshot TPU po realnym payloadzie F2
+                            time.sleep(1.0)
+                            remaining_f2_keys = sorted_p1_keys[1:]
+                    else:
+                        remaining_f2_keys = []
+
+                    # 2. Współbieżne przetworzenie pozostałych paczek (K2 w 100% zindeksowany w TPU)
+                    max_workers_f2 = min(2, len(remaining_f2_keys)) if self.concurrent_batches > 1 else 1
+                    if remaining_f2_keys:
+                        if max_workers_f2 > 1:
+                            print(f"  [Kolejka Paczek / Faza 2]: Rozpoczynanie redakcji Fazy 2 na ugruntowanym K2 ({max_workers_f2} paczek w locie)...")
+                            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers_f2) as executor_f2:
+                                fut_to_bidx_f2 = {
+                                    executor_f2.submit(
+                                        self._process_phase2_only,
+                                        phase1_data=phase1_outputs[b_idx]
+                                    ): b_idx
+                                    for b_idx in remaining_f2_keys
+                                }
+                                for future in concurrent.futures.as_completed(fut_to_bidx_f2):
                                     if cancel_check and cancel_check():
                                         print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
                                         break
-                                    if loop_i > 0:
-                                        time.sleep(0.25)
                                     try:
-                                        batch_output = self._process_phase2_only(phase1_data=phase1_outputs[b_idx])
+                                        batch_output = future.result()
                                         self._record_batch_results(
                                             batch_output=batch_output,
                                             translated_results=translated_results,
@@ -6962,10 +6971,41 @@ class MultimodalTranslator:
                                             total_lines=total_lines
                                         )
                                     except ContextCacheDiscountError:
+                                        for f in fut_to_bidx_f2:
+                                            f.cancel()
                                         raise
                                     except Exception as e:
                                         pbar.write(f" 🔴 [Niepowodzenie Fazy 2 Paczki]: {format_friendly_api_error(e)}")
                                         pbar.refresh()
+                        else:
+                            print(f"  [Kolejka Paczek / Faza 2]: Płynna redakcja Fazy 2 na ugruntowanym K2 (1 paczka na raz)...")
+                            for loop_i, b_idx in enumerate(remaining_f2_keys):
+                                if cancel_check and cancel_check():
+                                    print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
+                                    break
+                                if loop_i > 0:
+                                    time.sleep(0.25)
+                                try:
+                                    batch_output = self._process_phase2_only(phase1_data=phase1_outputs[b_idx])
+                                    self._record_batch_results(
+                                        batch_output=batch_output,
+                                        translated_results=translated_results,
+                                        translated_regions=translated_regions,
+                                        translated_typesetting=translated_typesetting,
+                                        translated_addressees=translated_addressees,
+                                        translated_speakers=translated_speakers,
+                                        episode_whisper_transcriptions=episode_whisper_transcriptions,
+                                        history=history,
+                                        checkpoint_path=checkpoint_path,
+                                        pbar=pbar,
+                                        progress_callback=progress_callback,
+                                        total_lines=total_lines
+                                    )
+                                except ContextCacheDiscountError:
+                                    raise
+                                except Exception as e:
+                                    pbar.write(f" 🔴 [Niepowodzenie Fazy 2 Paczki]: {format_friendly_api_error(e)}")
+                                    pbar.refresh()
 
             # 6.9. Zero-Gap Healing Pass: uzupełnienie ewentualnych brakujących kwestii po awariach paczek
             missing_entries = [item for item in raw_entries if item[0] not in translated_results]
