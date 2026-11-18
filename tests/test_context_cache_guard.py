@@ -1251,17 +1251,15 @@ def test_hydrogen_1to1_concurrency_cap_in_translate_file(monkeypatch, tmp_path):
     monkeypatch.setattr(translator.profiler, "profile_episode", lambda *a, **kw: None)
     monkeypatch.setattr("translator.get_anime_context", lambda *a, **kw: None)
     translator.whisper = None
+    monkeypatch.setattr(translator.manga_canon, "get_or_discover_canon", lambda *a, **kw: None)
     k2_c = translator.client_pool_f2.get_client(affinity_idx=0)
     k2_c.models.generate_content = MagicMock(return_value=MagicMock(usage_metadata=MagicMock(cached_content_token_count=45000)))
 
     out_path = tmp_path / "test_concurrency_out.ass"
     translator.translate_file(subs_path=str(test_sub_path), output_path=str(out_path))
 
-    # Asercja 1: Żadna pula F1/F2 nie może przekroczyć liczby kluczy w podpuli (max 2 dla F1, brak >1 dla F2)
-    assert recorded_pool_workers, "Oczekiwano uruchomienia ThreadPoolExecutor w Fazie 1!"
-    assert all(w <= 2 for w in recorded_pool_workers if w is not None), f"Przekroczono limit 1:1 kluczy! Wykryto max_workers={recorded_pool_workers}"
-    # Dokładnie jedno użycie puli wielowątkowej (dla F1); F2 na 1 kluczu K2 idzie ścieżką sekwencyjną!
-    assert len(recorded_pool_workers) == 1, f"Faza 2 na 1 kluczu K2 powinna działać sekwencyjnie bez ThreadPoolExecutor! Wykryto pule: {recorded_pool_workers}"
+    # Standard 11.2.19: Zarówno F1 (K0 z failoverem K1), jak i F2 (K2) działają ściśle sekwencyjnie bez ThreadPoolExecutor
+    assert recorded_pool_workers == [], f"Dla Hydrogen F1 i F2 powinny działać sekwencyjnie (0 pul ThreadPoolExecutor)! Wykryto: {recorded_pool_workers}"
     # Asercja 2: Warm-up F1 przekazał symetryczną sygnaturę dekodera
     assert f1_warmup_kwargs.get("thinking_config") is not None
     assert f1_warmup_kwargs.get("response_schema") is not None
@@ -1373,6 +1371,98 @@ def test_ensure_cache_ready_accounts_warmup_tokens_when_ping_enabled():
 
     assert acc["prompt"] == 86259
     assert acc["output"] == 1
+
+
+@pytest.mark.unit
+def test_hydrogen_f1_pins_primary_key_k0_with_automatic_k1_failover(monkeypatch):
+    """
+    Standard 11.2.19: Weryfikuje konsolidację F1 na kluczu głównym K0 dla Hydrogen
+    oraz automatyczny failover na K1 w przypadku błędu / cooldownu K0.
+    """
+    from unittest.mock import MagicMock
+    from translator import MultimodalTranslator
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=False
+    )
+
+    requested_affinities = []
+    real_get_client = translator.client_pool_f1.get_client
+
+    def spy_get_client(affinity_idx=None):
+        requested_affinities.append(affinity_idx)
+        return real_get_client(affinity_idx=affinity_idx)
+
+    monkeypatch.setattr(translator.client_pool_f1, "get_client", spy_get_client)
+    monkeypatch.setattr("client_factory.global_rate_limiter.acquire", lambda: None)
+
+    mock_resp = MagicMock()
+    mock_resp.text = '{"lines": []}'
+    mock_resp.usage_metadata = MagicMock(prompt_token_count=100, cached_content_token_count=35000, candidates_token_count=10, thoughts_token_count=0)
+
+    for c in translator.client_pool_f1.clients:
+        c.models.generate_content = MagicMock(return_value=mock_resp)
+
+    # 1. Wywołania normalne: paczki 0, 1, 2, 3 dla Hydrogen muszą ZAWSZE żądać affinity_idx=0 (K0)
+    for b_idx in range(4):
+        translator._call_gemini_with_retry([{"role": "user", "parts": ["test"]}], None, batch_idx=b_idx)
+
+    assert requested_affinities == [0, 0, 0, 0], f"Dla Hydrogen affinity w F1 musi być zawsze 0! Wykryto: {requested_affinities}"
+
+    # 2. Test failover: gdy K0 jest w cooldownie, get_client(affinity_idx=0) musi bezpiecznie zwrócić K1
+    k0_client = translator.client_pool_f1.clients[0]
+    k1_client = translator.client_pool_f1.clients[1]
+
+    translator.client_pool_f1.report_error(k0_client, "429 quota")
+    fallback_client = translator.client_pool_f1.get_client(affinity_idx=0)
+    assert fallback_client is k1_client, "Gdy K0 ma cooldown, ruch F1 musi automatycznie trafić do K1!"
+
+
+@pytest.mark.unit
+def test_planned_self_warming_init_vs_unexpected_warn_and_batch1_confirm(capsys):
+    """
+    Standard 11.2.19:
+    1. Paczka 0 na Hydrogen generuje planowy komunikat 'Context Cache INIT / Self-Warming' (nie WARN).
+    2. Paczka > 0 na Hydrogen z zerem tokenów generuje ostrzeżenie 'Context Cache WARN'.
+    3. Paczka 0 i Paczka 1 z cached >= 32768 drukują 'Context Cache AKTYWNY'.
+    """
+    from translator import MultimodalTranslator
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=False
+    )
+    # Reset licznika tokenów do stanu po pojedynczym cold-starcie (koszt 0.49 PLN <= 6.00 PLN)
+    translator.current_episode_tokens = {
+        "prompt": 80000,
+        "cached": 0,
+        "output": 500,
+        "model": "gemini-4-hydrogen"
+    }
+
+    # Krok 1: Paczka 0 z 0 tokenów cache (planowy cold-start)
+    capsys.readouterr()
+    translator._audit_batch_context_cache(b_idx=0, cached_tokens=0, phase="phase1")
+    out1 = capsys.readouterr().out
+    assert "Context Cache INIT / Self-Warming" in out1
+    assert "Context Cache WARN" not in out1
+
+    # Krok 2: Paczka 1 z 0 tokenów cache (nieplanowany spadek cache)
+    translator._audit_batch_context_cache(b_idx=1, cached_tokens=0, phase="phase1")
+    out2 = capsys.readouterr().out
+    assert "Context Cache WARN" in out2
+
+    # Krok 3: Paczka 0 oraz Paczka 1 z aktywnym cache
+    translator._audit_batch_context_cache(b_idx=0, cached_tokens=86000, phase="phase1")
+    out3a = capsys.readouterr().out
+    assert "Context Cache AKTYWNY" in out3a
+
+    translator._audit_batch_context_cache(b_idx=1, cached_tokens=86000, phase="phase1")
+    out3b = capsys.readouterr().out
+    assert "Context Cache AKTYWNY" in out3b
 
 
 
