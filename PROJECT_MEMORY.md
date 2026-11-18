@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-18 — Standard 11.2.16 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.16 (Decoupled Phase-1 Canary & Fail-Closed Budget Guard)`
-- **Commit certyfikacji kodu:** `bef0e51` (`bef0e51da1b22033d609f18896fc16b5856888ca`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-18 — Standard 11.2.17 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.17 (F1 Zero-Silent-Retry, Global Budget Sentinel & 1:1 Hydrogen Concurrency)`
+- **Commit certyfikacji kodu:** `e6e3161` (`e6e31610d7a8d98d6318eab660371b76cf306af4`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -34,20 +34,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.13:** `b08c42e` (Commit 1), `d3fe0ec` (Commit 2), `7414ae2` (Commit 3)
 - **Commity Standardu 11.2.14:** `6f25edc` (Commit 1), `61b1a9f` (Commit 2), `402f86a` (Commit 3)
 - **Commity Standardu 11.2.15:** `0e42387` (Commit 1), `74f65b4` (Commit 2), `ba52095` (Commit 3)
-- **Commity Standardu 11.2.16:**
-  * Commit 1 (`bef0e51`): `fix(pipeline): remove monolithic canary gate, implement fail-closed graceful fallback and restore F2 Batch 0 JIT retry (11.2.16)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 2 (`6d65ba0`): `test(pipeline): add non-tautological canary trap and fail-closed budget guard tests (11.2.16)`
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.16 — pure decoupled phases and fail-closed budget safety net`
-- **Status 11.2.16:** `CERTIFIED / CLOSED (2026-11-18)`
+- **Commity Standardu 11.2.16:** `bef0e51` (Commit 1), `6d65ba0` (Commit 2), `3dcb70c` (Commit 3)
+- **Commity Standardu 11.2.17:**
+  * Commit 1 (`e6e3161`): `fix(pipeline): disable F1 silent retry for b_idx>0, enforce global budget sentinel, 1:1 Hydrogen concurrency and F1 warmup symmetry (11.2.17)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 2 (`0175847`): `test(pipeline): add non-tautological tests for F1 no-silent-retry, global budget halt and 1:1 concurrency cap (11.2.17)`
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.17 — F1 zero-silent-retry, global budget sentinel and 1:1 Hydrogen concurrency`
+- **Status 11.2.17:** `CERTIFIED / CLOSED (2026-11-18)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
-- **Stan metryk:** `398 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `469 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (398/398 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.16` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.16: Decoupled Phase-1 Canary & Fail-Closed Budget Guard — usunięcie archaicznego monolitycznego Canary Gate z `translate_file` / `translate_subtitles`, wdrożenie czysto sekwencyjnego Pre-flightu Fazy 1 z zapisem do `phase1_outputs[0]`, przywrócenie obwodu asekuracyjnego JIT Warmup Retry dla Paczki 0 Fazy 2, bezpiecznik Fail-Closed z Graceful Fallback w `_audit_batch_context_cache` przy sufitowym limicie 6.00 PLN netto i koszcie nominalnym ~4.27 PLN netto [max ~4.76 PLN netto]).
+- **Stan metryk:** `401 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `472 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (401/401 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.17` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.17: F1 Zero-Silent-Retry, Global Budget Sentinel & 1:1 Hydrogen Concurrency — likwidacja cichego JIT Retry w Fazie 1 dla b_idx > 0, uniwersalny audyt budżetu sesji w _audit_batch_context_cache chroniący sufit 6.00 PLN nawet przy cache hit, symetria dekodera warm-upu F1 oraz rygor współbieżności 1:1 na fizycznych kluczach API dla modeli Hydrogen).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (398 passed w tests/)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (401 passed w tests/)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -569,7 +570,7 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
 
 ## 🏛️ ARB-067 / INC-AVT-065: Standard 11.2.16 — Decoupled Phase-1 Canary, Fail-Closed Graceful Fallback i Determinizm Kosztowy
 
-- **Status:** `RESOLVED (Standard 11.2.16, commity bef0e51, 6d65ba0, HEAD)`
+- **Status:** `RESOLVED (Standard 11.2.16, commity bef0e51, 6d65ba0, 3dcb70c)`
 - **Zidentyfikowano:**
   1. Archaiczny monolit Canary Gate w `translate_file` / `translate_subtitles`: Pre-flight Paczki 0 wywoływał `_process_single_batch`, który sztucznie uruchamiał Fazę 2 przed zakończeniem Fazy 1 pozostałych paczek, wywołując cross-phase cache thrashing na TPU. Następnie Faza 1 przetwarzała paczkę 0 powtórnie, marnując tokeny i czas.
   2. Zbyt agresywny i ślepy bezpiecznik `_audit_batch_context_cache`: Bezwarunkowe `os._exit(1)` przy `cached_tokens == 0` bez sprawdzania realnego kosztu sesji uniemożliwiało dokończenie tłumaczenia, nawet gdy całkowity koszt mieścił się w bezpiecznym marginesie $\le 6.00$ PLN netto.
@@ -584,6 +585,26 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   3. `translator.py:_process_phase2_only`: Przywrócenie obwodu **JIT Warmup Retry** wyłącznie dla Paczki 0 Fazy 2 (`if p2_cached == 0 and b_idx == 0:` z pauzą 1.2 s), gwarantując bezbłędne ugruntowanie bufora redaktora w TPU bez ryzyka kaskadowych ponowień na paczkach 1–12.
   4. `tests/test_context_cache_guard.py`: Wdrożenie 3 nietrywialnych testów jednostkowych: `test_archaic_canary_gate_removed_from_translate_file`, `test_f2_graceful_fallback_on_zero_cache`, `test_hard_halt_on_cost_exceeded` (27/27 tests passing, łącznie 398/398 passing w `tests/`).
   5. Determinizm finansowy: Nominalny koszt odcinka wynosi **4.27 PLN netto** (~5.25 PLN brutto), a w pesymistycznym przypadku pojedynczego retry na F2 Paczce 0 koszt wynosi maksymalnie **4.76 PLN netto** (~5.85 PLN brutto, margines bezpieczeństwa 20.7% poniżej limitu 6.00 PLN).
+
+
+## 🏛️ ARB-068 / INC-AVT-066: Standard 11.2.17 — F1 Zero-Silent-Retry, Global Budget Sentinel i 1:1 Hydrogen Concurrency
+
+- **Status:** `RESOLVED (Standard 11.2.17, commity e6e3161, 0175847, HEAD)`
+- **Zidentyfikowano:** W trakcie tłumaczenia `<SERIA>` / `<ODCINEK>` wystąpił skok kosztu do poziomu 12.06 PLN z powodu czterech sprzężonych defektów:
+  1. Nadmierna współbieżność F1 i F2: Na 2 klucze F1 uruchamiano `concurrent_batches=6` (3 ciężkie zapytania na 1 klucz naraz), co niszczyło sloty KV w TPU. Na 1 klucz K2 Fazy 2 wchodziły 2 wątki z kolizją budżetów CoT (2048 vs 3072 tokenów).
+  2. Nielimitowany cichy JIT Retry w Fazie 1: Warunek `cached_tokens == 0` w `_process_phase1_only` nie był ograniczony do `b_idx == 0` i logował wyłącznie na poziomie debug/info, po cichu podwajając wywołania API dla paczek 1..N.
+  3. Martwe pole bezpiecznika budżetowego w `_audit_batch_context_cache`: Weryfikacja sufitu `6.00 PLN` wykonywała się wyłącznie w gałęzi `cached_tokens == 0`. Paczki, które po cichym ponowieniu zwróciły `cached >= 32768`, omijały sprawdzenie całkowitego budżetu sesji.
+  4. Asymetria warm-upu F1: Ping rozgrzewający `ensure_cache_ready` dla F1 nie przekazywał konfiguracji dekodera (`thinking_config`, `response_schema`, `response_mime_type`), co skutkowało niedopasowaniem prefix snapshotu.
+- **Komponenty Naprawy:**
+  1. `translator.py:_audit_batch_context_cache`: Globalny bezpiecznik budżetowy aktywny po każdej paczce (również przy `cached_tokens >= 32768` oraz partial hit). Jeśli zweryfikowany koszt netto przekroczy `HARD_BUDGET_LIMIT_PLN = 6.00 PLN`, potok natychmiast zatrzymuje proces via `os._exit(1)` i rzuca `ContextCacheDiscountError`.
+  2. `translator.py:_process_phase1_only`: Ścisłe ograniczenie obwodu JIT Warmup Retry w Fazie 1 wyłącznie do bramki Canary (`b_idx == 0`). Całkowita blokada ponowień dla paczek 1..N (dokładnie 1 wywołanie API na paczkę).
+  3. `translator.py:translate_subtitles`: Symetria warm-upu Fazy 1 w `ensure_cache_ready` — wyznaczenie budżetu myślenia F1 via `resolve_f1_thinking_budget` oraz przekazanie `thinking_config`, `response_schema` (`LeanBatchTranslationResponse` dla Hydrogen) i `response_mime_type="application/json"`.
+  4. `translator.py:translate_subtitles`: Rygor współbieżności 1:1 na fizycznych kluczach API dla modeli Hydrogen:
+     - Faza 1: `max_workers_f1 = max(1, min(self.concurrent_batches, f1_pool_size, len(remaining_tasks)))` (max 2 paczki w locie na 2 kluczach $K_0, K_1$).
+     - Faza 2: `max_workers_f2 = max(1, min(self.concurrent_batches, f2_pool_size, len(remaining_f2_keys)))` (dokładnie 1 wątek na pojedynczym kluczu $K_2$ — ścieżka sekwencyjna bez kolizji CoT).
+  5. `tests/test_context_cache_guard.py`: Wdrożenie 3 nietrywialnych testów jednostkowych: `test_f1_no_silent_jit_retry_on_non_canary_batches`, `test_global_budget_halt_even_on_cache_hit`, `test_hydrogen_1to1_concurrency_cap_in_translate_file` (30/30 tests passing, łącznie 401/401 passing w `tests/`).
+  6. Determinizm finansowy: Nominalny koszt odcinka wynosi **$\le 4.30$ PLN netto** (~4.27 PLN netto, ~5.25 PLN brutto), a w pesymistycznym przypadku pojedynczego retry na F2 Paczce 0 koszt wynosi maksymalnie **$\le 4.85$ PLN netto** (~5.96 PLN brutto, margines 19.2% poniżej limitu 6.00 PLN).
+
 
 
 
