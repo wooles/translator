@@ -2029,7 +2029,9 @@ class MultimodalTranslator:
         self.trace_log = trace_log
         self.trace_dir = trace_dir
         self.flight_recorder: Optional[EpisodeFlightRecorder] = None
-        self.system_prompt = get_translation_system_prompt(keep_honorifics=keep_honorifics, lean=False)
+        from model_resolver import is_gemini_4_or_hydrogen_model
+        use_lean_f1 = is_gemini_4_or_hydrogen_model(self.model_phase1)
+        self.system_prompt = get_translation_system_prompt(keep_honorifics=keep_honorifics, lean=use_lean_f1)
         radio_dispatch_rule = (
             "\n\n### Protokół Łączności i Meldunków (Radio & Dispatch Invariance)\n"
             "Krótkie komunikaty radiowe, meldunki i potwierdzenia rozkazów (roger, copy that, acknowledged, wilco, understood) "
@@ -2062,12 +2064,13 @@ class MultimodalTranslator:
         
         # Phase 2 - Script Doctor / Editorial Verifier
         if self.enable_verifier:
+            use_lean_f2 = is_gemini_4_or_hydrogen_model(self.model_phase2)
             self.verifier = DialogueVerifier(
                 client=self.client_pool_f2 or self.client,
                 model=self.model_phase2,
                 keep_honorifics=keep_honorifics,
                 thinking_budget=self.thinking_budget_phase2,
-                lean=False
+                lean=use_lean_f2
             )
             if hasattr(self.verifier, "system_prompt"):
                 self.verifier.system_prompt += radio_dispatch_rule
@@ -2223,20 +2226,30 @@ class MultimodalTranslator:
                 cost_disp = f"{current_net_pln:.2f} PLN" if current_net_pln is not None else "NIEZNANY (AWARIA KALKULATORA LUB BRAK TELEMETRII)"
                 _trigger_hard_halt(cost_disp, f"Serwer zwrócił 0 tokenów cache{'!'}")
 
-            # 3. Standard 11.2.19: Rozróżnienie planowego Self-Warming INIT (Paczka 0 Hydrogen) od nieoczekiwanego WARN
+            # 3. Standard 11.2.20: Rozróżnienie planowego Self-Warming INIT (Paczka 0), trybu Hydrogen Zero-Cache Lean oraz nieoczekiwanego WARN
             from model_resolver import is_gemini_4_or_hydrogen_model
             active_phase_model = (
                 getattr(getattr(self, "verifier", None), "model", getattr(self, "model_phase2", self.model))
                 if phase == "phase2"
                 else getattr(self, "model_phase1", self.model)
             )
-            if b_idx == 0 and is_gemini_4_or_hydrogen_model(active_phase_model):
+            is_active_hydrogen = is_gemini_4_or_hydrogen_model(active_phase_model)
+            prompt_len = len(getattr(self, "system_prompt", ""))
+            is_hydrogen_lean = is_active_hydrogen and prompt_len < 60000
+
+            if b_idx == 0 and is_active_hydrogen:
                 init_msg = (
                     f"\n  ℹ️ [Context Cache INIT / Self-Warming]: Paczka {b_idx} ({phase}) inicjalizuje bufor TPU na dedykowanym kluczu.\n"
                     f"     Bieżący zweryfikowany koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN (kolejne paczki z rabatem -95%)."
                 )
                 print(init_msg)
                 logger.info(f"[Context Cache INIT / Self-Warming]: Planned cold-start on {phase} b_idx {b_idx}. Cost: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN.")
+            elif is_hydrogen_lean:
+                lean_msg = (
+                    f"\n  ℹ️ [Hydrogen Zero-Cache Lean]: Paczka {b_idx} ({phase}) — bieżący koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN."
+                )
+                print(lean_msg)
+                logger.info(f"[Hydrogen Zero-Cache Lean]: Paczka {b_idx} ({phase}) — bieżący koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN.")
             else:
                 warn_msg = (
                     f"\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Wykryto 0 tokenów cache ({phase}, paczka {b_idx}).\n"
@@ -3896,8 +3909,8 @@ class MultimodalTranslator:
                     "response_schema": effective_schema,
                 }
                 if is_hydrogen:
-                    if gen_config_kwargs.get("max_output_tokens") is None or gen_config_kwargs["max_output_tokens"] < 16384:
-                        gen_config_kwargs["max_output_tokens"] = 16384
+                    if gen_config_kwargs.get("max_output_tokens") is None or gen_config_kwargs["max_output_tokens"] < 32768:
+                        gen_config_kwargs["max_output_tokens"] = 32768
                 if not is_hydrogen:
                     gen_config_kwargs["temperature"] = 0.25
 
@@ -4170,25 +4183,29 @@ class MultimodalTranslator:
             # 1. Start line
             raw_timestamps.append((untranslated_in_batch[0][1].start + untranslated_in_batch[0][1].end) // 2)
 
+            N = len(untranslated_in_batch)
+            max_frames_for_batch = min(8, max(4, N // 10))
+
             # 2. Priority: Signs and On-screen captions for OCR
             for _, ev, clean_txt, ts_pref in untranslated_in_batch:
                 vtype = detect_event_visual_type(ev, ts_pref, style_report=getattr(self, "style_report", None))
                 if vtype.get("is_sign") or (clean_txt.startswith("[") and clean_txt.endswith("]")):
                     sign_ts = (ev.start + ev.end) // 2
                     raw_timestamps.append(sign_ts)
-                    if len(raw_timestamps) >= 4:
+                    if len(raw_timestamps) >= max_frames_for_batch:
                         break
 
             # 3. Middle / Scene transition frames
-            N = len(untranslated_in_batch)
-            if N >= 8 and len(raw_timestamps) < 4:
-                raw_timestamps.append((untranslated_in_batch[N // 3][1].start + untranslated_in_batch[N // 3][1].end) // 2)
-                raw_timestamps.append((untranslated_in_batch[(2 * N) // 3][1].start + untranslated_in_batch[(2 * N) // 3][1].end) // 2)
+            if N >= 8 and len(raw_timestamps) < max_frames_for_batch:
+                step_slots = max(2, max_frames_for_batch - len(raw_timestamps) - 1)
+                for s_i in range(1, step_slots + 1):
+                    idx_slot = min(N - 1, (s_i * N) // (step_slots + 1))
+                    raw_timestamps.append((untranslated_in_batch[idx_slot][1].start + untranslated_in_batch[idx_slot][1].end) // 2)
             elif N >= 3 and len(raw_timestamps) < 3:
                 raw_timestamps.append((untranslated_in_batch[N // 2][1].start + untranslated_in_batch[N // 2][1].end) // 2)
 
             # 4. End of scene / Reaction frame
-            if N >= 2 and len(raw_timestamps) < 4:
+            if N >= 2 and len(raw_timestamps) < max_frames_for_batch:
                 raw_timestamps.append((untranslated_in_batch[-1][1].start + untranslated_in_batch[-1][1].end) // 2)
 
             # Sort and deduplicate timestamps (min 1500ms apart)
@@ -4197,7 +4214,7 @@ class MultimodalTranslator:
             for ts in raw_timestamps:
                 if not deduped_ts or all(abs(ts - existing) >= 1500 for existing in deduped_ts):
                     deduped_ts.append(ts)
-                if len(deduped_ts) >= 4:
+                if len(deduped_ts) >= max_frames_for_batch:
                     break
 
             for ts in deduped_ts:
@@ -4430,7 +4447,7 @@ class MultimodalTranslator:
                 "speech_style_pl": sp_style,
                 "notes": prag_note or ""
             })
-        focused_rules_str = get_focused_rules_for_batch(batch_items_for_rules, max_rules=3)
+        focused_rules_str = get_focused_rules_for_batch(batch_items_for_rules, max_rules=5 if len(untranslated_in_batch) > 40 else 3)
 
         # Dynamic JIT Scoping of Series Bible Context for current batch
         scoped_series_bible_str = series_bible_str
@@ -5409,7 +5426,7 @@ class MultimodalTranslator:
                 prev_speaker_name = spk_name
 
             t0_phase2 = time.perf_counter()
-            phase2_focused_rules = get_focused_rules_for_batch(pass1_items, max_rules=3)
+            phase2_focused_rules = get_focused_rules_for_batch(pass1_items, max_rules=5 if len(pass1_items) > 40 else 3)
             # INC-AVT-060: Offset klucza dla Fazy 2 zapobiegający kolizji pamięci TPU z Fazą 1
             f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx
             refined_lines: List[RefinedLine] = self.verifier.verify_batch(
@@ -6553,9 +6570,10 @@ class MultimodalTranslator:
             logger.info("[Context Cache]: Weryfikacja progu tokenów i rozgrzewanie pamięci podręcznej...")
             print(f"  [Infrastruktura Finansowa]: Weryfikacja i rozgrzewanie pamięci Context Cache z pełną wiedzą odcinka...")
             pool_or_c1 = getattr(self, "client_pool_f1", None) or getattr(self, "client_pool", None) or self.client
-            self.system_prompt = ensure_cache_token_floor(self.system_prompt, pool_or_c1, self.model_phase1)
-            # Standard 11.2.18: Zero-Waste Self-Warming dla Hydrogen (0 syntetycznych pingów F1, pełna symetria sygnatury)
+            # Standard 11.2.20: Hydrogen Zero-Cache Lean — brak sztucznego dopełniania do 33.5k tok (oszczędność ~20k tok/paczkę)
             f1_is_hydrogen = is_gemini_4_or_hydrogen_model(self.model_phase1)
+            if not f1_is_hydrogen:
+                self.system_prompt = ensure_cache_token_floor(self.system_prompt, pool_or_c1, self.model_phase1)
             f1_warmup_budget = self.resolve_f1_thinking_budget(len(raw_entries))
             f1_thinking = build_thinking_config(self.model_phase1, f1_warmup_budget)
             f1_schema = LeanBatchTranslationResponse if f1_is_hydrogen else BatchTranslationResponse
@@ -6581,10 +6599,10 @@ class MultimodalTranslator:
                 from verifier import LeanRefinedBatchResponse
                 from model_resolver import build_thinking_config
                 pool_or_c2 = getattr(self.verifier, "client_pool", None) or getattr(self, "client_pool_f2", None) or getattr(self.verifier, "client", None)
-                self.verifier.system_prompt = ensure_cache_token_floor(self.verifier.system_prompt, pool_or_c2, self.verifier.model)
-
-                # Standard 11.2.18: Dla Hydrogen brak zbędnego startowego pingu K2 przed Fazą 1 (oszczędność -0.47 PLN)
+                # Standard 11.2.20: Hydrogen Zero-Cache Lean — brak sztucznego dopełniania promptu F2 do 33.5k tok
                 f2_is_hydrogen = is_gemini_4_or_hydrogen_model(self.verifier.model)
+                if not f2_is_hydrogen:
+                    self.verifier.system_prompt = ensure_cache_token_floor(self.verifier.system_prompt, pool_or_c2, self.verifier.model)
                 f2_thinking = build_thinking_config(self.verifier.model, getattr(self.verifier, "thinking_budget", 2048))
                 c2 = ContextCacheManager.ensure_cache_ready(
                     client=pool_or_c2,
@@ -6651,12 +6669,25 @@ class MultimodalTranslator:
             except Exception as e:
                 logger.warning(f"Nie udało się wykryć cięć montażowych lub czerni: {e}")
 
+        from model_resolver import is_gemini_4_or_hydrogen_model
+        if is_gemini_4_or_hydrogen_model(self.model_phase1) and self.batch_size >= 24:
+            # Standard 11.2.20 (Hydrogen Zero-Cache Lean): ~52-60 linii/paczkę (~6 paczek na odcinek 334 linii)
+            eff_base_bs = max(self.batch_size, 52)
+            eff_max_bs = max(eff_base_bs + 8, 60)
+            eff_min_scene = 36
+            eff_min_leap = 28
+        else:
+            eff_base_bs = self.batch_size
+            eff_max_bs = min(32, self.batch_size + 8) if self.batch_size >= 8 else self.batch_size
+            eff_min_scene = 16 if self.batch_size >= 16 else self.batch_size
+            eff_min_leap = 12 if self.batch_size >= 12 else self.batch_size
+
         batches = create_adaptive_batches(
             raw_entries,
-            base_batch_size=self.batch_size,
-            max_batch_size=min(32, self.batch_size + 8) if self.batch_size >= 8 else self.batch_size,
-            min_scene_batch=16 if self.batch_size >= 16 else self.batch_size,
-            min_leap_batch=12 if self.batch_size >= 12 else self.batch_size,
+            base_batch_size=eff_base_bs,
+            max_batch_size=eff_max_bs,
+            min_scene_batch=eff_min_scene,
+            min_leap_batch=eff_min_leap,
             leap_threshold_ms=8000,
             scene_threshold_ms=3800,
             coalesce_tail=(self.batch_size >= 8)
