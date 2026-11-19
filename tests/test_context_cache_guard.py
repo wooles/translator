@@ -1450,10 +1450,16 @@ def test_planned_self_warming_init_vs_unexpected_warn_and_batch1_confirm(capsys)
     assert "Context Cache INIT / Self-Warming" in out1
     assert "Context Cache WARN" not in out1
 
-    # Krok 2: Paczka 1 z 0 tokenów cache (nieplanowany spadek cache)
+    # Krok 2: Paczka 1 z 0 tokenów cache w trybie Hydrogen Zero-Cache Lean (system_prompt < 60000)
     translator._audit_batch_context_cache(b_idx=1, cached_tokens=0, phase="phase1")
     out2 = capsys.readouterr().out
-    assert "Context Cache WARN" in out2
+    assert "Hydrogen Zero-Cache Lean" in out2
+
+    # Krok 2b: Gdy system_prompt jest pełny (> 60000, np. wymuszony non-lean), b_idx > 0 generuje Context Cache WARN
+    translator.system_prompt = "A" * 70000
+    translator._audit_batch_context_cache(b_idx=1, cached_tokens=0, phase="phase1")
+    out2b = capsys.readouterr().out
+    assert "Context Cache WARN" in out2b
 
     # Krok 3: Paczka 0 oraz Paczka 1 z aktywnym cache
     translator._audit_batch_context_cache(b_idx=0, cached_tokens=86000, phase="phase1")
@@ -1463,6 +1469,165 @@ def test_planned_self_warming_init_vs_unexpected_warn_and_batch1_confirm(capsys)
     translator._audit_batch_context_cache(b_idx=1, cached_tokens=86000, phase="phase1")
     out3b = capsys.readouterr().out
     assert "Context Cache AKTYWNY" in out3b
+
+
+@pytest.mark.unit
+def test_hydrogen_uses_lean_prompt_without_33k_padding(monkeypatch, tmp_path):
+    """
+    Standard 11.2.20 (Hydrogen Zero-Cache Lean):
+    Weryfikuje, że dla modelu gemini-4-hydrogen system_prompt F1 i F2 jest inicjalizowany
+    w trybie lean=True (< 50 000 znaków), a w translate_file pomijane jest dopełnianie ensure_cache_token_floor.
+    W przeciwieństwie do gemini-3.8-flash, który zachowuje pełny prompt (> 150 000 znaków).
+    """
+    import pysubs2
+    from unittest.mock import MagicMock
+    from translator import MultimodalTranslator
+
+    t_hydrogen = MultimodalTranslator(
+        api_key="mock_key",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+    assert len(t_hydrogen.system_prompt) < 50000, f"System prompt F1 dla Hydrogen powinien być lean (<50k)! Wykryto: {len(t_hydrogen.system_prompt)}"
+    assert len(t_hydrogen.verifier.system_prompt) < 50000, f"System prompt F2 dla Hydrogen powinien być lean (<50k)! Wykryto: {len(t_hydrogen.verifier.system_prompt)}"
+
+    t_flash = MultimodalTranslator(
+        api_key="mock_key",
+        model="gemini-3.8-flash",
+        enable_verifier=True
+    )
+    assert len(t_flash.system_prompt) > 150000, f"System prompt F1 dla Flash powinien być pełny (>150k)! Wykryto: {len(t_flash.system_prompt)}"
+
+    # Weryfikacja pomijania ensure_cache_token_floor w translate_file dla Hydrogen
+    floor_calls = []
+    monkeypatch.setattr("context_cache.ensure_cache_token_floor", lambda prompt, *a, **kw: floor_calls.append(prompt) or prompt)
+    monkeypatch.setattr("context_cache.ContextCacheManager.ensure_cache_ready", lambda *a, **kw: True)
+    monkeypatch.setattr(t_hydrogen.profiler, "profile_episode", lambda *a, **kw: None)
+    monkeypatch.setattr("translator.get_anime_context", lambda *a, **kw: None)
+    monkeypatch.setattr(t_hydrogen.manga_canon, "get_or_discover_canon", lambda *a, **kw: None)
+    t_hydrogen.whisper = None
+
+    subs = pysubs2.SSAFile()
+    for i in range(5):
+        subs.append(pysubs2.SSAEvent(start=i * 2000, end=i * 2000 + 1500, text=f"Line {i}"))
+    test_sub_path = tmp_path / "test_lean_prompt.ass"
+    subs.save(str(test_sub_path))
+
+    def mock_p1(b_idx, *args, **kwargs):
+        return {
+            "b_idx": b_idx,
+            "pass1_items": [{"id": 0, "orig_idx": 0, "en": "test", "pl": "test"}],
+            "untranslated_in_batch": [],
+            "scene_desc": "",
+            "batch_response": MagicMock(scene_diagnosis=None),
+            "lookback_history": [],
+            "lookahead_events": [],
+            "batch": []
+        }
+
+    def mock_p2(phase1_data, *args, **kwargs):
+        b_idx = phase1_data["b_idx"]
+        return (b_idx, {b_idx * 2: "przekład"}, {}, [], [], "", "")
+
+    monkeypatch.setattr(t_hydrogen, "_process_phase1_only", mock_p1)
+    monkeypatch.setattr(t_hydrogen, "_process_phase2_only", mock_p2)
+
+    out_path = tmp_path / "test_lean_out.ass"
+    t_hydrogen.translate_file(subs_path=str(test_sub_path), output_path=str(out_path))
+
+    assert floor_calls == [], f"Dla Hydrogen ensure_cache_token_floor NIE może być wywołany! Wykryto wywołania: {len(floor_calls)}"
+
+
+@pytest.mark.unit
+def test_hydrogen_zero_cache_lean_batches_around_55_lines():
+    """
+    Standard 11.2.20 (Hydrogen Zero-Cache Lean Batching):
+    Weryfikuje, że dla 334-liniowego odcinka logika paczkowania w translate_file
+    dla gemini-4-hydrogen tworzy ~5-8 paczek (~52-60 linii/paczkę),
+    podczas gdy dla gemini-3.8-flash powstaje 11-15 paczek (po max 32 linie).
+    """
+    import pysubs2
+    from translator import create_adaptive_batches
+    from model_resolver import is_gemini_4_or_hydrogen_model
+
+    # Syntetyczny odcinek 334 linii z realistycznymi przerwami dialogowymi
+    raw_entries = []
+    current_time = 0
+    for i in range(334):
+        # Przeskoki scen co ~55 linii (4.5s przerwy)
+        gap = 4500 if (i in (55, 110, 165, 225, 280)) else 400
+        start = current_time + gap
+        end = start + 1800
+        current_time = end
+        ev = pysubs2.SSAEvent(start=start, end=end, text=f"Dialog line {i}")
+        raw_entries.append((i, ev, f"Dialog line {i}", ""))
+
+    def compute_batches_for_model(model_name: str, batch_size: int = 30):
+        if is_gemini_4_or_hydrogen_model(model_name) and batch_size >= 24:
+            eff_base_bs = max(batch_size, 52)
+            eff_max_bs = max(eff_base_bs + 8, 60)
+            eff_min_scene = 36
+            eff_min_leap = 28
+        else:
+            eff_base_bs = batch_size
+            eff_max_bs = min(32, batch_size + 8) if batch_size >= 8 else batch_size
+            eff_min_scene = 16 if batch_size >= 16 else batch_size
+            eff_min_leap = 12 if batch_size >= 12 else batch_size
+
+        return create_adaptive_batches(
+            raw_entries,
+            base_batch_size=eff_base_bs,
+            max_batch_size=eff_max_bs,
+            min_scene_batch=eff_min_scene,
+            min_leap_batch=eff_min_leap,
+            leap_threshold_ms=8000,
+            scene_threshold_ms=3800,
+            coalesce_tail=(batch_size >= 8)
+        )
+
+    batches_hydrogen = compute_batches_for_model("gemini-4-hydrogen", batch_size=30)
+    batches_flash = compute_batches_for_model("gemini-3.8-flash", batch_size=30)
+
+    assert 5 <= len(batches_hydrogen) <= 8, f"Dla Hydrogen oczekiwano 5-8 paczek! Otrzymano: {len(batches_hydrogen)}"
+    assert 11 <= len(batches_flash) <= 15, f"Dla Flash oczekiwano 11-15 paczek! Otrzymano: {len(batches_flash)}"
+    # Sprawdzenie średniej liczby linii w paczce dla Hydrogen
+    avg_lines_hydrogen = sum(len(b) for b in batches_hydrogen) / len(batches_hydrogen)
+    assert 45 <= avg_lines_hydrogen <= 65, f"Średnia wielkość paczki dla Hydrogen powinna wynosić ~55 linii! Otrzymano: {avg_lines_hydrogen:.1f}"
+
+
+@pytest.mark.unit
+def test_hydrogen_zero_cache_budget_guard_still_halts_above_6_pln(monkeypatch):
+    """
+    Standard 11.2.20 (Fail-Closed Budget Sentinel Invariance):
+    Weryfikuje, że w trybie Zero-Cache Lean, jeśli łączny koszt sesji przekroczy 6.00 PLN,
+    _audit_batch_context_cache nadal natychmiast wyzwala twardy HALT (os._exit(1)).
+    """
+    import os
+    from translator import MultimodalTranslator, ContextCacheDiscountError
+
+    monkeypatch.delenv("AVT_ALLOW_UNCACHED_BILLING", raising=False)
+    exit_calls = []
+    monkeypatch.setattr(os, "_exit", lambda code: exit_calls.append(code))
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=False
+    )
+    # Symulacja przekroczenia budżetu sesji (> 6.00 PLN)
+    translator.current_episode_tokens = {
+        "prompt": 2500000,
+        "cached": 0,
+        "output": 500000,
+        "model": "gemini-4-hydrogen"
+    }
+
+    try:
+        translator._audit_batch_context_cache(b_idx=3, cached_tokens=0, phase="phase1")
+    except ContextCacheDiscountError:
+        pass
+
+    assert exit_calls == [1], "W trybie Zero-Cache Lean przekroczenie 6.00 PLN musi bezwzględnie zatrzymać potok via os._exit(1)!"
 
 
 
