@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-19 — Standard 11.2.19 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.19 (Single-Key Primary F1 with K1 Failover & Clean Self-Warming Telemetry)`
-- **Commit certyfikacji kodu:** `be13cb6` (`be13cb63a43627d3c018265a7e189d5351a5477c`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-19 — Standard 11.2.20 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.20 (Hydrogen Zero-Cache Lean Architecture)`
+- **Commit certyfikacji kodu:** `5f04bac` (`5f04bacee40ec8b2be855476a6cf94c038c353b3`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -37,20 +37,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.16:** `bef0e51` (Commit 1), `6d65ba0` (Commit 2), `3dcb70c` (Commit 3)
 - **Commity Standardu 11.2.17:** `e6e3161` (Commit 1), `0175847` (Commit 2), `4948cb9` (Commit 3)
 - **Commity Standardu 11.2.18:** `90ddeb7` (Commit 1), `b536d22` (Commit 2), `8d80bf1` (Commit 3)
-- **Commity Standardu 11.2.19:**
-  * Commit 1 (`be13cb6`): `fix(pipeline): consolidate Hydrogen F1 on primary key K0 with K1 failover and separate planned Self-Warming INIT from WARN (11.2.19)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 2 (`9f8ea35`): `test(pipeline): verify Hydrogen K0 primary pinning with K1 failover and Self-Warming INIT telemetry (11.2.19)`
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.19 — single-key primary F1 with K1 failover and clean self-warming telemetry`
-- **Status 11.2.19:** `CERTIFIED / CLOSED (2026-11-19)`
+- **Commity Standardu 11.2.19:** `be13cb6` (Commit 1), `9f8ea35` (Commit 2), `7b73a2c` (Commit 3)
+- **Commity Standardu 11.2.20:**
+  * Commit 1 (`5f04bac`): `feat(pipeline): implement Hydrogen Zero-Cache Lean architecture (lean=True, no 33.5k padding, ~55-line batches, scaled frames/rules) (11.2.20)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 2 (`a2594f9`): `test(pipeline): verify Hydrogen Zero-Cache Lean prompt size, ~55-line batching and 6.00 PLN budget guard (11.2.20)`
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.20 — Hydrogen Zero-Cache Lean architecture`
+- **Status 11.2.20:** `CERTIFIED / CLOSED (2026-11-19)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
-- **Stan metryk:** `405 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `476 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (405/405 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.19` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.19: Single-Key Primary F1 with K1 Failover & Clean Self-Warming Telemetry — konsolidacja Fazy 1 na pojedynczym kluczu podstawowym $K_0$ dla modeli Hydrogen z automatycznym failoverem na $K_1$ via `effective_f1_affinity = 0 if is_hydrogen else batch_idx`, sekwencyjny drafting Fazy 1 `max_workers_f1 = 1` eliminujący drugi cold-start i oszczędzający $-0.49$ PLN netto / $-0.60$ PLN brutto, rozróżnienie planowego `Self-Warming INIT` [`logger.info`] na Paczce 0 od nieoczekiwanego `Context Cache WARN` [`logger.warning`], potwierdzenie rabatu -95% na Paczkach 0 i 1 oraz precyzyjne komunikaty `Context Cache HALT` bez wprowadzających w błąd odwołań do zerowego bilansu tokenów przy przekroczeniu limitu budżetowego 6.00 PLN).
+- **Stan metryk:** `408 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `479 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (408/408 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.20` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.20: Hydrogen Zero-Cache Lean Architecture — empiryczna weryfikacja żywego API wykazała brak wsparcia dla Implicit/Explicit Context Caching na `gemini-4-hydrogen`; silnik eliminuje sztuczny padding 33.5k tokenów i przechodzi w autorytatywny tryb `lean=True` z system promptem ~14.2k tokenów [5.6× redukcja wejścia], grupuje odcinek w ~55-liniowe paczki [~6 paczek zamiast 14], proporcjonalnie skaluje klatki wideo do 8 i reguły focused do 5, ustawia `max_output_tokens=32768`, zachowuje twardy bezpiecznik budżetowy Fail-Closed na poziomie 6.00 PLN z czystą telemetrią `ℹ️ [Hydrogen Zero-Cache Lean]`, gwarantując stabilny koszt odcinka na poziomie ~3.60–4.60 PLN netto przy 0% cache bez polegania na zewnętrznym buforze TPU).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (405 passed w tests/)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (408 passed w tests/)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -645,3 +646,32 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
      - Dodanie testu `test_hydrogen_f1_pins_primary_key_k0_with_automatic_k1_failover` weryfikującego stałe affinity K0 i poprawny failover na K1 po 429.
      - Dodanie testu `test_planned_self_warming_init_vs_unexpected_warn_and_batch1_confirm` weryfikującego rozróżnienie INIT od WARN oraz emisję statusu aktywnego cache na Paczkach 0 i 1.
   5. Determinizm finansowy: Eliminacja drugiego cold-startu F1 oszczędza **-0.49 PLN netto** (-0.60 PLN brutto). Całkowity koszt odcinka wynosi **3.78 PLN netto** (~4.65 PLN brutto), a w pesymistycznym przypadku (failover na K1) nie przekracza **4.27 PLN netto** (~5.25 PLN brutto, 28.8% margines poniżej sufitu 6.00 PLN).
+
+
+## 🏛️ ARB-071 / INC-AVT-069: Standard 11.2.20 — Architektura Hydrogen Zero-Cache Lean
+
+- **Status:** `RESOLVED (Standard 11.2.20, commity 5f04bac, a2594f9, HEAD)`
+- **Zidentyfikowano (Empiryczna Weryfikacja Żywego API):**
+  1. Założenie architektoniczne Standardów 11.2.0–11.2.19 zakładało, że model `gemini-4-hydrogen` obsługuje Implicit Context Caching (automatyczny rabat -95% po przekroczeniu progu 32768 tokenów). W tym celu silnik sztucznie pompował prompt systemowy paddingiem 33.5k tokenów (`ensure_cache_token_floor`), osiągając ~80k tokenów wejściowych na każdą paczkę.
+  2. Rzeczywiste testy na żywym API (`google-genai` na kluczu Google AI Studio) wykazały kategorycznie:
+     - **Test A (Explicit Cache via `client.caches.create`):** Wywołał `ClientError: 404 Not Found` — model `gemini-4-hydrogen` nie obsługuje jawnego Context Cache.
+     - **Testy B, C, D (Implicit Cache: system_instruction, contents prefix, stała sygnatura dekodera):** Na zapytaniach o różnej treści `contents` (Paczka B po Paczce A) serwery Google zwróciły `cached_content_token_count: None` (dokładnie 0 tokenów zrabatowanych).
+     - Wniosek diagnostyczny: Model `gemini-4-hydrogen` nie posiada aktywnego mechanizmu cache prefixów na klastrach TPU. Wypychanie 80k tokenów na paczkę generowało koszt 16.88 PLN netto za odcinek (13 paczek F1 + 13 paczek F2).
+- **Komponenty Naprawy:**
+  1. `translator.py:__init__`: Autorytatywny tryb `lean=True` dla modeli Hydrogen w Fazie 1 (`use_lean_f1`) i Fazie 2 (`use_lean_f2`). W trybie lean prompt systemowy zostaje odchudzony do ~14.2k tokenów (kompletny paradygmat gramatyczny i zasady bez nadmiarowego komentarza).
+  2. `translator.py:translate_file`: Całkowite pominięcie `ensure_cache_token_floor` (33.5k tokenów paddingu) dla `f1_is_hydrogen` i `f2_is_hydrogen`. Wielkość promptu wejściowego spada z ~80k do ~14.2k tokenów (5.6× mniejszy narzut wejściowy).
+  3. `translator.py:create_adaptive_batches`: Grupowanie odcinka w ~52–60-liniowe paczki (`eff_base_bs=52, eff_max_bs=60, eff_min_scene=36, eff_min_leap=28`) dla `is_gemini_4_or_hydrogen_model(self.model_phase1) and self.batch_size >= 24`. Odcinek 334 linii jest tłumaczony w ~6 paczkach zamiast 14, co redukuje liczbę wywołań API o 57%.
+  4. `translator.py:_call_gemini_with_retry`: Zwiększenie limitu tokenów wyjściowych `max_output_tokens = 32768` dla modeli Hydrogen, co gwarantuje pełną redundancję wyjścia dla 60-liniowych paczek z rozbudowanym CoT i JSON.
+  5. `translator.py:translate_file`: Proporcjonalne skalowanie liczby klatek wideo do 8 (`max_frames = min(8, max(4, N // 10))`) oraz reguł focused do 5 (`max_rules = 5 if len(...) > 40 else 3`), zapewniając optymalne nasycenie multimodalne dla dłuższych paczek.
+  6. `translator.py:_audit_batch_context_cache`: Utrzymanie twardego bezpiecznika budżetowego Fail-Closed na poziomie `6.00 PLN` (`HARD_BUDGET_LIMIT_PLN`), przy czym dla paczek w trybie lean (`len(system_prompt) < 60000`) zerowy rabat logowany jest jako czysta, informacyjna telemetria `ℹ️ [Hydrogen Zero-Cache Lean]`, bez fałszywych alarmów `Context Cache WARN`.
+  7. `tests/test_context_cache_guard.py`:
+     - Aktualizacja testu `test_planned_self_warming_init_vs_unexpected_warn_and_batch1_confirm` (uwzględnienie statusu lean).
+     - Dodanie testu `test_hydrogen_uses_lean_prompt_without_33k_padding`.
+     - Dodanie testu `test_hydrogen_zero_cache_lean_batches_around_55_lines`.
+     - Dodanie testu `test_hydrogen_zero_cache_budget_guard_still_halts_above_6_pln`.
+     - Pełny pakiet testów: 37/37 passing w module, 408/408 passing w `tests/`.
+  8. Determinizm finansowy i gwarancja budżetowa:
+     - Zużycie tokenów wejściowych spada z 2.08M do zaledwie 170k tokenów na odcinek.
+     - Całkowity koszt odcinka przy **0% cache** wynosi nominalnie **~3.60–4.60 PLN netto** (~4.43–5.66 PLN brutto).
+     - Koszt jest w 100% zdeterminowany wewnętrznie i całkowicie odporny na fluktuacje klastrów TPU serwerów Google.
+
