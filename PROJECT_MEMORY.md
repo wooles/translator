@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-19 — Standard 11.2.20 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.20 (Hydrogen Zero-Cache Lean Architecture)`
-- **Commit certyfikacji kodu:** `5f04bac` (`5f04bacee40ec8b2be855476a6cf94c038c353b3`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-23 — Standard 11.2.21 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.21 (Deterministic Adaptive Batching & Selective Risk-Weighted Phase 2 for Hydrogen Zero-Cache Lean)`
+- **Commit certyfikacji kodu:** `376e7f4` (`376e7f4f6918d2da53c0d83e29f0c5a04e590059`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -38,20 +38,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.17:** `e6e3161` (Commit 1), `0175847` (Commit 2), `4948cb9` (Commit 3)
 - **Commity Standardu 11.2.18:** `90ddeb7` (Commit 1), `b536d22` (Commit 2), `8d80bf1` (Commit 3)
 - **Commity Standardu 11.2.19:** `be13cb6` (Commit 1), `9f8ea35` (Commit 2), `7b73a2c` (Commit 3)
-- **Commity Standardu 11.2.20:**
-  * Commit 1 (`5f04bac`): `feat(pipeline): implement Hydrogen Zero-Cache Lean architecture (lean=True, no 33.5k padding, ~55-line batches, scaled frames/rules) (11.2.20)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 2 (`a2594f9`): `test(pipeline): verify Hydrogen Zero-Cache Lean prompt size, ~55-line batching and 6.00 PLN budget guard (11.2.20)`
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.20 — Hydrogen Zero-Cache Lean architecture`
-- **Status 11.2.20:** `CERTIFIED / CLOSED (2026-11-19)`
+- **Commity Standardu 11.2.20:** `5f04bac` (Commit 1), `a2594f9` (Commit 2), `9a9d88e` (Commit 3)
+- **Commity Standardu 11.2.21:**
+  * Commit 1 (`376e7f4`): `fix(pipeline): honor min_scene_batch on 2800ms breaks and add risk-weighted selective Phase 2 for Hydrogen Zero-Cache Lean (11.2.21)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 2 (`feaa9a0`): `test(pipeline): verify 2800ms batching threshold fix, selective risk-weighted F2 and <=4.60 PLN zero-cache simulation (11.2.21)`
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.21 — deterministic batching and risk-weighted selective Phase 2`
+- **Status 11.2.21:** `CERTIFIED / CLOSED (2026-11-23)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
-- **Stan metryk:** `408 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `479 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (408/408 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.20` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.20: Hydrogen Zero-Cache Lean Architecture — empiryczna weryfikacja żywego API wykazała brak wsparcia dla Implicit/Explicit Context Caching na `gemini-4-hydrogen`; silnik eliminuje sztuczny padding 33.5k tokenów i przechodzi w autorytatywny tryb `lean=True` z system promptem ~14.2k tokenów [5.6× redukcja wejścia], grupuje odcinek w ~55-liniowe paczki [~6 paczek zamiast 14], proporcjonalnie skaluje klatki wideo do 8 i reguły focused do 5, ustawia `max_output_tokens=32768`, zachowuje twardy bezpiecznik budżetowy Fail-Closed na poziomie 6.00 PLN z czystą telemetrią `ℹ️ [Hydrogen Zero-Cache Lean]`, gwarantując stabilny koszt odcinka na poziomie ~3.60–4.60 PLN netto przy 0% cache bez polegania na zewnętrznym buforze TPU).
+- **Stan metryk:** `411 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `482 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (411/411 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.21` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.21: Deterministic Adaptive Batching & Selective Risk-Weighted Phase 2 for Hydrogen Zero-Cache Lean — naprawa progów cięcia w `create_adaptive_batches` poprzez uwzględnienie `min_scene_batch` przy pauzach >= 2.8s oraz progu gęstości słów `word_density_threshold` dla dużych paczek, co gwarantuje rzeczywiste ~6 paczek na odcinek 334 linii przy parametrach `56/64/44/36`; wdrożenie selektywnej redakcji F2 dla modeli Hydrogen w trybie Zero-Cache Lean z limitem <= 50% paczki oraz twardym globalnym pułapem <= 170 linii na odcinek; przenoszenie niekrytycznych alertów audio i uwag F1 do pola `notes`, utrzymujące ekonomiczny tryb `LOW (2048)` CoT w Verifierze bez utraty informacji merytorycznej; deterministyczny koszt pełnego 334-liniowego odcinka na poziomie 4.37–4.60 PLN netto przy 0% cache z marginesem >23% poniżej sufitu 6.00 PLN).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (408 passed w tests/)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (411 passed w tests/)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -674,4 +675,32 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
      - Zużycie tokenów wejściowych spada z 2.08M do zaledwie 170k tokenów na odcinek.
      - Całkowity koszt odcinka przy **0% cache** wynosi nominalnie **~3.60–4.60 PLN netto** (~4.43–5.66 PLN brutto).
      - Koszt jest w 100% zdeterminowany wewnętrznie i całkowicie odporny na fluktuacje klastrów TPU serwerów Google.
+
+
+## 🏛️ ARB-072 / INC-AVT-070: Standard 11.2.21 — Deterministyczne Paczkowanie i Selektywna Redakcja Fazy 2 dla Hydrogen Zero-Cache Lean
+
+- **Status:** `RESOLVED (Standard 11.2.21, commity 376e7f4, feaa9a0, HEAD)`
+- **Zidentyfikowano (Przekroczenie Budżetu 6.34 PLN na F2 Paczce 6/11):**
+  1. Zahardkodowane progi cięcia w `create_adaptive_batches` (`translator.py:1486, 1492`): Warunek `(gap_ms >= 2800 and len(current_batch) >= 18)` ignorował parametry `min_scene_batch=36` i `min_leap_batch=28` przy częstych pauzach dramaturgicznych (np. 3.2s co 20 linii), a próg `current_words >= 150` wymuszał cięcie natychmiast na `base_batch_size`. Skutkowało to fragmentacją 334-liniowego odcinka do 11 paczek (w tym paczek zaledwie 18-liniowych) zamiast planowanych ~6 paczek.
+  2. Pełna weryfikacja 100% linii w Fazie 2 przy 0% cache: Faza 2 weryfikowała każdą kwestię dialogową (koszt zmienny `0.00894 PLN/linia`), mimo że jedynie 31.8% kwestii (61/192) wymagało rzeczywistej redakcji, a 68.2% stanowiło czysty, bezbłędny szkic F1.
+  3. Nadmierna eskalacja CoT do poziomu `MEDIUM` (3072 tokenów) w 71.4% paczek F2 (5/7) z powodu obecności niekrytycznych uwag `audio_alert` lub `ambiguity_note` generowanych przez F1.
+- **Komponenty Naprawy:**
+  1. `translator.py:create_adaptive_batches`:
+     - Uzależnienie progu cięcia `2800ms` od `min_beat_batch = max(18, min_scene_batch)`, co zapobiega powstawaniu przedwczesnych mikropaczek 18-liniowych przy dużych progach Hydrogen.
+     - Dynamiczny próg gęstości słów `word_density_threshold = 150 if base_batch_size <= 34 else max(150, base_batch_size * 7)`, gwarantujący, że duże paczki nie są rozcinane przedwcześnie przy 150 słowach.
+     - Pełna kompatybilność wsteczna z chronionym `test_system.py` dla `base_batch_size <= 34`.
+  2. `translator.py:translate_file`: Konfiguracja progów dla Hydrogen: `eff_base_bs = max(self.batch_size, 56)`, `eff_max_bs = max(eff_base_bs + 8, 64)`, `eff_min_scene = 44`, `eff_min_leap = 36`. 334-liniowy odcinek jest deterministycznie dzielony na 5–7 paczek.
+  3. `translator.py:_score_phase2_editorial_risk` oraz `_select_hydrogen_phase2_candidates`:
+     - Wyznaczenie deterministycznej wagi ryzyka linii na podstawie flag krytycznych (`is_missing_translation`, `is_blind_draft`, `is_song`), miary kalki (`calque_score >= 0.25`), dyrektyw kondensacji, alertów audio i niepewności mówcy/adresata.
+     - Twardy sufit redakcji: maksymalnie 50% linii w paczce oraz globalny limit `<= 170` linii na odcinek.
+     - Dla kwestii bez flag krytycznych wskazówki audio/F1 są przenoszone do pola `notes`, co pozwala utrzymać ekonomiczny budżet myślenia `LOW (2048)` CoT bez utraty informacji merytorycznej dla Verifiera.
+  4. `translator.py:_process_phase2_only`:
+     - Przekazanie `total_batches` z Fazy 1 w `phase1_data`.
+     - Zastosowanie selekcji `_select_hydrogen_phase2_candidates` dla `is_h_lean_f2`. Jeśli w paczce brak linii wysokiego ryzyka (0 kandydatów), wywołanie API Fazy 2 jest całkowicie pomijane (0.00 PLN), a zatwierdzony szkic F1 przechodzi bez zmian.
+  5. `translator.py:_audit_batch_context_cache`: Uściślenie notatki na Paczce 0 informującej o aktywnym limicie 6.00 PLN w trybie Zero-Cache Lean.
+  6. `tests/test_context_cache_guard.py`:
+     - `test_adaptive_batches_respects_min_scene_with_frequent_2800ms_gaps`: Potwierdza powstanie dokładnie 5–7 paczek dla 334 linii mimo częstych pauz 3.2s.
+     - `test_selective_phase2_caps_lines_and_maintains_low_cot`: Potwierdza selekcję <= 50% paczki, priorytetyzację ryzyka, transfer alertów do notes i utrzymanie LOW CoT 2048.
+     - `test_standard_11_2_21_zero_cache_cost_simulation_under_5_pln`: Deterministyczna symulacja kosztu 334-liniowego odcinka na empirycznych współczynnikach wykazująca koszt **<= 4.60 PLN netto** (4.37–4.46 PLN netto, margines >23% poniżej sufitu 6.00 PLN).
+
 
