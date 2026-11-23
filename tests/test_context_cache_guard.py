@@ -1762,6 +1762,207 @@ def test_standard_11_2_21_zero_cache_cost_simulation_under_5_pln():
     assert breakdown["net_pln"] <= 4.60, f"Symulowany koszt przekroczył 4.60 PLN netto: {breakdown}"
 
 
+@pytest.mark.unit
+def test_checkpoint_restored_tokens_do_not_poison_session_budget_limit(monkeypatch):
+    """
+    Standard 11.2.22: Weryfikuje izolację budżetu bieżącej sesji od długu przywróconego z checkpointu.
+    Historyczny stan 5.67 PLN z poprzedniej sesji + 0.50 PLN w nowej sesji daje deltę 0.50 PLN <= 6.00 PLN (brak HALT).
+    Dopiero przekroczenie 6.00 PLN przyrostu w bieżącej sesji uruchamia os._exit(1).
+    """
+    import os
+    from translator import MultimodalTranslator, ContextCacheDiscountError
+
+    monkeypatch.delenv("AVT_ALLOW_UNCACHED_BILLING", raising=False)
+    exit_calls = []
+    monkeypatch.setattr(os, "_exit", lambda code: exit_calls.append(code))
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+    # Stan bazowy przywrócony z wcześniejszego checkpointu (~5.67 PLN)
+    translator._checkpoint_baseline_f1 = {"prompt": 200000, "cached": 0, "output": 70000, "model": "gemini-4-hydrogen"}
+    translator._checkpoint_baseline_f2 = {"prompt": 110000, "cached": 0, "output": 60000, "model": "gemini-4-hydrogen"}
+
+    # Bieżące liczniki = baseline + niewielki przyrost nowej sesji (~0.45 PLN delta)
+    translator.current_episode_tokens = {"prompt": 227000, "cached": 0, "output": 80000, "model": "gemini-4-hydrogen"}
+    translator.verifier.current_episode_tokens = {"prompt": 110000, "cached": 0, "output": 60000, "model": "gemini-4-hydrogen"}
+
+    translator._audit_batch_context_cache(b_idx=3, cached_tokens=0, phase="phase1")
+    assert exit_calls == [], f"Historyczny dług z checkpointu wyzwolił fałszywy HALT: {exit_calls}"
+
+    # Przekroczenie 6.00 PLN w samej bieżącej sesji (delta > 6.00 PLN) nadal wyzwala twardy HALT
+    translator.current_episode_tokens["output"] += 220000
+    try:
+        translator._audit_batch_context_cache(b_idx=4, cached_tokens=0, phase="phase1")
+    except ContextCacheDiscountError:
+        pass
+    assert exit_calls == [1], "Przekroczenie 6.00 PLN przyrostu w bieżącej sesji musi uruchomić os._exit(1)!"
+
+
+@pytest.mark.unit
+def test_flight_recorder_logs_phase1_batch_before_budget_halt(monkeypatch):
+    """
+    Standard 11.2.22 (Pre-HALT Telemetry Persistence):
+    Weryfikuje, że w _process_phase1_only zapis do flight_recorder.log_phase1_batch
+    wykonuje się PRZED audytem budżetu mogącym wywołać os._exit(1).
+    """
+    import os
+    import pysubs2
+    from unittest.mock import MagicMock
+    from translator import MultimodalTranslator, ContextCacheDiscountError
+
+    monkeypatch.delenv("AVT_ALLOW_UNCACHED_BILLING", raising=False)
+    events_order = []
+
+    def mock_exit(code):
+        events_order.append(("os_exit", code))
+
+    monkeypatch.setattr(os, "_exit", mock_exit)
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=False
+    )
+    mock_fr = MagicMock()
+    mock_fr.log_phase1_batch.side_effect = lambda **kw: events_order.append(("flight_recorder", kw.get("batch_id")))
+    translator.flight_recorder = mock_fr
+
+    def mock_call(*args, **kwargs):
+        resp = MagicMock()
+        resp.translations = []
+        resp.characters_identified = []
+        resp.visual_events = []
+        resp.typesetting_notes = []
+        resp.speaker_identifications = []
+        resp.raw_thoughts = ""
+        resp.model_dump.return_value = {}
+        translator._thread_local.last_batch_token_usage = {"prompt": 30000, "cached": 0, "output": 5000, "model": "gemini-4-hydrogen"}
+        translator.current_episode_tokens = {"prompt": 2500000, "cached": 0, "output": 500000, "model": "gemini-4-hydrogen"}
+        return resp
+
+    monkeypatch.setattr(translator, "_call_gemini_with_retry", mock_call)
+
+    ev = pysubs2.SSAEvent(text="Sample line", start=0, end=1500, style="Default", name="Speaker")
+    batch_item = (1, ev, "Sample line", "")
+
+    try:
+        translator._process_phase1_only(
+            b_idx=4,
+            batch=[batch_item],
+            untranslated_in_batch=[batch_item],
+            batches=[[batch_item]] * 5,
+            video_path=None,
+            is_ass=True,
+            anime_meta=None,
+            episode_profile=None,
+            anime_context_str="",
+            episode_profile_str="",
+            series_bible_str="",
+            manga_canon_str="",
+            combined_glossary={},
+            all_user_rules=[],
+            history=[],
+            pbar=MagicMock(),
+            translated_results={}
+        )
+    except ContextCacheDiscountError:
+        pass
+
+    assert events_order == [("flight_recorder", 4), ("os_exit", 1)], f"Zapis flight_recorder musi wyprzedzać HALT! Kolejność: {events_order}"
+
+
+@pytest.mark.unit
+def test_concurrent_futures_timeout_triggers_timeout_fallback(monkeypatch):
+    """
+    Standard 11.2.22: Weryfikuje, że concurrent.futures.TimeoutError() (o pustym str(e) == '')
+    jest rozpoznawany jako timeout i po przekroczeniu progu prób aktywuje przełączenie modelu.
+    """
+    import concurrent.futures
+    from unittest.mock import MagicMock
+    from translator import MultimodalTranslator, BatchTranslationResponse, LeanBatchTranslationResponse
+
+    monkeypatch.setattr("time.sleep", lambda s: None)
+    monkeypatch.setattr("client_factory.global_rate_limiter.acquire", lambda: None)
+    monkeypatch.setattr("model_resolver.resolve_best_models", lambda *a, **kw: {"hydrogen": "gemini-4-hydrogen", "flash": "gemini-3.8-flash"})
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0",
+        model="gemini-4-hydrogen",
+        enable_verifier=False
+    )
+
+    seen_models = []
+    def mock_generate(model=None, contents=None, config=None, **kwargs):
+        seen_models.append(model)
+        if "hydrogen" in str(model):
+            raise concurrent.futures.TimeoutError()
+        resp = MagicMock()
+        resp.parsed = BatchTranslationResponse(translations=[])
+        resp.usage_metadata = MagicMock(prompt_token_count=1000, cached_content_token_count=0, candidates_token_count=50, thoughts_token_count=0)
+        return resp
+
+    translator.client_pool_f1.clients[0].models.generate_content = mock_generate
+    monkeypatch.setattr("context_cache.ContextCacheManager.get_or_create_cache", lambda *a, **kw: "__IMPLICIT_CACHE_95__")
+
+    res = translator._call_gemini_with_retry(contents=["Test"], schema_class=BatchTranslationResponse, batch_idx=0)
+    assert res is not None
+    assert "gemini-3.8-flash" in seen_models, f"TimeoutError() o pustym str() powinien wyzwolić fallback na Flash! Modele: {seen_models}"
+
+
+@pytest.mark.unit
+def test_standard_11_2_22_calibrated_2026_11_23_cost_under_4_60_pln():
+    """
+    Standard 11.2.22: Weryfikuje domyślny sufit episode_line_cap=115 w _select_hydrogen_phase2_candidates
+    oraz symulację pełnego 334-liniowego odcinka (7 paczek, 0% cache, kalibracja b=3 z 2026-11-23) <= 4.60 PLN netto.
+    """
+    from pricing_guard import PricingGuard
+    from translator import MultimodalTranslator
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+
+    real_batch_sizes = [60, 57, 39, 52, 50, 57, 19]
+    total_f2_selected = 0
+    for b_len in real_batch_sizes:
+        batch_items = [
+            {
+                "id": j + 1,
+                "en": "Long realistic dialogue sentence with ten words for scoring check.",
+                "pl": "Długie zdanie dialogowe do punktacji selektywnej Fazy 2.",
+                "calque_score": 0.35,
+                "is_blind_draft": False,
+                "is_song": False,
+                "notes": ""
+            }
+            for j in range(b_len)
+        ]
+        sel = translator._select_hydrogen_phase2_candidates(batch_items, total_batches=len(real_batch_sizes))
+        total_f2_selected += len(sel)
+
+    assert total_f2_selected <= 115, f"Domyślna selekcja F2 przekroczyła limit 115 linii/odcinek: {total_f2_selected}"
+
+    f1_stats = {
+        "model": "gemini-4-hydrogen",
+        "prompt": sum(24500 + n * 150 for n in real_batch_sizes),
+        "cached": 0,
+        "output": sum(2700 + n * 95 for n in real_batch_sizes)
+    }
+    f2_stats = {
+        "model": "gemini-4-hydrogen",
+        "prompt": len(real_batch_sizes) * 16500 + total_f2_selected * 160,
+        "cached": 0,
+        "output": total_f2_selected * 270 + 1 * 2930
+    }
+    breakdown = PricingGuard.calculate_actual_cost_breakdown(f1_stats, f2_stats)
+    assert breakdown["net_pln"] <= 4.60, f"Skalibrowany koszt 11.2.22 przekroczył 4.60 PLN netto: {breakdown}"
+
+
 
 
 
