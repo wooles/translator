@@ -2155,9 +2155,24 @@ class MultimodalTranslator:
         def _compute_session_net_pln() -> Optional[float]:
             try:
                 from pricing_guard import PricingGuard
-                f1_st = getattr(self, "current_episode_tokens", {}) or {}
-                f2_st = getattr(getattr(self, "verifier", None), "current_episode_tokens", {}) or {}
-                if f1_st.get("prompt", 0) == 0 and f2_st.get("prompt", 0) == 0:
+                f1_raw = getattr(self, "current_episode_tokens", {}) or {}
+                f2_raw = getattr(getattr(self, "verifier", None), "current_episode_tokens", {}) or {}
+                b1 = getattr(self, "_checkpoint_baseline_f1", None) or {}
+                b2 = getattr(self, "_checkpoint_baseline_f2", None) or {}
+                # Standard 11.2.22: Nadzór budżetu bieżącej sesji (delta względem stanu przywróconego z checkpointu)
+                f1_st = {
+                    "prompt": max(0, int(f1_raw.get("prompt", 0) or 0) - int(b1.get("prompt", 0) or 0)),
+                    "cached": max(0, int(f1_raw.get("cached", 0) or 0) - int(b1.get("cached", 0) or 0)),
+                    "output": max(0, int(f1_raw.get("output", 0) or 0) - int(b1.get("output", 0) or 0)),
+                    "model": f1_raw.get("model", self.model),
+                }
+                f2_st = {
+                    "prompt": max(0, int(f2_raw.get("prompt", 0) or 0) - int(b2.get("prompt", 0) or 0)),
+                    "cached": max(0, int(f2_raw.get("cached", 0) or 0) - int(b2.get("cached", 0) or 0)),
+                    "output": max(0, int(f2_raw.get("output", 0) or 0) - int(b2.get("output", 0) or 0)),
+                    "model": f2_raw.get("model") or f1_st["model"],
+                }
+                if f1_st["prompt"] == 0 and f2_st["prompt"] == 0:
                     return None
                 cost_summary = PricingGuard.calculate_actual_cost_breakdown(f1_st, f2_st)
                 raw_net = cost_summary.get("net_pln")
@@ -2165,7 +2180,7 @@ class MultimodalTranslator:
                     return float(raw_net)
                 return None
             except Exception as pe:
-                logger.error(f"[Context Cache Audit] Błąd krytyczny kalkulacji kosztu PricingGuard: {pe}")
+                logger.error(f"[Context Cache Audit] Anomalia kalkulacji kosztu PricingGuard: {pe}")
                 return None
 
         def _trigger_hard_halt(cost_disp: str, reason_line: str) -> None:
@@ -3967,10 +3982,11 @@ class MultimodalTranslator:
                         config=cfg
                     )
 
-                # Direct generation using thread-safe client pool and token bucket limiter with hard 95s watchdog
+                # Standard 11.2.22: Watchdog 150s dla paczek 56-64 linii na Hydrogen (95s dla modeli standardowych)
+                f1_watchdog_sec = 150.0 if is_hydrogen else 95.0
                 with concurrent.futures.ThreadPoolExecutor(max_workers=1) as ex:
                     fut = ex.submit(_single_generate)
-                    response = fut.result(timeout=95.0)
+                    response = fut.result(timeout=f1_watchdog_sec)
 
                 if not hasattr(self, "_thread_local") or self._thread_local is None:
                     self._thread_local = threading.local()
@@ -4048,7 +4064,13 @@ class MultimodalTranslator:
                         f"Ostatni wyjątek: {e}. Proces wstrzymano w celu ochrony budżetu przed niekontrolowanymi zapytaniami."
                     )
 
-                is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
+                is_timeout = (
+                    isinstance(e, (TimeoutError, concurrent.futures.TimeoutError))
+                    or "504" in err_str
+                    or "deadline" in err_str
+                    or "timeout" in err_str
+                    or "timed out" in err_str
+                )
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
                 is_not_found = "404" in err_str or "not found" in err_str
@@ -4517,24 +4539,12 @@ class MultimodalTranslator:
         _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
         cached_tokens = _last_tu.get("cached", 0) if _last_tu else 0
 
-        # Standard 11.2.18 (Zero-Waste Self-Warming): Brak JIT Warmup Retry w Fazie 1 (również dla b_idx == 0).
-        # Paczka 0 F1 na K0 (oraz Paczka 1 F1 na K1) samodzielnie ugruntowują snapshot TPU realnym wsadem
-        # w dokładnie 1 wywołaniu API (eliminacja zbędnego podwajania wyjścia F1).
-
-        if b_idx == 0:
-            self._batch0_cache_telemetry_reported = True
-            self._audit_batch0_context_cache(cached_tokens)
-        else:
-            self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=cached_tokens, phase="phase1")
-
+        # Standard 11.2.22 (Pre-HALT Telemetry Persistence): Utrwalenie rekordu F1 przed audytem budżetowym,
+        # aby pełna telemetria (prompt/cached/output/czas) zachowała się w events.jsonl również przy HALT.
         if self.flight_recorder:
             try:
                 raw_resp = batch_response.model_dump() if hasattr(batch_response, "model_dump") else (batch_response.dict() if hasattr(batch_response, "dict") else str(batch_response))
-                p1_tok_usage = None
-                _tl = getattr(self, "_thread_local", None)
-                _last_tu = getattr(_tl, "last_batch_token_usage", None) if _tl is not None else None
-                if _last_tu:
-                    p1_tok_usage = dict(_last_tu)
+                p1_tok_usage = dict(_last_tu) if _last_tu else None
                 self.flight_recorder.log_phase1_batch(
                     batch_id=b_idx,
                     prompt_dump=prompt_text,
@@ -4544,6 +4554,13 @@ class MultimodalTranslator:
                 )
             except Exception:
                 logger.debug("Rejestracja odpowiedzi modelu zakończona wyjątkiem", exc_info=True)
+
+        # Standard 11.2.18 (Zero-Waste Self-Warming): Dokładnie 1 wywołanie API na paczkę w Fazie 1.
+        if b_idx == 0:
+            self._batch0_cache_telemetry_reported = True
+            self._audit_batch0_context_cache(cached_tokens)
+        else:
+            self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=cached_tokens, phase="phase1")
 
         # Update global Character Registry with thread lock and safe registration
         with self.lock:
@@ -5385,12 +5402,12 @@ class MultimodalTranslator:
         self,
         pass1_items: List[Dict[str, Any]],
         total_batches: int = 6,
-        episode_line_cap: int = 170
+        episode_line_cap: int = 115
     ) -> List[Dict[str, Any]]:
         """
-        Standard 11.2.21 (Selective Risk-Weighted Phase 2):
+        Standard 11.2.22 (Calibrated Selective Risk-Weighted Phase 2):
         Wybiera do redakcji F2 kwestie o najwyższym ryzyku stylistycznym/ontologicznym
-        z twardym sufitem <= 50% paczki oraz globalnym limitem <= 170 linii/odcinek.
+        z twardym sufitem <= 50% paczki oraz globalnym limitem <= 115 linii/odcinek (~34% odcinka).
         Dla linii bez flag krytycznych przenosi wskazówki audio/uwagi F1 do pola 'notes',
         utrzymując ekonomiczny tryb LOW (2048) bez utraty wskazówek merytorycznych.
         """
@@ -5574,8 +5591,20 @@ class MultimodalTranslator:
                 p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
                 p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
 
-                # Standard 11.2.18 (Zero-Waste Self-Warming): Fizyczna eliminacja JIT Warmup Retry z Fazy 2 (0 retry na 100% paczek).
-                # Paczka 0 F2 samodzielnie rozgrzewa dedykowany klucz K2 dokładną sygnaturą dekodera bez podwajania kosztów CoT.
+                # Standard 11.2.22 (Pre-HALT Telemetry Persistence): Utrwalenie rekordu F2 przed audytem budżetowym,
+                # aby pełna telemetria (prompt/cached/output/czas) zachowała się w events.jsonl również przy HALT.
+                if self.flight_recorder:
+                    try:
+                        self.flight_recorder.log_phase2_verifier(
+                            batch_id=b_idx,
+                            cot_budget=budget_val if 'budget_val' in locals() else 0,
+                            prompt_dump=getattr(self.verifier, "last_prompt", "") or "",
+                            raw_response=[r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r)) for r in refined_lines],
+                            response_time_sec=elapsed_phase2,
+                            token_usage=p2_tok_usage
+                        )
+                    except Exception:
+                        logger.debug("Rejestracja weryfikacji w locie zakończona wyjątkiem", exc_info=True)
 
                 self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=p2_cached, phase="phase2")
                 for r in refined_lines:
@@ -5636,18 +5665,6 @@ class MultimodalTranslator:
                         phase1_pl=p1_pl
                     )
 
-                if self.flight_recorder:
-                    try:
-                        self.flight_recorder.log_phase2_verifier(
-                            batch_id=b_idx,
-                            cot_budget=budget_val if 'budget_val' in locals() else 0,
-                            prompt_dump=getattr(self.verifier, "last_prompt", "") or "",
-                            raw_response=[r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r)) for r in refined_lines],
-                            response_time_sec=elapsed_phase2,
-                            token_usage=p2_tok_usage
-                        )
-                    except Exception:
-                        logger.debug("Rejestracja weryfikacji w locie zakończona wyjątkiem", exc_info=True)
 
                 any_redaction_printed = False
                 for r in refined_lines:
@@ -6031,11 +6048,15 @@ class MultimodalTranslator:
         self._asr_last_text = ""
         self._asr_consecutive_streak = 0
         self.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
+        self._checkpoint_baseline_f1 = {"prompt": 0, "cached": 0, "output": 0, "model": self.model}
         if not hasattr(self, "_thread_local") or self._thread_local is None:
             self._thread_local = threading.local()
         self._thread_local.last_batch_token_usage = {}
         if self.verifier:
             self.verifier.current_episode_tokens = {"prompt": 0, "cached": 0, "output": 0, "model": self.verifier.model}
+            self._checkpoint_baseline_f2 = {"prompt": 0, "cached": 0, "output": 0, "model": self.verifier.model}
+        else:
+            self._checkpoint_baseline_f2 = {"prompt": 0, "cached": 0, "output": 0, "model": self.model_phase2}
 
         init_slug = self._reset_episode_state_for_file(subs_file)
         if getattr(self, "trace_log", True):
@@ -6345,14 +6366,20 @@ class MultimodalTranslator:
 
         if restored_f1_tokens and isinstance(restored_f1_tokens, dict):
             for k in ["prompt", "cached", "output"]:
-                self.current_episode_tokens[k] = self.current_episode_tokens.get(k, 0) + restored_f1_tokens.get(k, 0)
-            if "model" in restored_f1_tokens and restored_f1_tokens["model"]:
+                val_f1 = int(restored_f1_tokens.get(k, 0) or 0)
+                self.current_episode_tokens[k] = self.current_episode_tokens.get(k, 0) + val_f1
+                self._checkpoint_baseline_f1[k] = val_f1
+            if restored_f1_tokens.get("model"):
                 self.current_episode_tokens["model"] = restored_f1_tokens["model"]
+                self._checkpoint_baseline_f1["model"] = restored_f1_tokens["model"]
         if restored_f2_tokens and isinstance(restored_f2_tokens, dict) and self.verifier:
             for k in ["prompt", "cached", "output"]:
-                self.verifier.current_episode_tokens[k] = self.verifier.current_episode_tokens.get(k, 0) + restored_f2_tokens.get(k, 0)
-            if "model" in restored_f2_tokens and restored_f2_tokens["model"]:
+                val_f2 = int(restored_f2_tokens.get(k, 0) or 0)
+                self.verifier.current_episode_tokens[k] = self.verifier.current_episode_tokens.get(k, 0) + val_f2
+                self._checkpoint_baseline_f2[k] = val_f2
+            if restored_f2_tokens.get("model"):
                 self.verifier.current_episode_tokens["model"] = restored_f2_tokens["model"]
+                self._checkpoint_baseline_f2["model"] = restored_f2_tokens["model"]
 
         if found_checkpoint_path and translated_results:
             print("\n" + "═" * 60)
@@ -6360,7 +6387,7 @@ class MultimodalTranslator:
             print(f"  Plik: {found_checkpoint_path.name}")
             print(f"  Wczytano {len(translated_results)}/{total_lines} gotowych kwestii dialogowych.")
             if restored_f1_tokens:
-                print(f"  Przywrócono stan zużycia tokenów z wcześniejszej sesji.")
+                print(f"  Przywrócono telemetrię historyczną (limit 6.00 PLN liczony od nowej sesji).")
             print("═" * 60 + "\n")
         else:
             print("[Autozapis]: Brak wcześniejszego checkpointu. Rozpoczynanie tłumaczenia.")
