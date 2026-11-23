@@ -1483,13 +1483,15 @@ def create_adaptive_batches(
         words = len(text_clean.split())
 
         is_full = len(current_batch) >= max_batch_size
-        is_dense = len(current_batch) >= base_batch_size and current_words >= 150
+        word_density_threshold = 150 if base_batch_size <= 34 else max(150, base_batch_size * 7)
+        is_dense = len(current_batch) >= base_batch_size and current_words >= word_density_threshold
 
         gap_ms = (ev.start - current_batch[-1][1].end) if current_batch else 0
+        min_beat_batch = max(18, min_scene_batch)
         is_scene_break = current_batch and (
             (gap_ms >= leap_threshold_ms and len(current_batch) >= min_leap_batch) or
             (gap_ms >= scene_threshold_ms and len(current_batch) >= min_scene_batch) or
-            (gap_ms >= 2800 and len(current_batch) >= 18)
+            (gap_ms >= 2800 and len(current_batch) >= min_beat_batch)
         )
 
         # Syntactic Sentence Boundary Coalescence:
@@ -2238,12 +2240,13 @@ class MultimodalTranslator:
             is_hydrogen_lean = is_active_hydrogen and prompt_len < 60000
 
             if b_idx == 0 and is_active_hydrogen:
+                mode_note = "tryb Zero-Cache Lean — aktywny sufit 6.00 PLN" if is_hydrogen_lean else "kolejne paczki z rabatem -95%"
                 init_msg = (
-                    f"\n  ℹ️ [Context Cache INIT / Self-Warming]: Paczka {b_idx} ({phase}) inicjalizuje bufor TPU na dedykowanym kluczu.\n"
-                    f"     Bieżący zweryfikowany koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN (kolejne paczki z rabatem -95%)."
+                    f"\n  ℹ️ [Context Cache INIT / Self-Warming]: Paczka {b_idx} ({phase}) — inicjalizacja sesji na dedykowanym kluczu.\n"
+                    f"     Bieżący zweryfikowany koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN ({mode_note})."
                 )
                 print(init_msg)
-                logger.info(f"[Context Cache INIT / Self-Warming]: Planned cold-start on {phase} b_idx {b_idx}. Cost: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN.")
+                logger.info(f"[Context Cache INIT / Self-Warming]: Initial batch on {phase} b_idx {b_idx}. Cost: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN ({mode_note}).")
             elif is_hydrogen_lean:
                 lean_msg = (
                     f"\n  ℹ️ [Hydrogen Zero-Cache Lean]: Paczka {b_idx} ({phase}) — bieżący koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN."
@@ -5325,8 +5328,105 @@ class MultimodalTranslator:
             "combined_glossary": combined_glossary,
             "all_user_rules": all_user_rules,
             "episode_profile": episode_profile,
+            "total_batches": len(batches) if batches else 1,
         }
         return phase1_data
+
+    @staticmethod
+    def _score_phase2_editorial_risk(item: Dict[str, Any]) -> Tuple[int, bool]:
+        """
+        Standard 11.2.21: Wyznacza deterministyczną wagę ryzyka redakcyjnego linii
+        oraz flagę krytycznego zapotrzebowania na MEDIUM CoT (0.00 PLN).
+        """
+        score = 0
+        critical_cot = False
+
+        if item.get("is_missing_translation") or item.get("is_blind_draft"):
+            score += 100
+            critical_cot = True
+        if item.get("is_song"):
+            score += 90
+            critical_cot = True
+
+        calque_sc = float(item.get("calque_score", 0.0) or 0.0)
+        if calque_sc >= 0.25:
+            score += int(40 + calque_sc * 40)
+
+        if item.get("condensation_directive") or item.get("cps_warning"):
+            score += 45
+        if item.get("audio_alert"):
+            score += 35
+        if item.get("ambiguity_note"):
+            score += 35
+        if item.get("canonical_glossary_term"):
+            score += 30
+
+        spk_conf = item.get("speaker_confidence")
+        tgt_conf = item.get("target_confidence")
+        if (spk_conf is not None and spk_conf < 0.95) or (tgt_conf is not None and tgt_conf < 0.95):
+            score += 30
+
+        notes_low = str(item.get("notes") or "").lower()
+        if any(k in notes_low for k in ("pułapka_profilera", "kwestia-wizytówka", "gra słowna", "zmiana trybu")):
+            score += 50
+
+        if item.get("relation_tag") or item.get("pragmatic_register"):
+            score += 20
+
+        word_cnt = len(str(item.get("en") or "").split())
+        if word_cnt >= 9:
+            score += 15 + min(15, word_cnt - 8)
+
+        return score, critical_cot
+
+    def _select_hydrogen_phase2_candidates(
+        self,
+        pass1_items: List[Dict[str, Any]],
+        total_batches: int = 6,
+        episode_line_cap: int = 170
+    ) -> List[Dict[str, Any]]:
+        """
+        Standard 11.2.21 (Selective Risk-Weighted Phase 2):
+        Wybiera do redakcji F2 kwestie o najwyższym ryzyku stylistycznym/ontologicznym
+        z twardym sufitem <= 50% paczki oraz globalnym limitem <= 170 linii/odcinek.
+        Dla linii bez flag krytycznych przenosi wskazówki audio/uwagi F1 do pola 'notes',
+        utrzymując ekonomiczny tryb LOW (2048) bez utraty wskazówek merytorycznych.
+        """
+        if not pass1_items or len(pass1_items) <= 10:
+            return pass1_items
+
+        scored_entries: List[Tuple[int, int, bool, Dict[str, Any]]] = []
+        for pos, it in enumerate(pass1_items):
+            sc, is_crit = self._score_phase2_editorial_risk(it)
+            if sc > 0:
+                scored_entries.append((sc, pos, is_crit, it))
+
+        if not scored_entries:
+            return []
+
+        per_batch_global_cap = max(8, episode_line_cap // max(1, int(total_batches or 1)))
+        batch_cap = max(8, min(int(len(pass1_items) * 0.50), per_batch_global_cap))
+
+        scored_entries.sort(key=lambda x: (-x[0], x[1]))
+        chosen = sorted(scored_entries[:batch_cap], key=lambda x: x[1])
+
+        selected_copies: List[Dict[str, Any]] = []
+        for _, _, is_crit, orig_it in chosen:
+            it_copy = dict(orig_it)
+            if not is_crit:
+                extra_hints: List[str] = []
+                if it_copy.get("audio_alert"):
+                    extra_hints.append(f"[Wskazówka audio: {str(it_copy['audio_alert']).strip()}]")
+                    it_copy["audio_alert"] = ""
+                if it_copy.get("ambiguity_note"):
+                    extra_hints.append(f"[Uwaga F1: {str(it_copy['ambiguity_note']).strip()}]")
+                    it_copy["ambiguity_note"] = ""
+                if extra_hints:
+                    existing_notes = str(it_copy.get("notes") or "").strip()
+                    it_copy["notes"] = f"{existing_notes} {' '.join(extra_hints)}".strip()
+            selected_copies.append(it_copy)
+
+        return selected_copies
 
     def _process_phase2_only(
         self,
@@ -5365,192 +5465,209 @@ class MultimodalTranslator:
 
         cot_info_str = ""
         if self.enable_verifier and hasattr(self, 'verifier') and self.verifier:
-            budget_val = getattr(self.verifier, "calculate_effective_budget", lambda items: getattr(self.verifier, "thinking_budget", 2048))(pass1_items)
-            model_tag = "Flash" if "flash" in getattr(self.verifier, "model", "").lower() else "Pro"
-            cot_info_str = f"Faza 2 (Redakcja {model_tag} CoT: {budget_val})"
-            if pbar and hasattr(pbar, "set_postfix_str"):
-                with self.lock:
-                    pbar.set_postfix_str(f"{cot_info_str}...")
-                    pbar.refresh()
-            if pbar and hasattr(pbar, "write"):
-                pbar.write(f" ├─ [{cot_info_str}]")
-            # Staggered entry (350ms per thread) to prevent simultaneous TPU burst collisions on 503
-            stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
-            if stagger_sec > 0:
-                time.sleep(stagger_sec)
+            from model_resolver import is_gemini_4_or_hydrogen_model
+            v_model_name = getattr(self.verifier, "model", getattr(self, "model_phase2", self.model))
+            v_prompt_len = len(getattr(self.verifier, "system_prompt", ""))
+            is_h_lean_f2 = is_gemini_4_or_hydrogen_model(v_model_name) and v_prompt_len < 60000
+            total_batches_f2 = max(1, int(phase1_data.get("total_batches", 6) or 6))
 
-            seen_p2_paradigms = set()
-            seen_p2_glossary = set()
-            seen_p2_speaker_voice = {}
-            seen_p2_speaker_prosody = {}
-            prev_speaker_name = None
-            for it in pass1_items:
-                paradigms = it.get("declension_paradigms")
-                if paradigms:
-                    if isinstance(paradigms, list):
-                        new_pars = []
-                        for p in paradigms:
-                            p_key = str(p).strip()
-                            if p_key not in seen_p2_paradigms:
-                                seen_p2_paradigms.add(p_key)
-                                new_pars.append(p)
-                        it["declension_paradigms"] = new_pars
-                    else:
-                        p_key = str(paradigms).strip()
-                        if p_key in seen_p2_paradigms:
-                            it["declension_paradigms"] = []
-                        else:
-                            seen_p2_paradigms.add(p_key)
-
-                gloss_term = it.get("canonical_glossary_term")
-                if gloss_term:
-                    g_key = str(gloss_term).strip().lower()
-                    if g_key in seen_p2_glossary:
-                        it["canonical_glossary_term"] = None
-                    else:
-                        seen_p2_glossary.add(g_key)
-
-                spk_name = (it.get("speaker_name") or it.get("speaker") or "").strip()
-                spk_voice = it.get("speaker_voice", "")
-                spk_prosody = it.get("prosody", "")
-                if spk_name:
-                    if prev_speaker_name == spk_name:
-                        if spk_voice and seen_p2_speaker_voice.get(spk_name) == spk_voice:
-                            it["speaker_voice"] = ""
-                        if spk_prosody and seen_p2_speaker_prosody.get(spk_name) == spk_prosody:
-                            it["prosody"] = ""
-                    if spk_voice and not seen_p2_speaker_voice.get(spk_name):
-                        seen_p2_speaker_voice[spk_name] = spk_voice
-                    if spk_prosody and not seen_p2_speaker_prosody.get(spk_name):
-                        seen_p2_speaker_prosody[spk_name] = spk_prosody
-                prev_speaker_name = spk_name
-
-            t0_phase2 = time.perf_counter()
-            phase2_focused_rules = get_focused_rules_for_batch(pass1_items, max_rules=5 if len(pass1_items) > 40 else 3)
-            # INC-AVT-060: Offset klucza dla Fazy 2 zapobiegający kolizji pamięci TPU z Fazą 1
-            f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx
-            refined_lines: List[RefinedLine] = self.verifier.verify_batch(
-                batch_items=pass1_items,
-                scene_summary=scene_desc or "",
-                episode_profile_str=episode_profile_str,
-                user_feedback_str=user_feedback_str,
-                glossary_str=glossary_str,
-                focused_rules_str=phase2_focused_rules,
-                series_bible_str=scoped_series_bible_str,
-                manga_canon_str=manga_canon_str,
-                history_context=lookback_history,
-                lookahead_events=lookahead_events,
-                character_registry=self.character_registry,
-                scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
-                batch_idx=f2_affinity_idx
+            verifier_batch_items = (
+                self._select_hydrogen_phase2_candidates(pass1_items, total_batches=total_batches_f2)
+                if is_h_lean_f2
+                else pass1_items
             )
-            elapsed_phase2 = round(max(0.0, time.perf_counter() - t0_phase2), 2)
-            _vtl = getattr(self.verifier, "_thread_local", None)
-            p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
-            p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
 
-            # Standard 11.2.18 (Zero-Waste Self-Warming): Fizyczna eliminacja JIT Warmup Retry z Fazy 2 (0 retry na 100% paczek).
-            # Paczka 0 F2 samodzielnie rozgrzewa dedykowany klucz K2 dokładną sygnaturą dekodera bez podwajania kosztów CoT.
+            if not verifier_batch_items:
+                if pbar and hasattr(pbar, "write"):
+                    pbar.write(f" ├─ [Faza 2 (Selektywna Redakcja)]: 0/{len(pass1_items)} linii wysokiego ryzyka — zachowano zweryfikowany szkic F1.")
+            else:
+                budget_val = getattr(self.verifier, "calculate_effective_budget", lambda items: getattr(self.verifier, "thinking_budget", 2048))(verifier_batch_items)
+                model_tag = "Flash" if "flash" in getattr(self.verifier, "model", "").lower() else "Pro"
+                sel_suffix = f", {len(verifier_batch_items)}/{len(pass1_items)} linii" if len(verifier_batch_items) < len(pass1_items) else ""
+                cot_info_str = f"Faza 2 (Redakcja {model_tag} CoT: {budget_val}{sel_suffix})"
+                if pbar and hasattr(pbar, "set_postfix_str"):
+                    with self.lock:
+                        pbar.set_postfix_str(f"{cot_info_str}...")
+                        pbar.refresh()
+                if pbar and hasattr(pbar, "write"):
+                    pbar.write(f" ├─ [{cot_info_str}]")
+                # Staggered entry (350ms per thread) to prevent simultaneous TPU burst collisions on 503
+                stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
+                if stagger_sec > 0:
+                    time.sleep(stagger_sec)
 
-            self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=p2_cached, phase="phase2")
-            for r in refined_lines:
-                orig_it = next((it for it in pass1_items if it.get("id") == r.id), None)
-                if orig_it:
-                    it_style = str(orig_it.get("style", "")).lower()
-                    if any(k in it_style for k in ["italic", "flashback_italic", "thoughts", "internal"]):
-                        r.refined_pl = re.sub(r"\{\\i[01]\}", "", r.refined_pl)
+                seen_p2_paradigms = set()
+                seen_p2_glossary = set()
+                seen_p2_speaker_voice = {}
+                seen_p2_speaker_prosody = {}
+                prev_speaker_name = None
+                for it in verifier_batch_items:
+                    paradigms = it.get("declension_paradigms")
+                    if paradigms:
+                        if isinstance(paradigms, list):
+                            new_pars = []
+                            for p in paradigms:
+                                p_key = str(p).strip()
+                                if p_key not in seen_p2_paradigms:
+                                    seen_p2_paradigms.add(p_key)
+                                    new_pars.append(p)
+                            it["declension_paradigms"] = new_pars
+                        else:
+                            p_key = str(paradigms).strip()
+                            if p_key in seen_p2_paradigms:
+                                it["declension_paradigms"] = []
+                            else:
+                                seen_p2_paradigms.add(p_key)
 
-                    # INC-AVT-044: Bezosobowa ochrona łączności radiowej i meldunków wojskowych
-                    en_clean_radio = re.sub(r"[^\w\s]", "", str(orig_it.get("en", "")).lower()).strip()
-                    if en_clean_radio in ("roger", "copy that", "acknowledged", "understood", "wilco", "roger that"):
-                        spk_name = str(orig_it.get("speaker", "")).strip()
-                        spk_g = ""
-                        if hasattr(self, "series_bible") and self.series_bible:
-                            spk_g = self.series_bible.get_character_gender(spk_name)
-                        if not spk_g:
-                            spk_g = self.character_registry.get(spk_name, "UNKNOWN")
-                        if spk_g != "MALE":
-                            is_female = (spk_g == "FEMALE")
-                            rep_przyjalem = "Przyjęłam." if is_female else "Przyjęto."
-                            rep_zrozumialem = "Zrozumiałam." if is_female else "Zrozumiano."
-                            r.refined_pl = re.sub(r"\bPrzyjąłem[.!]*", rep_przyjalem, r.refined_pl, flags=re.IGNORECASE)
-                            r.refined_pl = re.sub(r"\bZrozumiałem[.!]*", rep_zrozumialem, r.refined_pl, flags=re.IGNORECASE)
+                    gloss_term = it.get("canonical_glossary_term")
+                    if gloss_term:
+                        g_key = str(gloss_term).strip().lower()
+                        if g_key in seen_p2_glossary:
+                            it["canonical_glossary_term"] = None
+                        else:
+                            seen_p2_glossary.add(g_key)
 
-                    orig_pl_strip = str(orig_it.get("pl", "")).rstrip()
-                    orig_en_strip = str(orig_it.get("en", "")).rstrip()
-                    if orig_pl_strip.endswith(".") and orig_en_strip.endswith("."):
-                        ref_strip = r.refined_pl.rstrip()
-                        if not re.search(r"[.!?…\"”»\-\—]$", ref_strip) and not orig_it.get("is_sign"):
-                            r.refined_pl = ref_strip + "."
+                    spk_name = (it.get("speaker_name") or it.get("speaker") or "").strip()
+                    spk_voice = it.get("speaker_voice", "")
+                    spk_prosody = it.get("prosody", "")
+                    if spk_name:
+                        if prev_speaker_name == spk_name:
+                            if spk_voice and seen_p2_speaker_voice.get(spk_name) == spk_voice:
+                                it["speaker_voice"] = ""
+                            if spk_prosody and seen_p2_speaker_prosody.get(spk_name) == spk_prosody:
+                                it["prosody"] = ""
+                        if spk_voice and not seen_p2_speaker_voice.get(spk_name):
+                            seen_p2_speaker_voice[spk_name] = spk_voice
+                        if spk_prosody and not seen_p2_speaker_prosody.get(spk_name):
+                            seen_p2_speaker_prosody[spk_name] = spk_prosody
+                    prev_speaker_name = spk_name
 
-            refined_dict.update({r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines})
-            refined_region_dict.update({r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)})
-            refined_typesetting_dict.update({r.id: r.visual_typesetting for r in refined_lines if getattr(r, 'visual_typesetting', None)})
-
-            # Hotfix 11.1.6 (Zadanie 1.1 / E-11): Strażnik zablokowanej terminologii po Fazie 2
-            active_gloss_entries = batch_glossary_items if 'batch_glossary_items' in locals() and batch_glossary_items else []
-            if not active_gloss_entries:
-                if episode_profile and getattr(episode_profile, "glossary", None):
-                    active_gloss_entries = list(episode_profile.glossary)
-                elif hasattr(self, "series_bible") and self.series_bible and getattr(self.series_bible, "data", None):
-                    g_dict = self.series_bible.data.get("glossary", {})
-                    if isinstance(g_dict, dict):
-                        active_gloss_entries = [{"term_en": k, "translation_pl": v} for k, v in g_dict.items()]
-
-            for r_line in refined_lines:
-                orig_item = next((it for it in pass1_items if it["id"] == r_line.id), None)
-                if not orig_item:
-                    continue
-                r_en = orig_item.get("en", "") or ""
-                p1_pl = orig_item.get("pl", "") or ""
-                r_pl = refined_dict.get(r_line.id, p1_pl) or ""
-                refined_dict[r_line.id] = enforce_locked_glossary_terms(
-                    en_text=r_en,
-                    candidate_pl=r_pl,
-                    glossary_entries=active_gloss_entries,
-                    phase1_pl=p1_pl
+                t0_phase2 = time.perf_counter()
+                phase2_focused_rules = get_focused_rules_for_batch(verifier_batch_items, max_rules=5 if len(verifier_batch_items) > 40 else 3)
+                # INC-AVT-060: Offset klucza dla Fazy 2 zapobiegający kolizji pamięci TPU z Fazą 1
+                f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx
+                refined_lines: List[RefinedLine] = self.verifier.verify_batch(
+                    batch_items=verifier_batch_items,
+                    scene_summary=scene_desc or "",
+                    episode_profile_str=episode_profile_str,
+                    user_feedback_str=user_feedback_str,
+                    glossary_str=glossary_str,
+                    focused_rules_str=phase2_focused_rules,
+                    series_bible_str=scoped_series_bible_str,
+                    manga_canon_str=manga_canon_str,
+                    history_context=lookback_history,
+                    lookahead_events=lookahead_events,
+                    character_registry=self.character_registry,
+                    scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
+                    batch_idx=f2_affinity_idx
                 )
+                elapsed_phase2 = round(max(0.0, time.perf_counter() - t0_phase2), 2)
+                _vtl = getattr(self.verifier, "_thread_local", None)
+                p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
+                p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
 
-            if self.flight_recorder:
-                try:
-                    self.flight_recorder.log_phase2_verifier(
-                        batch_id=b_idx,
-                        cot_budget=budget_val if 'budget_val' in locals() else 0,
-                        prompt_dump=getattr(self.verifier, "last_prompt", "") or "",
-                        raw_response=[r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r)) for r in refined_lines],
-                        response_time_sec=elapsed_phase2,
-                        token_usage=p2_tok_usage
+                # Standard 11.2.18 (Zero-Waste Self-Warming): Fizyczna eliminacja JIT Warmup Retry z Fazy 2 (0 retry na 100% paczek).
+                # Paczka 0 F2 samodzielnie rozgrzewa dedykowany klucz K2 dokładną sygnaturą dekodera bez podwajania kosztów CoT.
+
+                self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=p2_cached, phase="phase2")
+                for r in refined_lines:
+                    orig_it = next((it for it in pass1_items if it.get("id") == r.id), None)
+                    if orig_it:
+                        it_style = str(orig_it.get("style", "")).lower()
+                        if any(k in it_style for k in ["italic", "flashback_italic", "thoughts", "internal"]):
+                            r.refined_pl = re.sub(r"\{\\i[01]\}", "", r.refined_pl)
+
+                        # INC-AVT-044: Bezosobowa ochrona łączności radiowej i meldunków wojskowych
+                        en_clean_radio = re.sub(r"[^\w\s]", "", str(orig_it.get("en", "")).lower()).strip()
+                        if en_clean_radio in ("roger", "copy that", "acknowledged", "understood", "wilco", "roger that"):
+                            spk_name = str(orig_it.get("speaker", "")).strip()
+                            spk_g = ""
+                            if hasattr(self, "series_bible") and self.series_bible:
+                                spk_g = self.series_bible.get_character_gender(spk_name)
+                            if not spk_g:
+                                spk_g = self.character_registry.get(spk_name, "UNKNOWN")
+                            if spk_g != "MALE":
+                                is_female = (spk_g == "FEMALE")
+                                rep_przyjalem = "Przyjęłam." if is_female else "Przyjęto."
+                                rep_zrozumialem = "Zrozumiałam." if is_female else "Zrozumiano."
+                                r.refined_pl = re.sub(r"\bPrzyjąłem[.!]*", rep_przyjalem, r.refined_pl, flags=re.IGNORECASE)
+                                r.refined_pl = re.sub(r"\bZrozumiałem[.!]*", rep_zrozumialem, r.refined_pl, flags=re.IGNORECASE)
+
+                        orig_pl_strip = str(orig_it.get("pl", "")).rstrip()
+                        orig_en_strip = str(orig_it.get("en", "")).rstrip()
+                        if orig_pl_strip.endswith(".") and orig_en_strip.endswith("."):
+                            ref_strip = r.refined_pl.rstrip()
+                            if not re.search(r"[.!?…\"”»\-\—]$", ref_strip) and not orig_it.get("is_sign"):
+                                r.refined_pl = ref_strip + "."
+
+                refined_dict.update({r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines})
+                refined_region_dict.update({r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)})
+                refined_typesetting_dict.update({r.id: r.visual_typesetting for r in refined_lines if getattr(r, 'visual_typesetting', None)})
+
+                # Hotfix 11.1.6 (Zadanie 1.1 / E-11): Strażnik zablokowanej terminologii po Fazie 2
+                active_gloss_entries = batch_glossary_items if 'batch_glossary_items' in locals() and batch_glossary_items else []
+                if not active_gloss_entries:
+                    if episode_profile and getattr(episode_profile, "glossary", None):
+                        active_gloss_entries = list(episode_profile.glossary)
+                    elif hasattr(self, "series_bible") and self.series_bible and getattr(self.series_bible, "data", None):
+                        g_dict = self.series_bible.data.get("glossary", {})
+                        if isinstance(g_dict, dict):
+                            active_gloss_entries = [{"term_en": k, "translation_pl": v} for k, v in g_dict.items()]
+
+                for r_line in refined_lines:
+                    orig_item = next((it for it in pass1_items if it["id"] == r_line.id), None)
+                    if not orig_item:
+                        continue
+                    r_en = orig_item.get("en", "") or ""
+                    p1_pl = orig_item.get("pl", "") or ""
+                    r_pl = refined_dict.get(r_line.id, p1_pl) or ""
+                    refined_dict[r_line.id] = enforce_locked_glossary_terms(
+                        en_text=r_en,
+                        candidate_pl=r_pl,
+                        glossary_entries=active_gloss_entries,
+                        phase1_pl=p1_pl
                     )
-                except Exception:
-                    logger.debug("Rejestracja weryfikacji w locie zakończona wyjątkiem", exc_info=True)
 
-            any_redaction_printed = False
-            for r in refined_lines:
-                orig_item = next((it for it in pass1_items if it["id"] == r.id), None)
-                orig_pl = orig_item["pl"] if orig_item else ""
-                clean_ref = sanitize_sub_text(r.refined_pl)
-                ch_desc = (getattr(r, 'changes_made', '') or '').strip()
+                if self.flight_recorder:
+                    try:
+                        self.flight_recorder.log_phase2_verifier(
+                            batch_id=b_idx,
+                            cot_budget=budget_val if 'budget_val' in locals() else 0,
+                            prompt_dump=getattr(self.verifier, "last_prompt", "") or "",
+                            raw_response=[r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r)) for r in refined_lines],
+                            response_time_sec=elapsed_phase2,
+                            token_usage=p2_tok_usage
+                        )
+                    except Exception:
+                        logger.debug("Rejestracja weryfikacji w locie zakończona wyjątkiem", exc_info=True)
 
-                # Strip internal ASS tags (like {\i1}, {\i0}) and normalize newlines for pure, clean console display (Standard 9.6, 2C.5, Standard 9.7, 2C.3)
-                disp_orig = re.sub(r"\{[^\}]*\}", "", str(orig_pl or "")).replace("\\r\\n", "\\N").replace("\\n", "\\N").replace("\r\n", "\\N").replace("\n", "\\N").strip()
-                disp_ref = re.sub(r"\{[^\}]*\}", "", str(clean_ref or "")).replace("\\r\\n", "\\N").replace("\\n", "\\N").replace("\r\n", "\\N").replace("\n", "\\N").strip()
+                any_redaction_printed = False
+                for r in refined_lines:
+                    orig_item = next((it for it in pass1_items if it["id"] == r.id), None)
+                    orig_pl = orig_item["pl"] if orig_item else ""
+                    clean_ref = sanitize_sub_text(r.refined_pl)
+                    ch_desc = (getattr(r, 'changes_made', '') or '').strip()
 
-                # Check if there is an actual textual modification or meaningful redaction note
-                lexically_same = DialogueVerifier.is_lexically_identical_ignoring_linebreak(disp_orig, disp_ref)
-                has_meaningful_note = bool(ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null")
-                has_text_change = bool(disp_orig and (disp_orig != disp_ref) and not (lexically_same and not has_meaningful_note))
+                    # Strip internal ASS tags (like {\i1}, {\i0}) and normalize newlines for pure, clean console display (Standard 9.6, 2C.5, Standard 9.7, 2C.3)
+                    disp_orig = re.sub(r"\{[^\}]*\}", "", str(orig_pl or "")).replace("\\r\\n", "\\N").replace("\\n", "\\N").replace("\r\n", "\\N").replace("\n", "\\N").strip()
+                    disp_ref = re.sub(r"\{[^\}]*\}", "", str(clean_ref or "")).replace("\\r\\n", "\\N").replace("\\n", "\\N").replace("\r\n", "\\N").replace("\n", "\\N").strip()
 
-                if has_text_change:
-                    any_redaction_printed = True
-                    clean_note = ch_desc if ch_desc.startswith("[") else (f"[{ch_desc}]" if ch_desc else "")
-                    pillar_note = f" {clean_note}" if clean_note else ""
+                    # Check if there is an actual textual modification or meaningful redaction note
+                    lexically_same = DialogueVerifier.is_lexically_identical_ignoring_linebreak(disp_orig, disp_ref)
+                    has_meaningful_note = bool(ch_desc and "Zweryfikowano" not in ch_desc and ch_desc.lower() != "null")
+                    has_text_change = bool(disp_orig and (disp_orig != disp_ref) and not (lexically_same and not has_meaningful_note))
 
-                    pbar.write(f" └─ [Redaktor Dialogów] #{r.id}{pillar_note}")
-                    pbar.write(f"    ├─ Szkic:  \"{disp_orig}\"")
-                    pbar.write(f"    └─ Szlif:  \"{disp_ref}\"")
+                    if has_text_change:
+                        any_redaction_printed = True
+                        clean_note = ch_desc if ch_desc.startswith("[") else (f"[{ch_desc}]" if ch_desc else "")
+                        pillar_note = f" {clean_note}" if clean_note else ""
 
-            if not any_redaction_printed:
-                pbar.write(f" └─ [Redaktor Dialogów] Zweryfikowano bez uwag (100% zgodności z Kanonem AVT)")
+                        pbar.write(f" └─ [Redaktor Dialogów] #{r.id}{pillar_note}")
+                        pbar.write(f"    ├─ Szkic:  \"{disp_orig}\"")
+                        pbar.write(f"    └─ Szlif:  \"{disp_ref}\"")
+
+                if not any_redaction_printed:
+                    pbar.write(f" └─ [Redaktor Dialogów] Zweryfikowano bez uwag (100% zgodności z Kanonem AVT)")
 
         # Standard 7.0 Primary Translation Authority:
         # Tekst z Fazy 1 i Fazy 2 traktowany jest jako autorytatywny bez wtórnych mutacji liczby zaimków przed linterem.
@@ -6671,11 +6788,11 @@ class MultimodalTranslator:
 
         from model_resolver import is_gemini_4_or_hydrogen_model
         if is_gemini_4_or_hydrogen_model(self.model_phase1) and self.batch_size >= 24:
-            # Standard 11.2.20 (Hydrogen Zero-Cache Lean): ~52-60 linii/paczkę (~6 paczek na odcinek 334 linii)
-            eff_base_bs = max(self.batch_size, 52)
-            eff_max_bs = max(eff_base_bs + 8, 60)
-            eff_min_scene = 36
-            eff_min_leap = 28
+            # Standard 11.2.21 (Deterministic Hydrogen Batching): ~56-64 linii/paczkę (~6 paczek na odcinek 334 linii)
+            eff_base_bs = max(self.batch_size, 56)
+            eff_max_bs = max(eff_base_bs + 8, 64)
+            eff_min_scene = 44
+            eff_min_leap = 36
         else:
             eff_base_bs = self.batch_size
             eff_max_bs = min(32, self.batch_size + 8) if self.batch_size >= 8 else self.batch_size
