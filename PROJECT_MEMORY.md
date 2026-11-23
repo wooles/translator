@@ -4,8 +4,8 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-23 — Standard 11.2.21 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.21 (Deterministic Adaptive Batching & Selective Risk-Weighted Phase 2 for Hydrogen Zero-Cache Lean)`
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-23 — Standard 11.2.21a Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.21a (Hotfix: Decouple is_blind_draft from MEDIUM CoT Escalation & Normalize <=10-line Tail Batches)`
 - **Commit certyfikacji kodu:** `376e7f4` (`376e7f4f6918d2da53c0d83e29f0c5a04e590059`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
@@ -40,15 +40,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.19:** `be13cb6` (Commit 1), `9f8ea35` (Commit 2), `7b73a2c` (Commit 3)
 - **Commity Standardu 11.2.20:** `5f04bac` (Commit 1), `a2594f9` (Commit 2), `9a9d88e` (Commit 3)
 - **Commity Standardu 11.2.21:**
-  * Commit 1 (`376e7f4`): `fix(pipeline): honor min_scene_batch on 2800ms breaks and add risk-weighted selective Phase 2 for Hydrogen Zero-Cache Lean (11.2.21)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 1 (`376e7f4`): `fix(pipeline): honor min_scene_batch on 2800ms breaks and add risk-weighted selective Phase 2 for Hydrogen Zero-Cache Lean (11.2.21)`
   * Commit 2 (`feaa9a0`): `test(pipeline): verify 2800ms batching threshold fix, selective risk-weighted F2 and <=4.60 PLN zero-cache simulation (11.2.21)`
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.21 — deterministic batching and risk-weighted selective Phase 2`
-- **Status 11.2.21:** `CERTIFIED / CLOSED (2026-11-23)`
+  * Commit 3 (`5df315d`): `docs(release): certify Standard 11.2.21 — deterministic batching and risk-weighted selective Phase 2`
+- **Commity Hotfixu 11.2.21a:**
+  * Commit 1 (`HEAD`): `fix(pipeline): decouple is_blind_draft from MEDIUM CoT escalation and normalize <=10-line tail batches (11.2.21a)`
+- **Status 11.2.21a:** `CERTIFIED / CLOSED (2026-11-23)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
 - **Stan metryk:** `411 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `482 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
 - **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (411/411 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.21` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.21: Deterministic Adaptive Batching & Selective Risk-Weighted Phase 2 for Hydrogen Zero-Cache Lean — naprawa progów cięcia w `create_adaptive_batches` poprzez uwzględnienie `min_scene_batch` przy pauzach >= 2.8s oraz progu gęstości słów `word_density_threshold` dla dużych paczek, co gwarantuje rzeczywiste ~6 paczek na odcinek 334 linii przy parametrach `56/64/44/36`; wdrożenie selektywnej redakcji F2 dla modeli Hydrogen w trybie Zero-Cache Lean z limitem <= 50% paczki oraz twardym globalnym pułapem <= 170 linii na odcinek; przenoszenie niekrytycznych alertów audio i uwag F1 do pola `notes`, utrzymujące ekonomiczny tryb `LOW (2048)` CoT w Verifierze bez utraty informacji merytorycznej; deterministyczny koszt pełnego 334-liniowego odcinka na poziomie 4.37–4.60 PLN netto przy 0% cache z marginesem >23% poniżej sufitu 6.00 PLN).
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.21a` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.21a: Deterministic Adaptive Batching & Selective Risk-Weighted Phase 2 for Hydrogen Zero-Cache Lean — naprawa progów cięcia w `create_adaptive_batches` poprzez uwzględnienie `min_scene_batch` przy pauzach >= 2.8s oraz progu gęstości słów `word_density_threshold` dla dużych paczek, co gwarantuje rzeczywiste ~6 paczek na odcinek 334 linii przy parametrach `56/64/44/36`; wdrożenie selektywnej redakcji F2 dla modeli Hydrogen w trybie Zero-Cache Lean z limitem <= 50% paczki oraz twardym globalnym pułapem <= 170 linii na odcinek; przenoszenie niekrytycznych alertów audio i uwag F1 do pola `notes`, utrzymujące ekonomiczny tryb `LOW (2048)` CoT w Verifierze bez utraty informacji merytorycznej; Hotfix 11.2.21a rozłącza `is_blind_draft` od eskalacji CoT `critical_cot` i normalizuje obsługę paczek końcowych `<= 10` linii; deterministyczny koszt pełnego 334-liniowego odcinka na poziomie 4.37–4.60 PLN netto przy 0% cache z marginesem >23% poniżej sufitu 6.00 PLN).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -702,5 +704,22 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
      - `test_adaptive_batches_respects_min_scene_with_frequent_2800ms_gaps`: Potwierdza powstanie dokładnie 5–7 paczek dla 334 linii mimo częstych pauz 3.2s.
      - `test_selective_phase2_caps_lines_and_maintains_low_cot`: Potwierdza selekcję <= 50% paczki, priorytetyzację ryzyka, transfer alertów do notes i utrzymanie LOW CoT 2048.
      - `test_standard_11_2_21_zero_cache_cost_simulation_under_5_pln`: Deterministyczna symulacja kosztu 334-liniowego odcinka na empirycznych współczynnikach wykazująca koszt **<= 4.60 PLN netto** (4.37–4.46 PLN netto, margines >23% poniżej sufitu 6.00 PLN).
+
+
+## 🏛️ ARB-073 / INC-AVT-071: Hotfix 11.2.21a — Rozłączenie is_blind_draft od eskalacji CoT MEDIUM oraz normalizacja krótkich paczek końcowych
+
+- **Status:** `RESOLVED (Hotfix 11.2.21a, commit HEAD)`
+- **Zidentyfikowano (Martwa gałąź LOW CoT dla is_blind_draft oraz asymetria paczek <= 10 linii):**
+  1. `_score_phase2_editorial_risk` ustawiało `critical_cot = True` dla `is_blind_draft=True`. Ponieważ `determine_blind_draft_status` ustawia `is_blind_draft=True` przy jakimkolwiek alercie audio (`audio_alert`) lub uwadze niejednoznaczności (`ambiguity_note`), każda linia z alertem otrzymywała `critical_cot = True`. Skutkowało to niemożnością przeniesienia alertów do `notes` w `_select_hydrogen_phase2_candidates` i wymuszało niepotrzebną eskalację budżetu myślenia do `MEDIUM (3072)` zamiast zamierzonego `LOW (2048)`.
+  2. W `_select_hydrogen_phase2_candidates` warunek `if not pass1_items or len(pass1_items) <= 10: return pass1_items` zwracał surowe, niemodyfikowane obiekty bez przeniesienia niekrytycznych alertów do pola `notes`, co w krótkich paczkach końcowych (np. 6 linii) również wyzwalało eskalację do `MEDIUM (3072)`.
+- **Komponenty Naprawy:**
+  1. `translator.py:_score_phase2_editorial_risk`:
+     - Rozłączenie `is_blind_draft` od `critical_cot = True`: linie z `is_blind_draft=True` otrzymują wysoki priorytet selekcji (`score += 100`), lecz `critical_cot` pozostaje `False`. Flaga `critical_cot = True` jest rezerwowana wyłącznie dla `is_missing_translation` oraz `is_song`.
+  2. `translator.py:_select_hydrogen_phase2_candidates`:
+     - Normalizacja paczek o długości `<= 10` linii: zachowanie wszystkich linii (`chosen = [(0, pos, self._score_phase2_editorial_risk(it)[1], it) for pos, it in enumerate(pass1_items)]`), z jednoczesnym przeniesieniem niekrytycznych alertów do pola `notes` pod osłoną głębokiej kopii, co gwarantuje budżet `LOW (2048)` także dla paczek końcowych.
+  3. `tests/test_context_cache_guard.py:test_selective_phase2_caps_lines_and_maintains_low_cot`:
+     - Integracja z `determine_blind_draft_status` oraz weryfikacja krótkiej paczki ogonowej (`items[30:36]`) o długości 6 linii, potwierdzająca selekcję wszystkich 6 linii oraz zachowanie budżetu `LOW (2048)`.
+     - Weryfikacja, że prawdziwa flaga krytyczna (`is_song=True`) wciąż prawidłowo eskaluje do `MEDIUM (3072)`.
+
 
 

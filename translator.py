@@ -5341,9 +5341,11 @@ class MultimodalTranslator:
         score = 0
         critical_cot = False
 
-        if item.get("is_missing_translation") or item.get("is_blind_draft"):
+        if item.get("is_missing_translation"):
             score += 100
             critical_cot = True
+        elif item.get("is_blind_draft"):
+            score += 100
         if item.get("is_song"):
             score += 90
             critical_cot = True
@@ -5392,23 +5394,29 @@ class MultimodalTranslator:
         Dla linii bez flag krytycznych przenosi wskazówki audio/uwagi F1 do pola 'notes',
         utrzymując ekonomiczny tryb LOW (2048) bez utraty wskazówek merytorycznych.
         """
-        if not pass1_items or len(pass1_items) <= 10:
-            return pass1_items
-
-        scored_entries: List[Tuple[int, int, bool, Dict[str, Any]]] = []
-        for pos, it in enumerate(pass1_items):
-            sc, is_crit = self._score_phase2_editorial_risk(it)
-            if sc > 0:
-                scored_entries.append((sc, pos, is_crit, it))
-
-        if not scored_entries:
+        if not pass1_items:
             return []
 
-        per_batch_global_cap = max(8, episode_line_cap // max(1, int(total_batches or 1)))
-        batch_cap = max(8, min(int(len(pass1_items) * 0.50), per_batch_global_cap))
+        if len(pass1_items) <= 10:
+            chosen = [
+                (0, pos, self._score_phase2_editorial_risk(it)[1], it)
+                for pos, it in enumerate(pass1_items)
+            ]
+        else:
+            scored_entries: List[Tuple[int, int, bool, Dict[str, Any]]] = []
+            for pos, it in enumerate(pass1_items):
+                sc, is_crit = self._score_phase2_editorial_risk(it)
+                if sc > 0:
+                    scored_entries.append((sc, pos, is_crit, it))
 
-        scored_entries.sort(key=lambda x: (-x[0], x[1]))
-        chosen = sorted(scored_entries[:batch_cap], key=lambda x: x[1])
+            if not scored_entries:
+                return []
+
+            per_batch_global_cap = max(8, episode_line_cap // max(1, int(total_batches or 1)))
+            batch_cap = max(8, min(int(len(pass1_items) * 0.50), per_batch_global_cap))
+
+            scored_entries.sort(key=lambda x: (-x[0], x[1]))
+            chosen = sorted(scored_entries[:batch_cap], key=lambda x: x[1])
 
         selected_copies: List[Dict[str, Any]] = []
         for _, _, is_crit, orig_it in chosen:

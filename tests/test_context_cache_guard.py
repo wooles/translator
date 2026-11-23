@@ -1673,7 +1673,7 @@ def test_selective_phase2_caps_lines_and_maintains_low_cot():
     - priorytetyzuje is_blind_draft / calque_score / cps_warning przed prostymi kwestiami,
     - przenosi niekrytyczne audio_alert / ambiguity_note do notes, utrzymując LOW CoT (2048) w verifierze.
     """
-    from translator import MultimodalTranslator
+    from translator import MultimodalTranslator, determine_blind_draft_status
 
     translator = MultimodalTranslator(
         api_key="mock_k0,mock_k1,mock_k2",
@@ -1683,32 +1683,58 @@ def test_selective_phase2_caps_lines_and_maintains_low_cot():
 
     items = []
     for i in range(56):
+        audio_al = "Drobna różnica tonu" if i == 33 else ""
+        amb_note = "Sprawdź zaimek" if i == 34 else ""
+        calque_sc = 0.45 if i in (30, 31) else 0.0
+        blind_flag = determine_blind_draft_status(
+            has_audio_conflict=bool(audio_al),
+            has_ambiguity_conflict=bool(amb_note),
+            calque_score=calque_sc
+        )
         it = {
             "id": i + 1,
             "en": "Yes." if i < 25 else "That is a fairly long sentence with several nuanced words inside.",
             "pl": "Tak." if i < 25 else "To dosyć długie zdanie z kilkoma niuansami w środku.",
-            "calque_score": 0.45 if i in (30, 31) else 0.0,
+            "calque_score": calque_sc,
             "cps_warning": "CPS > 17" if i == 32 else "",
-            "audio_alert": "Drobna różnica tonu" if i == 33 else "",
-            "ambiguity_note": "Sprawdź zaimek" if i == 34 else "",
-            "is_blind_draft": False,
+            "audio_alert": audio_al,
+            "ambiguity_note": amb_note,
+            "is_blind_draft": blind_flag,
             "is_song": False,
             "notes": ""
         }
         items.append(it)
+
+    assert items[33]["is_blind_draft"] is True
+    assert items[34]["is_blind_draft"] is True
 
     selected = translator._select_hydrogen_phase2_candidates(items, total_batches=6, episode_line_cap=170)
     assert 8 <= len(selected) <= 28, f"Selekcja F2 powinna zwrócić 8-28 linii z 56! Otrzymano: {len(selected)}"
     sel_ids = {it["id"] for it in selected}
     assert {31, 32, 33, 34, 35}.issubset(sel_ids), "Linie z kalką, CPS i alertami muszą znaleźć się w wybranym podzbiorze!"
 
-    # Niekrytyczne alerty zostały przeniesione do notes, więc verifier wybiera ekonomiczne LOW (2048)
+    # Hotfix 11.2.21a: Mimo is_blind_draft=True z Fazy 1 alerty trafiają do notes, a verifier wybiera LOW (2048)
     assert translator.verifier.calculate_effective_budget(selected) == 2048
     item_34 = next(it for it in selected if it["id"] == 34)
+    assert item_34["is_blind_draft"] is True
     assert "Wskazówka audio" in item_34["notes"]
     assert item_34["audio_alert"] == ""
+    item_35 = next(it for it in selected if it["id"] == 35)
+    assert item_35["is_blind_draft"] is True
+    assert "Uwaga F1" in item_35["notes"]
+    assert item_35["ambiguity_note"] == ""
     # Oryginał w items pozostaje nienaruszony (brak mutacji źródłowej listy)
     assert items[33]["audio_alert"] == "Drobna różnica tonu"
+
+    # Krótka paczka końcowa (<= 10 linii): wszystkie linie zachowane i utrzymane na LOW (2048)
+    tail_selected = translator._select_hydrogen_phase2_candidates(items[30:36], total_batches=6, episode_line_cap=170)
+    assert len(tail_selected) == 6
+    assert translator.verifier.calculate_effective_budget(tail_selected) == 2048
+
+    # Prawdziwa flaga krytyczna (is_song=True) nadal eskaluje do MEDIUM (3072)
+    song_batch = [dict(items[33], is_song=True)]
+    song_selected = translator._select_hydrogen_phase2_candidates(song_batch, total_batches=6, episode_line_cap=170)
+    assert translator.verifier.calculate_effective_budget(song_selected) == 3072
 
 
 @pytest.mark.unit
