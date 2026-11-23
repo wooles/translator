@@ -1564,10 +1564,10 @@ def test_hydrogen_zero_cache_lean_batches_around_55_lines():
 
     def compute_batches_for_model(model_name: str, batch_size: int = 30):
         if is_gemini_4_or_hydrogen_model(model_name) and batch_size >= 24:
-            eff_base_bs = max(batch_size, 52)
-            eff_max_bs = max(eff_base_bs + 8, 60)
-            eff_min_scene = 36
-            eff_min_leap = 28
+            eff_base_bs = max(batch_size, 56)
+            eff_max_bs = max(eff_base_bs + 8, 64)
+            eff_min_scene = 44
+            eff_min_leap = 36
         else:
             eff_base_bs = batch_size
             eff_max_bs = min(32, batch_size + 8) if batch_size >= 8 else batch_size
@@ -1628,6 +1628,113 @@ def test_hydrogen_zero_cache_budget_guard_still_halts_above_6_pln(monkeypatch):
         pass
 
     assert exit_calls == [1], "W trybie Zero-Cache Lean przekroczenie 6.00 PLN musi bezwzględnie zatrzymać potok via os._exit(1)!"
+
+
+@pytest.mark.unit
+def test_adaptive_batches_respects_min_scene_with_frequent_2800ms_gaps():
+    """
+    Standard 11.2.21: Weryfikuje usunięcie zahardkodowanego progu 18 linii dla przerw >= 2800 ms.
+    Dla 334 linii z realistyczną przerwą 3200 ms co 20 linii oraz progami Hydrogen (56/64/44/36)
+    musi powstać dokładnie 5-7 paczek (a nie 11-16 jak w 11.2.20).
+    """
+    import pysubs2
+    from translator import create_adaptive_batches
+
+    raw_entries = []
+    cur_t = 0
+    for i in range(334):
+        gap = 3200 if (i > 0 and i % 20 == 0) else 350
+        start = cur_t + gap
+        end = start + 1900
+        cur_t = end
+        txt = f"Sample dialogue line number {i} with realistic word count here."
+        ev = pysubs2.SSAEvent(start=start, end=end, text=txt)
+        raw_entries.append((i, ev, txt, ""))
+
+    batches_h = create_adaptive_batches(
+        raw_entries,
+        base_batch_size=56,
+        max_batch_size=64,
+        min_scene_batch=44,
+        min_leap_batch=36,
+        leap_threshold_ms=8000,
+        scene_threshold_ms=3800,
+        coalesce_tail=True
+    )
+    assert 5 <= len(batches_h) <= 7, f"Oczekiwano 5-7 paczek dla Hydrogen mimo częstych pauz 3.2s! Otrzymano: {len(batches_h)}"
+    assert min(len(b) for b in batches_h[:-1]) >= 40, f"Wykryto przedwczesną małą paczkę: {[len(b) for b in batches_h]}"
+
+
+@pytest.mark.unit
+def test_selective_phase2_caps_lines_and_maintains_low_cot():
+    """
+    Standard 11.2.21: Weryfikuje selekcję ryzyka F2 (_select_hydrogen_phase2_candidates):
+    - ogranicza 56-liniową paczkę do <= 28 linii (globalny pułap <= 170/6),
+    - priorytetyzuje is_blind_draft / calque_score / cps_warning przed prostymi kwestiami,
+    - przenosi niekrytyczne audio_alert / ambiguity_note do notes, utrzymując LOW CoT (2048) w verifierze.
+    """
+    from translator import MultimodalTranslator
+
+    translator = MultimodalTranslator(
+        api_key="mock_k0,mock_k1,mock_k2",
+        model="gemini-4-hydrogen",
+        enable_verifier=True
+    )
+
+    items = []
+    for i in range(56):
+        it = {
+            "id": i + 1,
+            "en": "Yes." if i < 25 else "That is a fairly long sentence with several nuanced words inside.",
+            "pl": "Tak." if i < 25 else "To dosyć długie zdanie z kilkoma niuansami w środku.",
+            "calque_score": 0.45 if i in (30, 31) else 0.0,
+            "cps_warning": "CPS > 17" if i == 32 else "",
+            "audio_alert": "Drobna różnica tonu" if i == 33 else "",
+            "ambiguity_note": "Sprawdź zaimek" if i == 34 else "",
+            "is_blind_draft": False,
+            "is_song": False,
+            "notes": ""
+        }
+        items.append(it)
+
+    selected = translator._select_hydrogen_phase2_candidates(items, total_batches=6, episode_line_cap=170)
+    assert 8 <= len(selected) <= 28, f"Selekcja F2 powinna zwrócić 8-28 linii z 56! Otrzymano: {len(selected)}"
+    sel_ids = {it["id"] for it in selected}
+    assert {31, 32, 33, 34, 35}.issubset(sel_ids), "Linie z kalką, CPS i alertami muszą znaleźć się w wybranym podzbiorze!"
+
+    # Niekrytyczne alerty zostały przeniesione do notes, więc verifier wybiera ekonomiczne LOW (2048)
+    assert translator.verifier.calculate_effective_budget(selected) == 2048
+    item_34 = next(it for it in selected if it["id"] == 34)
+    assert "Wskazówka audio" in item_34["notes"]
+    assert item_34["audio_alert"] == ""
+    # Oryginał w items pozostaje nienaruszony (brak mutacji źródłowej listy)
+    assert items[33]["audio_alert"] == "Drobna różnica tonu"
+
+
+@pytest.mark.unit
+def test_standard_11_2_21_zero_cache_cost_simulation_under_5_pln():
+    """
+    Standard 11.2.21: Deterministyczna symulacja kosztu odcinka 334 linii (6 paczek,
+    50% selektywna F2 = 167 linii, 0% cache) na empirycznych współczynnikach z 2026-11-18.
+    Weryfikuje koszt <= 4.60 PLN netto (ponad 23% marginesu do limitu 6.00 PLN).
+    """
+    from pricing_guard import PricingGuard
+
+    f1_stats = {
+        "model": "gemini-4-hydrogen",
+        "prompt": 6 * 14768 + 334 * 100,
+        "cached": 0,
+        "output": 6 * 3200 + 334 * 105
+    }
+    f2_stats = {
+        "model": "gemini-4-hydrogen",
+        "prompt": 6 * 14300 + 167 * 140,
+        "cached": 0,
+        "output": 167 * 270 + 1 * 2930
+    }
+    breakdown = PricingGuard.calculate_actual_cost_breakdown(f1_stats, f2_stats)
+    assert breakdown["net_pln"] <= 4.60, f"Symulowany koszt przekroczył 4.60 PLN netto: {breakdown}"
+
 
 
 
