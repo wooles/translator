@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-23 — Standard 11.2.21a Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.21a (Hotfix: Decouple is_blind_draft from MEDIUM CoT Escalation & Normalize <=10-line Tail Batches)`
-- **Commit certyfikacji kodu:** `376e7f4` (`376e7f4f6918d2da53c0d83e29f0c5a04e590059`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-23 — Standard 11.2.22 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.22 (Checkpoint Session-Delta Budget Isolation, Pre-HALT Telemetry Persistence, Timeout Resilience & F2 Cap 115)`
+- **Commit certyfikacji kodu:** `f021602` (`f02160249c5bbd8299849206752763f357fbb4d2`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -39,18 +39,18 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.18:** `90ddeb7` (Commit 1), `b536d22` (Commit 2), `8d80bf1` (Commit 3)
 - **Commity Standardu 11.2.19:** `be13cb6` (Commit 1), `9f8ea35` (Commit 2), `7b73a2c` (Commit 3)
 - **Commity Standardu 11.2.20:** `5f04bac` (Commit 1), `a2594f9` (Commit 2), `9a9d88e` (Commit 3)
-- **Commity Standardu 11.2.21:**
-  * Commit 1 (`376e7f4`): `fix(pipeline): honor min_scene_batch on 2800ms breaks and add risk-weighted selective Phase 2 for Hydrogen Zero-Cache Lean (11.2.21)`
-  * Commit 2 (`feaa9a0`): `test(pipeline): verify 2800ms batching threshold fix, selective risk-weighted F2 and <=4.60 PLN zero-cache simulation (11.2.21)`
-  * Commit 3 (`5df315d`): `docs(release): certify Standard 11.2.21 — deterministic batching and risk-weighted selective Phase 2`
-- **Commity Hotfixu 11.2.21a:**
-  * Commit 1 (`HEAD`): `fix(pipeline): decouple is_blind_draft from MEDIUM CoT escalation and normalize <=10-line tail batches (11.2.21a)`
-- **Status 11.2.21a:** `CERTIFIED / CLOSED (2026-11-23)`
+- **Commity Standardu 11.2.21:** `376e7f4` (Commit 1), `feaa9a0` (Commit 2), `5df315d` (Commit 3)
+- **Commity Hotfixu 11.2.21a:** `9650713` (Commit 1)
+- **Commity Standardu 11.2.22:**
+  * Commit 1 (`f021602`): `fix(pipeline): isolate session budget delta from checkpoint history, persist flight_recorder pre-HALT, detect TimeoutError and calibrate F2 cap=115 (11.2.22)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 2 (`f1b7349`): `test(pipeline): verify checkpoint session-delta budget, pre-HALT flight_recorder, TimeoutError detection and 115-line F2 cap (11.2.22)`
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.22 — checkpoint session-delta budget isolation, pre-HALT telemetry and calibrated F2 cap=115`
+- **Status 11.2.22:** `CERTIFIED / CLOSED (2026-11-23)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
-- **Stan metryk:** `411 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `482 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (411/411 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.21a` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.21a: Deterministic Adaptive Batching & Selective Risk-Weighted Phase 2 for Hydrogen Zero-Cache Lean — naprawa progów cięcia w `create_adaptive_batches` poprzez uwzględnienie `min_scene_batch` przy pauzach >= 2.8s oraz progu gęstości słów `word_density_threshold` dla dużych paczek, co gwarantuje rzeczywiste ~6 paczek na odcinek 334 linii przy parametrach `56/64/44/36`; wdrożenie selektywnej redakcji F2 dla modeli Hydrogen w trybie Zero-Cache Lean z limitem <= 50% paczki oraz twardym globalnym pułapem <= 170 linii na odcinek; przenoszenie niekrytycznych alertów audio i uwag F1 do pola `notes`, utrzymujące ekonomiczny tryb `LOW (2048)` CoT w Verifierze bez utraty informacji merytorycznej; Hotfix 11.2.21a rozłącza `is_blind_draft` od eskalacji CoT `critical_cot` i normalizuje obsługę paczek końcowych `<= 10` linii; deterministyczny koszt pełnego 334-liniowego odcinka na poziomie 4.37–4.60 PLN netto przy 0% cache z marginesem >23% poniżej sufitu 6.00 PLN).
+- **Stan metryk:** `415 passed` w `tests/` oraz `71 passed, 153 deselected` w `test_system.py` (łącznie `486 passed` fast unit/integration + `153 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (415/415 TESTS PASSED, 71/71 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.22` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.22: Checkpoint Session-Delta Budget Isolation, Pre-HALT Telemetry Persistence, Timeout Resilience & F2 Cap 115 — izolacja nadzoru budżetowego bieżącej sesji od długu historycznego przywracanego z checkpointu poprzez śledzenie `_checkpoint_baseline_f1/_f2` i liczenie limitu 6.00 PLN wyłącznie od delty bieżącej sesji; utrwalanie telemetrii `flight_recorder` przed audytem budżetowym `_audit_batch_context_cache`, likwidujące ślepotę rejestrów `events.jsonl` przy zatrzymaniu procesu HALT; wydłużenie watchdog timeoutu F1 dla Hydrogen do 150.0s z poprawnym rozpoznawaniem `concurrent.futures.TimeoutError` o pustym stringu; kalibracja domyślnego sufitu selektywnej redakcji Fazy 2 `episode_line_cap = 115` linii (~34% odcinka), gwarantująca deterministyczny koszt czystego 334-liniowego odcinka na poziomie 3.95–4.59 PLN netto przy 0% cache z marginesem >= 23.5% poniżej twardego limitu 6.00 PLN).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -720,6 +720,33 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   3. `tests/test_context_cache_guard.py:test_selective_phase2_caps_lines_and_maintains_low_cot`:
      - Integracja z `determine_blind_draft_status` oraz weryfikacja krótkiej paczki ogonowej (`items[30:36]`) o długości 6 linii, potwierdzająca selekcję wszystkich 6 linii oraz zachowanie budżetu `LOW (2048)`.
      - Weryfikacja, że prawdziwa flaga krytyczna (`is_song=True`) wciąż prawidłowo eskaluje do `MEDIUM (3072)`.
+
+
+## 🏛️ ARB-074 / INC-AVT-072: Standard 11.2.22 — Izolacja budżetu sesji od checkpointu, Pre-HALT Flight Recorder, Timeout Resilience i Kalibracja F2 Cap 115
+
+- **Status:** `RESOLVED (Standard 11.2.22, commity f021602, f1b7349, HEAD)`
+- **Zidentyfikowano (Przyczyna HALT-u z 2026-11-23 w Fazie 1 na Paczce 4):**
+  1. **Zatrucie budżetu sesji długiem z checkpointu:** Wznawianie z pliku `.checkpoint.json` dopisywało historyczne tokeny (np. 5.67 PLN z przerwanej sesji) bezpośrednio do `self.current_episode_tokens`, w wyniku czego bezpiecznik `HARD_BUDGET_LIMIT_PLN = 6.00` liczył koszt całkowity od początku odcinka zamiast bieżącej sesji. Nowa sesja miała jedynie 0.33 PLN marginesu i zatrzymywała się na Paczce 4.
+  2. **Ślepota telemetrii przy HALT:** Metoda `_audit_batch_context_cache` wywoływała `os._exit(1)` przed wywołaniem `flight_recorder.log_phase1_batch` / `log_phase2_verifier`. W rezultacie paczka wyzwalająca zatrzymanie nie trafiała do `events.jsonl`.
+  3. **Nierozpoznawanie `concurrent.futures.TimeoutError`:** Obiekt `concurrent.futures.TimeoutError()` konwertowany do stringa daje pusty ciąg `""`, przez co `is_timeout = "timeout" in err_str` ewaluowało się do `False`. Dodatkowo watchdog `95.0 s` w F1 był zbyt ciasny dla paczek 56–64 linii na modelach Hydrogen.
+  4. **Kalibracja sufitu F2:** Pomiary Paczki 3 wykazały `prompt = 26 887` tokenów dla 16 linii F2. Domyślny sufit `episode_line_cap = 170` pozwalał na selekcję do 50% odcinka, co przy 0% cache zbliżało koszt do granicy 4.60 PLN. Obniżenie sufitu do `115` linii (~34% odcinka) gwarantuje koszt `<= 4.59 PLN` netto.
+- **Komponenty Naprawy:**
+  1. `translator.py:_audit_batch_context_cache` oraz `translate_file`:
+     - Wprowadzenie `_checkpoint_baseline_f1` oraz `_checkpoint_baseline_f2`, inicjalizowanych na 0 i zasilanych tokenami przywróconymi z checkpointu.
+     - `_compute_session_net_pln` oblicza koszt bezpiecznika 6.00 PLN wyłącznie od delty bieżącej sesji (`max(0, current - baseline)`), zachowując pełne liczniki dla raportu końcowego odcinka.
+  2. `translator.py:_process_phase1_only` oraz `_process_phase2_only`:
+     - Zapis do `self.flight_recorder` (odpowiednio `log_phase1_batch` i `log_phase2_verifier`) wykonywany jest PRZED wywołaniem `_audit_batch_context_cache`. Pełny rekord telemetrii (prompt, cached, output, czas) zostaje trwale zapisany w `events.jsonl` nawet w przypadku natychmiastowego `os._exit(1)`.
+     - Usunięcie zdublowanego bloku rejestracji F2 z końca pętli paczki.
+  3. `translator.py:_call_gemini_with_retry`:
+     - Wydłużenie watchdoga z `95.0 s` do `150.0 s` dla paczek F1 modeli Hydrogen.
+     - Rozszerzenie wykrywania timeoutu o jawne sprawdzenie typu wyjątku: `isinstance(e, (TimeoutError, concurrent.futures.TimeoutError))`.
+  4. `translator.py:_select_hydrogen_phase2_candidates`:
+     - Kalibracja domyślnego parametru `episode_line_cap = 115` linii na odcinek.
+  5. `tests/test_context_cache_guard.py`:
+     - `test_checkpoint_restored_tokens_do_not_poison_session_budget_limit`: Weryfikacja braku fałszywego HALT przy baseline 5.67 PLN + delta 0.45 PLN oraz poprawnego HALT przy delcie sesji > 6.00 PLN.
+     - `test_flight_recorder_logs_phase1_batch_before_budget_halt`: Potwierdzenie kolejności `flight_recorder` przed `os_exit`.
+     - `test_concurrent_futures_timeout_triggers_timeout_fallback`: Potwierdzenie rozpoznawania `concurrent.futures.TimeoutError()` i fallbacku na model Flash.
+     - `test_standard_11_2_22_calibrated_2026_11_23_cost_under_4_60_pln`: Weryfikacja sufitu 115 linii i symulacja kosztu czystego 334-liniowego odcinka `<= 4.60 PLN` netto.
 
 
 
