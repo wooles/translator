@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-24 — Standard 11.2.25 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.25 (Residual DEF-02 Guard — scene_discourse UNSPECIFIED Reset Enforcement & FFmpeg Scene-Cut Boundaries in translator._resolve_line_addressee / lookback_history)`
-- **Commit certyfikacji kodu:** `22ddc18` (`22ddc185e846a4071fc48d13fc08040de215f629`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-24 — Standard 11.2.26 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.26 (OBS-04 — API Retry Telemetry F1/F2 in EpisodeFlightRecorder.log_retry & Pre-Batch events.jsonl Persistence)`
+- **Commit certyfikacji kodu:** `58a362d` (`58a362d14fa5a801fbd5e53dc21290f6a8ddc58e`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -45,20 +45,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.23:** `44a61cf` (Commit 1), `c33e220` (Commit 2), `4aae11a` (Commit 3)
 - **Commity Hotfixu 11.2.23a:** `5f0ba5a` (Commit 1), `d0e23dd` (Commit 2), `e595b52` (Commit 3)
 - **Commity Standardu 11.2.24:** `0910539` (Commit 1), `6b500a2` (Commit 2), `6852a5a` (Commit 3)
-- **Commity Standardu 11.2.25:**
-  * Commit 1 (`e4bdf85`): `fix(pipeline): enforce scene_discourse UNSPECIFIED reset and FFmpeg scene-cut boundary in _resolve_line_addressee and lookback_history (residual DEF-02, 11.2.25)`
-  * Commit 2 (`22ddc18`): `test(pipeline): verify residual DEF-02 across all 5 production scene-cut geometries and standalone _resolve_line_addressee guard (11.2.25)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.25 — residual DEF-02 scene-cut addressee guard in translator._resolve_line_addressee`
-- **Status 11.2.25:** `CERTIFIED / CLOSED (2026-11-24)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a`; **bezwzględne 0 B diffu** na wszystkich plikach chronionych Z16 oraz `scene_discourse.py`, `pipeline_logger.py`, `series_memory.py` względem `6852a5a`)
-- **Stan metryk:** `447 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `517 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (447/447 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.25` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.25: Residual DEF-02 Guard — poszanowanie resetu `UNSPECIFIED` z `scene_discourse.py` w `translator.py:_resolve_line_addressee`, jednolity rygor cięć scen `>= 3500 ms` lub `>= 2500 ms` z granicą FFmpeg w wyszukiwaniu wstecznym, `lookback_history` i forward lookahead z pominięciem szyldów i myśli wewnętrznych, oraz zapis `start_ms`/`end_ms` w `lookback_history` budowanym z `prev_batch`).
+- **Commity Standardu 11.2.25:** `e4bdf85` (Commit 1), `22ddc18` (Commit 2), `0961c31` (Commit 3)
+- **Commity Standardu 11.2.26:**
+  * Commit 1 (`96f5730`): `fix(telemetry): add EpisodeFlightRecorder.log_retry and record F1/F2 API retry events (503/429/504/TimeoutError) in events.jsonl before batch completion (OBS-04, 11.2.26)`
+  * Commit 2 (`58a362d`): `test(telemetry): add httpx.MockTransport integration tests verifying retry events in events.jsonl before phase1_batch and phase2_verifier (OBS-04, 11.2.26)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.26 (OBS-04) — API retry telemetry in pipeline_logger and translator`
+- **Status 11.2.26:** `CERTIFIED / CLOSED (2026-11-24)`
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a`; **bezwzględne 0 B diffu** na wszystkich 29 plikach chronionych Z16 oraz `scene_discourse.py`, `series_memory.py` względem `0961c31`)
+- **Stan metryk:** `450 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `520 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (450/450 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.26` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.26: OBS-04 API Retry Telemetry — metoda `EpisodeFlightRecorder.log_retry` zapisująca zdarzenia `stage="retry"` w `events.jsonl` oraz diagnostykę `[RETRY | ...]` w `full_trace.log`, klasyfikator `_classify_retry_error_type` i bezpieczny helper `_log_retry_telemetry` w `translator.py` rejestrujące wszystkie ścieżki ponowień Fazy 1 przed `time.sleep`, oraz scoped obserwator `client_pool_f2.report_error` rejestrujący ponowienia Fazy 2 przy zachowaniu 0 B diffu na chronionym `verifier.py`).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (447 passed w tests/)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (450 passed w tests/)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -842,5 +843,25 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
      - `Standard 11.2.26` (planowany): `OBS-04` (`pipeline_logger.py:log_retry`).
      - `Standard 11.2.27` (kandydat): `OBS-05` (`\NI` w Fazie 2).
      - `DEF-01` / `DEF-04` / `OBS-01`: oznaczone jako `KNOWN GAP` do weryfikacji w kolejnym przebiegu end-to-end; `OBS-03` (`pricing_guard.py:379`) poza zakresem.
+
+
+## 🏛️ ARB-078 / INC-AVT-076: Standard 11.2.26 (`OBS-04`) — Telemetria ponowień API (`pipeline_logger.py:log_retry`) dla Fazy 1 i Fazy 2 przed zakończeniem paczki
+
+- **Status:** `RESOLVED (Standard 11.2.26, commity 96f5730, 58a362d, HEAD)`
+- **Zidentyfikowano (`OBS-04` z audytów produkcyjnych):**
+  1. W dziennikach `EpisodeFlightRecorder` (`events.jsonl` oraz `full_trace.log`) brakowało rejestrowania zdarzeń ponowień żądań API (`503 UNAVAILABLE`, `429 RESOURCE_EXHAUSTED`, `504 DEADLINE_EXCEEDED`, `TimeoutError`), przez co próby ponowienia oraz czasy oczekiwania przed pomyślnym zapisem `phase1_batch` / `phase2_verifier` były niewidoczne w telemetrii post-mortem.
+  2. Chronione pliki Z16 (`verifier.py`, `client_factory.py`) nie mogły zostać zmodyfikowane (rygor 0 B diffu Z16).
+- **Komponenty Naprawy:**
+  1. `pipeline_logger.py:EpisodeFlightRecorder.log_retry`:
+     - Dodano metodę rejestrującą zdarzenia `stage="retry"` w `events.jsonl` z polami top-level (`timestamp_iso`, `stage`, `batch_id`, `line_id`) oraz pełnym ładunkiem (`batch_id`, `phase`, `error_type`, `attempt_number`, `wait_ms`, `timestamp`, `model`, `error_detail` do 300 znaków) i wpisem diagnostycznym w `full_trace.log`.
+  2. `translator.py:_classify_retry_error_type` i `_log_retry_telemetry`:
+     - Deterministyczna klasyfikacja wyjątków i kodów HTTP (`503`, `429`, `504`, `TimeoutError`, `403`, `404`, `500`) oraz rejestracja przed `time.sleep` na wszystkich 3 ścieżkach ponowień Fazy 1 w `_call_gemini_with_retry`.
+  3. `translator.py:_process_phase2_only`:
+     - Bezpieczny, czasowo ograniczony (`try...finally`) obserwator na `client_pool_f2.report_error` rejestrujący zdarzenia `phase="F2"` z pełnym przywróceniem oryginalnej metody po wyjściu, zachowując dokładne **0 B diffu** w `verifier.py` i `client_factory.py`.
+  4. `tests/test_standard_11_2_26.py`:
+     - 3 testy integracyjne oparte o prawdziwy `google.genai.Client` z `httpx.MockTransport` oraz dyskowy zapis `EpisodeFlightRecorder` w `tmp_path`, potwierdzające chronologię `retry` < `phase1_batch` / `phase2_verifier`, brak podwójnego bilingu oraz przywracanie hooka F2.
+  5. **Gotowość do przebiegu kontrolnego (§4.4):**
+     - Potok gotowy do pełnego przebiegu weryfikacyjnego z pełną obserwowalnością ponowień API (`OBS-04` zamknięty); `OBS-05` (`\NI` w F2) pozostaje kandydatem do `11.2.27`, a `OBS-03` (`pricing_guard.py:379`) poza zakresem.
+
 
 
