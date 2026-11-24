@@ -257,6 +257,55 @@ def enforce_locked_glossary_terms(
         "king", "queen", "saint", "grandmaster", "archmage"
     }
 
+    POLISH_FLEX_ENDINGS = (
+        "ami", "ach", "ego", "emu", "ych", "ich", "ymi", "imi",
+        "owi", "iem", "iom", "ów", "om", "im", "ym", "em", "ej",
+        "ą", "ę", "a", "e", "i", "o", "u", "y"
+    )
+
+    def _polish_stem(w: str) -> str:
+        w = w.lower()
+        if len(w) <= 3:
+            return w
+        for end in POLISH_FLEX_ENDINGS:
+            if w.endswith(end) and len(w) - len(end) >= 3:
+                return w[:-len(end)]
+        return w
+
+    def _term_preserved_in_candidate(cand_text: str, term: str) -> bool:
+        if not cand_text or not term:
+            return False
+        cand_norm = re.sub(r'(?:\\N|\s)+', ' ', str(cand_text)).lower()
+        term_low = str(term).strip().lower()
+        if term_low in cand_norm:
+            return True
+
+        term_words = re.findall(r'[a-ząćęłńóśźż0-9]+', term_low)
+        if not term_words:
+            return False
+        cand_words = re.findall(r'[a-ząćęłńóśźż0-9]+', cand_norm)
+        if not cand_words or len(cand_words) < len(term_words):
+            return False
+
+        term_stems = [_polish_stem(w) for w in term_words]
+        cand_stems = [_polish_stem(w) for w in cand_words]
+
+        max_window = len(term_words) + 2
+        n_terms = len(term_stems)
+        n_cands = len(cand_stems)
+
+        for i in range(n_cands):
+            if cand_stems[i] == term_stems[0]:
+                matched_count = 1
+                cand_idx = i + 1
+                while matched_count < n_terms and cand_idx < min(n_cands, i + max_window):
+                    if cand_stems[cand_idx] == term_stems[matched_count]:
+                        matched_count += 1
+                    cand_idx += 1
+                if matched_count == n_terms:
+                    return True
+        return False
+
     def _get_noun_stem(noun: str) -> str:
         n = noun.lower().strip()
         if n.endswith("rzec"):
@@ -307,7 +356,7 @@ def enforce_locked_glossary_terms(
 
             noun_stem = _get_noun_stem(canon_noun)
 
-            if canon_gen.lower() not in updated_pl.lower():
+            if canon_gen.lower() not in updated_pl.lower() and not _term_preserved_in_candidate(updated_pl, trans_pl_str):
                 adj_regex = rf"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*(?:{'|'.join(re.escape(s) for s in alt_stems)})[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*(?:ego|emu|ym|im|a|ej|ą|e|y|i|ych|ich|ymi|imi))\s+([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*{re.escape(noun_stem)}[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*)\b"
 
                 def repl(m: re.Match) -> str:
@@ -322,21 +371,29 @@ def enforce_locked_glossary_terms(
             canon_noun, canon_mid, canon_gen = pl_words[0], pl_words[1], pl_words[2]
             noun_stem = _get_noun_stem(canon_noun)
             target_tail = f"{canon_mid} {canon_gen}".lower()
-            if target_tail not in updated_pl.lower():
+            if target_tail not in updated_pl.lower() and not _term_preserved_in_candidate(updated_pl, trans_pl_str):
                 three_word_pat = rf"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*{re.escape(noun_stem)}[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*)\s+[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:ego|emu|ym|im|iej|ą|e|y|i)\s+[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+\b"
                 def repl_3w(m: re.Match) -> str:
                     noun_w = m.group(1)
                     return f"{noun_w} {canon_mid} {canon_gen}"
                 updated_pl = re.sub(three_word_pat, repl_3w, updated_pl, flags=re.IGNORECASE)
 
-        # 3. Fallback: ochrona formy z Fazy 1
+        # 3. Fallback: ochrona formy z Fazy 1 (Standard 11.2.23 DEF-01: odporność na fleksję i znaki \N)
         if phase1_pl:
             p1_low = phase1_pl.lower()
             cand_low = updated_pl.lower()
             trans_low = trans_pl_str.lower()
             stem_trans = trans_low[:max(4, len(trans_low) - 2)]
-            has_p1 = trans_low in p1_low or stem_trans in p1_low
-            has_cand = trans_low in cand_low or stem_trans in cand_low
+            has_p1 = (
+                trans_low in p1_low
+                or stem_trans in p1_low
+                or _term_preserved_in_candidate(phase1_pl, trans_pl_str)
+            )
+            has_cand = (
+                trans_low in cand_low
+                or stem_trans in cand_low
+                or _term_preserved_in_candidate(updated_pl, trans_pl_str)
+            )
             if has_p1 and not has_cand:
                 updated_pl = phase1_pl
 
@@ -2044,7 +2101,7 @@ class MultimodalTranslator:
         dialogue_craft_rules = (
             "\n\n### Wytyczne Rzemiosła Dialogowego\n"
             "1. Syntaktyka i ciągłość: całe zdania rozbite na linijki tworzą spójną całość z naturalnym polskim szykiem wyrazów.\n"
-            "2. Spójność wielokropków: kontynuacje myśli urwanej wielokropkiem zachowują małą literę i ciągłość zdania.\n"
+            "2. Spójność wielokropków: kontynuacje myśli urwanej wielokropkiem zachowują małą literę i ciągłość zdania wyłącznie w obrębie wypowiedzi tego samego mówcy; wejście nowego mówcy rozpoczyna się wielką literą.\n"
             "3. Liczba i płeć: w dialogach bezpośrednich forma adresatywna oraz formy fleksyjne zgodne z relacją postaci, wektorem stanu sceny i rejestrem seiyū.\n"
             "4. Kondensacja i tempo: zachowaj zwięzłość (do 17.0 znaków na sekundę, do 38 znaków w wierszu, maksymalnie 2 wiersze na planszę).\n"
             "5. Naturalność: żywy język dialogowy zamiast kalek dosłownych i struktur obcojęzycznych.\n"
@@ -2579,7 +2636,8 @@ class MultimodalTranslator:
         if not canonical_gender and (spk_clean or raw_spk):
             for check_name in [spk_clean, raw_spk]:
                 if check_name and check_name in self.character_registry:
-                    desc = self.character_registry[check_name].lower()
+                    reg_v = self.character_registry[check_name]
+                    desc = (reg_v.get("description", "") if isinstance(reg_v, dict) else str(reg_v)).lower()
                     if any(k in desc for k in self.FEMALE_ROLE_KEYWORDS):
                         canonical_gender = "kobieta"
                         break
@@ -3261,8 +3319,76 @@ class MultimodalTranslator:
         # Full deterministic character registry sorted alphabetically (Zero-JIT Scoping)
         if self.character_registry:
             lines.append("--- ZNANE POSTACIE W ODCINKU (spójność ról, statusu i płci) ---")
+
+            def _is_generic_character_desc(desc_text: str) -> bool:
+                d = str(desc_text or "").strip().lower()
+                clean_d = re.sub(r"\[(?:KOBIETA|MĘŻCZYZNA|PARA DWÓCH|RELACJA HIERARCHICZNA|OCHRONA PRZESKOKÓW|GRUPA|W 2\. os\.|Wymóg|Filar|T-V Invariance)[^\]]*\]", "", d, flags=re.IGNORECASE)
+                clean_d = re.sub(r"\s+", " ", clean_d).strip()
+                return clean_d in ("postać epizodyczna / tło", "postać (postać)", "postać", "postać epizodyczna", "tło") or clean_d.startswith("postać (postać")
+
+            # Standard 11.2.23 (OBS-02): Zbieranie aliasów ze zweryfikowanych / bogatszych wpisów kanonicznych
+            covered_aliases = set()
+            for c_name, c_entry in self.character_registry.items():
+                c_name_str = str(c_name).strip()
+                tokens = c_name_str.split()
+                aliases_list: List[str] = []
+                priority_val = None
+                has_verified_val = False
+
+                if isinstance(c_entry, dict):
+                    aliases_list = c_entry.get("aliases") or []
+                    priority_val = c_entry.get("priority")
+                    has_verified_val = bool(c_entry.get("has_verified_gender"))
+                    desc_check = str(c_entry.get("description") or "")
+                elif hasattr(c_entry, "aliases"):
+                    aliases_list = getattr(c_entry, "aliases", []) or []
+                    priority_val = getattr(c_entry, "priority", None)
+                    has_verified_val = bool(getattr(c_entry, "has_verified_gender", False))
+                    desc_check = str(getattr(c_entry, "description", None) or c_entry)
+                else:
+                    desc_check = str(c_entry)
+                    if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "characters"):
+                        b_char = self.series_bible.characters.get(c_name_str)
+                        if b_char:
+                            if isinstance(b_char, dict):
+                                aliases_list = b_char.get("aliases") or []
+                                priority_val = b_char.get("priority")
+                                has_verified_val = bool(b_char.get("has_verified_gender"))
+                            else:
+                                aliases_list = getattr(b_char, "aliases", []) or []
+                                priority_val = getattr(b_char, "priority", None)
+                                has_verified_val = bool(getattr(b_char, "has_verified_gender", False))
+
+                is_richer = (
+                    len(tokens) >= 2
+                    or priority_val == "P0"
+                    or has_verified_val is True
+                    or not _is_generic_character_desc(desc_check)
+                )
+
+                if is_richer:
+                    for a in aliases_list:
+                        a_low = str(a).strip().lower()
+                        if a_low:
+                            covered_aliases.add(a_low)
+                    if len(tokens) >= 2:
+                        covered_aliases.add(tokens[0].lower())
+                    covered_aliases.add(c_name_str.lower())
+
             for name in sorted(self.character_registry.keys()):
-                det_str = str(self.character_registry[name])
+                raw_val = self.character_registry[name]
+                if isinstance(raw_val, dict):
+                    det_str = str(raw_val.get("description") or raw_val)
+                elif hasattr(raw_val, "description"):
+                    det_str = str(getattr(raw_val, "description", None) or raw_val)
+                else:
+                    det_str = str(raw_val)
+
+                name_low = str(name).strip().lower()
+                if _is_generic_character_desc(det_str):
+                    if name_low in covered_aliases:
+                        continue
+
                 clean_det = re.sub(r"\[(?:KOBIETA|MĘŻCZYZNA|PARA DWÓCH|RELACJA HIERARCHICZNA|OCHRONA PRZESKOKÓW|GRUPA|W 2\. os\.|Wymóg|Filar|T-V Invariance)[^\]]*\]", "", det_str, flags=re.IGNORECASE)
                 clean_det = re.sub(r"\s+", " ", clean_det).strip()
                 lines.append(f"• {name}: {clean_det or det_str}")
@@ -5398,6 +5524,28 @@ class MultimodalTranslator:
 
         return score, critical_cot
 
+    @staticmethod
+    def _is_speaker_change_lowercase(
+        prev_item: Optional[Dict[str, Any]],
+        curr_item: Dict[str, Any]
+    ) -> bool:
+        """
+        Standard 11.2.23 (DEF-03): Wykrywa wejście nowego mówcy rozpoczynające się
+        małą literą po wielokropku lub innej pauzie poprzedniego mówcy.
+        """
+        if not prev_item or not curr_item:
+            return False
+        spk_prev = (prev_item.get("speaker") or prev_item.get("actor") or "").strip().lower()
+        spk_curr = (curr_item.get("speaker") or curr_item.get("actor") or "").strip().lower()
+        if not spk_prev or not spk_curr or spk_prev == spk_curr:
+            return False
+
+        pl_text = str(curr_item.get("pl") or "")
+        clean_text = re.sub(r"^(?:\{[^}]*\}|\s)+", "", pl_text)
+        if clean_text.startswith("...") or clean_text.startswith("…"):
+            return False
+        return bool(clean_text and clean_text[0].islower())
+
     def _select_hydrogen_phase2_candidates(
         self,
         pass1_items: List[Dict[str, Any]],
@@ -5405,7 +5553,7 @@ class MultimodalTranslator:
         episode_line_cap: int = 115
     ) -> List[Dict[str, Any]]:
         """
-        Standard 11.2.22 (Calibrated Selective Risk-Weighted Phase 2):
+        Standard 11.2.23 (Calibrated Selective Risk-Weighted Phase 2 & DEF-03):
         Wybiera do redakcji F2 kwestie o najwyższym ryzyku stylistycznym/ontologicznym
         z twardym sufitem <= 50% paczki oraz globalnym limitem <= 115 linii/odcinek (~34% odcinka).
         Dla linii bez flag krytycznych przenosi wskazówki audio/uwagi F1 do pola 'notes',
@@ -5414,17 +5562,32 @@ class MultimodalTranslator:
         if not pass1_items:
             return []
 
-        if len(pass1_items) <= 10:
-            chosen = [
-                (0, pos, self._score_phase2_editorial_risk(it)[1], it)
-                for pos, it in enumerate(pass1_items)
-            ]
+        base_scores = [self._score_phase2_editorial_risk(it) for it in pass1_items]
+        pos_scores = sorted([sc for sc, _ in base_scores if sc > 0])
+        if pos_scores:
+            n_pos = len(pos_scores)
+            p90_idx = min(n_pos - 1, int(0.90 * (n_pos - 1) + 0.5))
+            p90_weight = max(pos_scores[p90_idx], 40)
         else:
-            scored_entries: List[Tuple[int, int, bool, Dict[str, Any]]] = []
+            p90_weight = 40
+
+        if len(pass1_items) <= 10:
+            chosen = []
             for pos, it in enumerate(pass1_items):
-                sc, is_crit = self._score_phase2_editorial_risk(it)
+                prev_it = pass1_items[pos - 1] if pos > 0 else None
+                is_spk_ch = self._is_speaker_change_lowercase(prev_it, it)
+                is_crit = base_scores[pos][1]
+                chosen.append((0, pos, is_crit, it, is_spk_ch))
+        else:
+            scored_entries: List[Tuple[int, int, bool, Dict[str, Any], bool]] = []
+            for pos, it in enumerate(pass1_items):
+                prev_it = pass1_items[pos - 1] if pos > 0 else None
+                sc, is_crit = base_scores[pos]
+                is_spk_ch = self._is_speaker_change_lowercase(prev_it, it)
+                if is_spk_ch:
+                    sc += p90_weight
                 if sc > 0:
-                    scored_entries.append((sc, pos, is_crit, it))
+                    scored_entries.append((sc, pos, is_crit, it, is_spk_ch))
 
             if not scored_entries:
                 return []
@@ -5436,8 +5599,13 @@ class MultimodalTranslator:
             chosen = sorted(scored_entries[:batch_cap], key=lambda x: x[1])
 
         selected_copies: List[Dict[str, Any]] = []
-        for _, _, is_crit, orig_it in chosen:
+        for _, _, is_crit, orig_it, is_spk_ch in chosen:
             it_copy = dict(orig_it)
+            if is_spk_ch:
+                hint_spk = "[Korekta wielkiej litery na wejściu nowego mówcy]"
+                existing_notes = str(it_copy.get("notes") or "").strip()
+                if hint_spk not in existing_notes:
+                    it_copy["notes"] = f"{existing_notes} {hint_spk}".strip()
             if not is_crit:
                 extra_hints: List[str] = []
                 if it_copy.get("audio_alert"):

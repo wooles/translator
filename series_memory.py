@@ -4695,7 +4695,11 @@ class SeriesBible:
         self.storage_dir = storage_dir or SERIES_MEMORY_DIR
         if self.db_path != ":memory:":
             self.storage_dir.mkdir(parents=True, exist_ok=True)
-            self.file_path = self._resolve_bible_path()
+            custom_path = kwargs.get("bible_path") or kwargs.get("file_path")
+            if custom_path:
+                self.file_path = Path(custom_path)
+            else:
+                self.file_path = self._resolve_bible_path()
             repo_root = Path(__file__).resolve().parent
             artefakty_dir = repo_root / "Artefakty"
             if artefakty_dir.exists() and (storage_dir is None or storage_dir == SERIES_MEMORY_DIR):
@@ -6213,6 +6217,124 @@ class SeriesBible:
                             d_tok = generate_polish_name_declension(c_tok, det_gender)
                             d_tok["gender"] = det_gender
                             self.data["declensions"][c_tok] = d_tok
+
+            # -------------------------------------------------------------
+            # 0e. Generalizowana korekta płci rodzica w RAM (OBS-01 / B6)
+            # -------------------------------------------------------------
+            all_rels = dict(self.data.get("relationships", {}))
+            all_rels.update(self.data.get("relations", {}))
+            for rel_k, rel_val in all_rels.items():
+                if "->" not in rel_k:
+                    continue
+                parts = [p.strip() for p in rel_k.split("->")]
+                if len(parts) < 2:
+                    continue
+                target_cand = parts[1]
+                rel_desc = rel_val.get("description", "") if isinstance(rel_val, dict) else str(rel_val)
+
+                is_mother_address = bool(re.search(r"['\"„](?:Matko|Mamo|Mamusiu|Mateńko)['\"”]", rel_desc, re.IGNORECASE) or re.search(r"\bZwrot:\s*['\"„]?(?:Matko|Mamo|Mamusiu|Mateńko)\b", rel_desc, re.IGNORECASE))
+                is_mother_role = bool(re.search(r"(?:-|->)\s*matk[aię]\b", rel_desc, re.IGNORECASE) or re.search(r"\bmatka\s+(?:protagonisty|bohatera|głównego)\b", rel_desc, re.IGNORECASE))
+                is_mother = is_mother_address or is_mother_role
+
+                is_father_address = bool(re.search(r"['\"„](?:Ojcze|Tato|Tatusiu)['\"”]", rel_desc, re.IGNORECASE) or re.search(r"\bZwrot:\s*['\"„]?(?:Ojcze|Tato|Tatusiu)\b", rel_desc, re.IGNORECASE))
+                is_father_role = bool(re.search(r"(?:-|->)\s*oj(?:ciec|ca)\b", rel_desc, re.IGNORECASE) or re.search(r"\bojciec\s+(?:protagonisty|bohatera|głównego)\b", rel_desc, re.IGNORECASE))
+                is_father = is_father_address or is_father_role
+
+                if is_mother and not is_father:
+                    exp_gender = "FEMALE"
+                    exp_gram = "FEMININE"
+                    opp_tag_re = r"\[MĘŻCZYZNA\s+\(Adresat[^\]]*\]"
+                    corr_tag = "[KOBIETA (Adresat) - W 2. os. lp. 'ty' wymóg form żeńskich: byłaś / zrobiłaś / jesteś pewna]"
+                elif is_father and not is_mother:
+                    exp_gender = "MALE"
+                    exp_gram = "MASCULINE"
+                    opp_tag_re = r"\[KOBIETA\s+\(Adresat[^\]]*\]"
+                    corr_tag = "[MĘŻCZYZNA (Adresat) - W 2. os. lp. 'ty' wymóg form męskich: byłeś / zrobiłeś / jesteś pewien]"
+                else:
+                    continue
+
+                # Wyszukanie postaci Target w characters
+                target_clean = extract_clean_speaker_name(target_cand).strip()
+                target_low = target_clean.lower()
+                tgt_key = None
+                tgt_entry = None
+
+                if target_cand in self.data["characters"]:
+                    tgt_key = target_cand
+                    tgt_entry = self.data["characters"][target_cand]
+                elif target_clean in self.data["characters"]:
+                    tgt_key = target_clean
+                    tgt_entry = self.data["characters"][target_clean]
+                else:
+                    for ck, cv in self.data["characters"].items():
+                        if "->" in ck:
+                            continue
+                        ck_low = ck.lower()
+                        if ck_low == target_low or normalize_name_nfkd(ck).lower() == target_low:
+                            tgt_key = ck
+                            tgt_entry = cv
+                            break
+                        if isinstance(cv, dict):
+                            aliases = [str(a).lower().strip() for a in cv.get("aliases", [])]
+                            if target_low in aliases:
+                                tgt_key = ck
+                                tgt_entry = cv
+                                break
+                        tokens = [t.lower() for t in ck.split()]
+                        if target_low in tokens:
+                            tgt_key = ck
+                            tgt_entry = cv
+                            break
+
+                if tgt_entry is not None:
+                    if not isinstance(tgt_entry, dict):
+                        tgt_entry = {
+                            "description": str(tgt_entry),
+                            "gender": exp_gender,
+                            "grammatical_gender": exp_gram,
+                            "has_verified_gender": True,
+                            "confidence": 0.95,
+                            "priority": "P0"
+                        }
+                        self.data["characters"][tgt_key] = tgt_entry
+                    else:
+                        tgt_entry["gender"] = exp_gender
+                        tgt_entry["grammatical_gender"] = exp_gram
+                        tgt_entry["has_verified_gender"] = True
+                        tgt_entry["confidence"] = max(float(tgt_entry.get("confidence", 0.0) or 0.0), 0.95)
+                        tgt_entry["priority"] = "P0"
+
+                    if "description" in tgt_entry:
+                        desc_s = str(tgt_entry["description"])
+                        desc_s = re.sub(opp_tag_re, corr_tag, desc_s, flags=re.IGNORECASE)
+                        if exp_gender == "FEMALE":
+                            desc_s = re.sub(r"\bMĘŻCZYZNA\b", "KOBIETA", desc_s)
+                        else:
+                            desc_s = re.sub(r"\bKOBIETA\b", "MĘŻCZYZNA", desc_s)
+                        tgt_entry["description"] = desc_s
+
+                    if "declensions" in self.data and isinstance(self.data["declensions"], dict):
+                        char_for_decl = tgt_entry.get("name") or tgt_key
+                        if char_for_decl in self.data["declensions"]:
+                            new_d = generate_polish_name_declension(char_for_decl, exp_gender)
+                            if new_d:
+                                new_d["gender"] = exp_gender
+                                self.data["declensions"][char_for_decl] = new_d
+
+                # Zaktualizuj sprzeczny znacznik adresata w relacji w RAM
+                if re.search(opp_tag_re, rel_desc, re.IGNORECASE):
+                    updated_rel_desc = re.sub(opp_tag_re, corr_tag, rel_desc, flags=re.IGNORECASE)
+                    if isinstance(rel_val, dict):
+                        rel_val["description"] = updated_rel_desc
+                        if "relations" in self.data and rel_k in self.data["relations"]:
+                            self.data["relations"][rel_k] = rel_val
+                        if "relationships" in self.data and rel_k in self.data["relationships"]:
+                            self.data["relationships"][rel_k] = rel_val
+                    else:
+                        if "relations" in self.data and rel_k in self.data["relations"]:
+                            self.data["relations"][rel_k] = updated_rel_desc
+                        if "relationships" in self.data and rel_k in self.data["relationships"]:
+                            self.data["relationships"][rel_k] = updated_rel_desc
 
             # -------------------------------------------------------------
             # a) Scalanie zduplikowanych rekordów postaci (diakrytyki / umlauty)

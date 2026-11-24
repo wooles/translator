@@ -812,6 +812,7 @@ class SpeakerTurn:
         target_confidence: float = 0.0,
         plural_group_gender: str = "AMBIGUOUS",
         you_group_gender: str = "AMBIGUOUS",
+        scene_boundaries: Optional[List[int]] = None,
     ):
         clean_spk, tag_g = _normalize_event_actor(speaker)
         self.speaker: str = (clean_spk or speaker or "").strip()
@@ -828,6 +829,7 @@ class SpeakerTurn:
         self.target_confidence: float = target_confidence
         self.plural_group_gender: str = plural_group_gender
         self.you_group_gender: str = you_group_gender
+        self.scene_boundaries: Optional[List[int]] = list(scene_boundaries or []) if scene_boundaries else None
         self.sub_turns: List["SpeakerTurn"] = [self]
 
         for ev in self.events:
@@ -1314,6 +1316,20 @@ def _is_same_character(
             else (data.get("characters", {}) if isinstance(data, dict) else {})
         )
         if isinstance(chars, dict):
+            c1_in_chars = any(c1 == k.lower() or f1 == normalize_ascii_diacritics(k).lower() for k in chars.keys())
+            c2_in_chars = any(c2 == k.lower() or f2 == normalize_ascii_diacritics(k).lower() for k in chars.keys())
+            if c1_in_chars and c2_in_chars:
+                for char_k, char_v in chars.items():
+                    if not isinstance(char_v, dict):
+                        continue
+                    al_list = [char_k] + list(char_v.get("aliases", []))
+                    al_lows = {a.lower().strip() for a in al_list if a}
+                    al_folds = {normalize_ascii_diacritics(a).lower().strip() for a in al_list if a}
+                    all_al = al_lows | al_folds
+                    if (c1 in all_al or f1 in all_al) and (c2 in all_al or f2 in all_al):
+                        return True
+                return False
+
             for char_k, char_v in chars.items():
                 if not isinstance(char_v, dict):
                     continue
@@ -2057,11 +2073,15 @@ def is_offscreen_or_voiceover(item: Any) -> bool:
     """Sprawdza, czy element jest spoza kadru (narrator, radio, offscreen)."""
     s = (getattr(item, "style", "") or "").lower()
     spk = (getattr(item, "speaker", getattr(item, "name", "")) or "").lower()
-    return any(k in s or k in spk for k in [
-        "offscreen", "off-screen", "off_screen", "os", "o.s.",
-        "voiceover", "voice-over", "vo", "v.o.",
+    long_markers = [
+        "offscreen", "off-screen", "off_screen",
+        "voiceover", "voice-over",
         "radio", "phone", "comm", "narrat"
-    ])
+    ]
+    if any(k in s or k in spk for k in long_markers):
+        return True
+    short_pat = re.compile(r"\b(?:os|o\.s\.|vo|v\.o\.)\b", re.IGNORECASE)
+    return bool(short_pat.search(s) or short_pat.search(spk))
 
 
 def is_discourse_ignorable(item_or_speaker: Any) -> bool:
@@ -2501,13 +2521,33 @@ def _is_offscreen_speaker_excluded(
     return False
 
 
+def _is_scene_cut_or_long_gap(
+    prev_end: int,
+    curr_start: int,
+    scene_boundaries: Optional[List[int]] = None
+) -> bool:
+    """
+    Standard 11.2.23 (DEF-02): Wykrywa przerwę międzyscenową (>= 3500 ms)
+    lub obecność granicy sceny FFmpeg w przedziale (prev_end, curr_start) przy pauzie >= 2500 ms.
+    """
+    gap_ms = max(0, curr_start - prev_end)
+    if gap_ms >= 3500:
+        return True
+    if gap_ms >= 2500 and scene_boundaries:
+        for b in scene_boundaries:
+            if prev_end < b < curr_start:
+                return True
+    return False
+
+
 def resolve_turn_addressee(
     turn: SpeakerTurn,
     previous_turn: Optional[SpeakerTurn] = None,
     series_bible: Optional[Any] = None,
     max_exchange_gap_ms: int = 5000,
     next_turn: Optional[SpeakerTurn] = None,
-    prior_turns: Optional[List[SpeakerTurn]] = None
+    prior_turns: Optional[List[SpeakerTurn]] = None,
+    scene_boundaries: Optional[List[int]] = None
 ) -> SpeakerTurn:
     """
     Dyadic Turn-Taking (Rozwiązywanie adresata 2. osoby) i Trójstopniowy Automat Rozdzielczości:
@@ -2519,9 +2559,19 @@ def resolve_turn_addressee(
     - Krok 3 (Forward Lookahead < 2.0 s przy pytaniu 2. os. ?): wyznaczaj target_actor z postaci odpowiadającej w kolejnej linii
       gdy Delta_t < 2.0 s, mowa głośna, brak zwrotu do osoby trzeciej (pewność 0.95).
     - Vocative-Predicate Lock: Obecność męskiego wołacza jednoznacznie wyznacza target_gender = 'MALE' i vocative_lock = True.
+    - Standard 11.2.23 (DEF-02): Reset propagacji adresata na cięciu sceny (granica FFmpeg przy gap >= 2500 ms) lub pauzie >= 3500 ms.
     """
     if turn is None:
         return turn
+
+    if scene_boundaries is None:
+        scene_boundaries = (
+            getattr(turn, "scene_boundaries", None)
+            or (getattr(previous_turn, "scene_boundaries", None) if previous_turn else None)
+            or getattr(series_bible, "scene_boundaries", None)
+            or getattr(series_bible, "scene_cuts_ms", None)
+            or []
+        )
 
     # Jeśli tura zawiera wiele zdarzeń, podziel na pod-segmenty SubTurn przed wyznaczeniem stanu adresata
     if len(turn.events) > 1 and len(getattr(turn, "sub_turns", [])) <= 1:
@@ -2536,7 +2586,8 @@ def resolve_turn_addressee(
                 series_bible=series_bible,
                 max_exchange_gap_ms=max_exchange_gap_ms,
                 next_turn=next_turn,
-                prior_turns=prior_turns
+                prior_turns=prior_turns,
+                scene_boundaries=scene_boundaries
             )
         sub_genders = {st.target_gender for st in turn.sub_turns if st.target_gender and st.target_gender not in ("AMBIGUOUS", "UNKNOWN")}
         if len(sub_genders) > 1:
@@ -2660,7 +2711,7 @@ def resolve_turn_addressee(
                         continue
 
                     gap_ms = max(0, turn.start - prev.end)
-                    if gap_ms > max_exchange_gap_ms:
+                    if gap_ms > max_exchange_gap_ms or _is_scene_cut_or_long_gap(prev.end, turn.start, scene_boundaries):
                         break
                     if _is_same_character(prev.speaker, turn.speaker, series_bible=series_bible):
                         prev_text = prev.text
@@ -2695,7 +2746,7 @@ def resolve_turn_addressee(
                         continue
 
                     gap_ms = max(0, turn.start - prev.end)
-                    if gap_ms > max_exchange_gap_ms:
+                    if gap_ms > max_exchange_gap_ms or _is_scene_cut_or_long_gap(prev.end, turn.start, scene_boundaries):
                         break
 
                     if not _is_same_character(prev.speaker, turn.speaker, series_bible=series_bible):
@@ -2804,13 +2855,25 @@ def resolve_turn_addressee(
                 and is_narrative_style(getattr(previous_turn, "style", "")) == is_narrative_style(getattr(turn, "style", ""))
             ):
                 gap_ms = max(0, turn.start - previous_turn.end)
-                if gap_ms <= max_exchange_gap_ms:
+                if _is_scene_cut_or_long_gap(previous_turn.end, turn.start, scene_boundaries):
+                    if not getattr(turn, "vocative_lock", False):
+                        turn.target_speaker = "UNSPECIFIED"
+                        turn.target_gender = "UNSPECIFIED"
+                        turn.target_confidence = 0.0
+                elif gap_ms <= max_exchange_gap_ms:
                     turn.target_speaker = previous_turn.speaker
                     turn.target_confidence = 0.80
                     _, prev_g, _ = _resolve_character_canonical_and_gender(
                         previous_turn.speaker, series_bible=series_bible, context_item=previous_turn
                     )
                     turn.target_gender = prev_g or getattr(previous_turn, "speaker_gender", None)
+
+        # Standard 11.2.23 (DEF-02): Reset propagacji adresata na cięciu sceny lub długiej pauzie (>= 3500 ms)
+        if previous_turn is not None and not getattr(turn, "vocative_lock", False):
+            if _is_scene_cut_or_long_gap(previous_turn.end, turn.start, scene_boundaries):
+                turn.target_speaker = "UNSPECIFIED"
+                turn.target_gender = "UNSPECIFIED"
+                turn.target_confidence = 0.0
 
     # Weryfikacja obecności uczestnika męskiego i klasyfikacja We_Group
     if not turn.scene_has_male_participant:
@@ -2938,9 +3001,17 @@ def group_speaker_turns(
 def resolve_all_speaker_turns(
     turns: List[SpeakerTurn],
     series_bible: Optional[Any] = None,
-    max_exchange_gap_ms: int = 5000
+    max_exchange_gap_ms: int = 5000,
+    scene_boundaries: Optional[List[int]] = None
 ) -> List[SpeakerTurn]:
     """Przetwarza sekwencję tur mówców stosując dyadic turn-taking, blokadę wołacza i inwariant grupy mieszanej."""
+    if scene_boundaries is None and turns:
+        scene_boundaries = (
+            getattr(turns[0], "scene_boundaries", None)
+            or getattr(series_bible, "scene_boundaries", None)
+            or getattr(series_bible, "scene_cuts_ms", None)
+            or []
+        )
     for i, turn in enumerate(turns):
         turn.partition_subturns(series_bible=series_bible)
         prev_turn = turns[i - 1] if i > 0 else None
@@ -2951,7 +3022,8 @@ def resolve_all_speaker_turns(
             next_turn=next_turn,
             prior_turns=turns[:i],
             series_bible=series_bible,
-            max_exchange_gap_ms=max_exchange_gap_ms
+            max_exchange_gap_ms=max_exchange_gap_ms,
+            scene_boundaries=scene_boundaries
         )
 
     # Inwariant Grupy Mieszanej: wyliczenie aktywnych uczestników w oknie ±15.0 s ze ścianami cięcia sceny
@@ -2963,11 +3035,17 @@ def process_scene_discourse(
     events: List[Any],
     series_bible: Optional[Any] = None,
     max_turn_gap_ms: int = 2500,
-    max_exchange_gap_ms: int = 5000
+    max_exchange_gap_ms: int = 5000,
+    scene_boundaries: Optional[List[int]] = None
 ) -> List[SpeakerTurn]:
     """Główny punkt wejścia Filaru 2 & 3: grupowanie w tury i rozwiązanie topologii dyskursu."""
     turns = group_speaker_turns(events, max_gap_ms=max_turn_gap_ms, series_bible=series_bible)
-    turns = resolve_all_speaker_turns(turns, series_bible=series_bible, max_exchange_gap_ms=max_exchange_gap_ms)
+    turns = resolve_all_speaker_turns(
+        turns,
+        series_bible=series_bible,
+        max_exchange_gap_ms=max_exchange_gap_ms,
+        scene_boundaries=scene_boundaries
+    )
     resolve_scene_participants(events, series_bible=series_bible, window_ms=15000)
     return turns
 
