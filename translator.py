@@ -345,57 +345,70 @@ def enforce_locked_glossary_terms(
         if not matched_en:
             continue
 
-        # 2. Korekta odwróconego synonimu przymiotnikowego do formy kanonicznej
-        pl_words = trans_pl_str.split()
-        if len(pl_words) == 2:
-            canon_noun, canon_gen = pl_words[0], pl_words[1]
-            gen_stem = canon_gen.lower()[:max(3, len(canon_gen) - 2)]
-            alt_stems = {gen_stem, gen_stem.replace("ia", "ie"), gen_stem.replace("ó", "o"), gen_stem.replace("ą", "ę")}
-            if "ie" in gen_stem:
-                alt_stems.add(gen_stem.replace("ie", "ia"))
+        # Standard 11.2.27 (DEF-05): Separator '/' lub ';' w glosariuszu oznacza warianty do wyboru,
+        # a nie dosłowną frazę wielowyrazową do podstawienia.
+        has_variant_sep = bool(re.search(r"[/;]", trans_pl_str))
+        pl_variants = (
+            [v.strip() for v in re.split(r"[/;]+", trans_pl_str) if v.strip()]
+            if has_variant_sep
+            else [trans_pl_str]
+        )
+        if not pl_variants:
+            continue
 
-            noun_stem = _get_noun_stem(canon_noun)
+        # 2. Korekta odwróconego synonimu przymiotnikowego do formy kanonicznej (wyłącznie dla pojedynczego terminu bez separatora)
+        if not has_variant_sep:
+            pl_words = trans_pl_str.split()
+            if len(pl_words) == 2:
+                canon_noun, canon_gen = pl_words[0], pl_words[1]
+                gen_stem = canon_gen.lower()[:max(3, len(canon_gen) - 2)]
+                alt_stems = {gen_stem, gen_stem.replace("ia", "ie"), gen_stem.replace("ó", "o"), gen_stem.replace("ą", "ę")}
+                if "ie" in gen_stem:
+                    alt_stems.add(gen_stem.replace("ie", "ia"))
 
-            if canon_gen.lower() not in updated_pl.lower() and not _term_preserved_in_candidate(updated_pl, trans_pl_str):
-                adj_regex = rf"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*(?:{'|'.join(re.escape(s) for s in alt_stems)})[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*(?:ego|emu|ym|im|a|ej|ą|e|y|i|ych|ich|ymi|imi))\s+([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*{re.escape(noun_stem)}[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*)\b"
+                noun_stem = _get_noun_stem(canon_noun)
 
-                def repl(m: re.Match) -> str:
-                    adj_word = m.group(1)
-                    noun_word = m.group(2)
-                    if adj_word[0].isupper() and not noun_word[0].isupper():
-                        noun_word = noun_word.capitalize()
-                    return f"{noun_word} {canon_gen}"
+                if canon_gen.lower() not in updated_pl.lower() and not _term_preserved_in_candidate(updated_pl, trans_pl_str):
+                    adj_regex = rf"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*(?:{'|'.join(re.escape(s) for s in alt_stems)})[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*(?:ego|emu|ym|im|a|ej|ą|e|y|i|ych|ich|ymi|imi))\s+([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*{re.escape(noun_stem)}[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*)\b"
 
-                updated_pl = re.sub(adj_regex, repl, updated_pl, flags=re.IGNORECASE)
-        elif len(pl_words) == 3:
-            canon_noun, canon_mid, canon_gen = pl_words[0], pl_words[1], pl_words[2]
-            noun_stem = _get_noun_stem(canon_noun)
-            target_tail = f"{canon_mid} {canon_gen}".lower()
-            if target_tail not in updated_pl.lower() and not _term_preserved_in_candidate(updated_pl, trans_pl_str):
-                three_word_pat = rf"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*{re.escape(noun_stem)}[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*)\s+[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:ego|emu|ym|im|iej|ą|e|y|i)\s+[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+\b"
-                def repl_3w(m: re.Match) -> str:
-                    noun_w = m.group(1)
-                    return f"{noun_w} {canon_mid} {canon_gen}"
-                updated_pl = re.sub(three_word_pat, repl_3w, updated_pl, flags=re.IGNORECASE)
+                    def repl(m: re.Match) -> str:
+                        adj_word = m.group(1)
+                        noun_word = m.group(2)
+                        if adj_word[0].isupper() and not noun_word[0].isupper():
+                            noun_word = noun_word.capitalize()
+                        return f"{noun_word} {canon_gen}"
 
-        # 3. Fallback: ochrona formy z Fazy 1 (Standard 11.2.23 DEF-01: odporność na fleksję i znaki \N)
+                    updated_pl = re.sub(adj_regex, repl, updated_pl, flags=re.IGNORECASE)
+            elif len(pl_words) == 3:
+                canon_noun, canon_mid, canon_gen = pl_words[0], pl_words[1], pl_words[2]
+                noun_stem = _get_noun_stem(canon_noun)
+                target_tail = f"{canon_mid} {canon_gen}".lower()
+                if target_tail not in updated_pl.lower() and not _term_preserved_in_candidate(updated_pl, trans_pl_str):
+                    three_word_pat = rf"\b([A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*{re.escape(noun_stem)}[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]*)\s+[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+(?:ego|emu|ym|im|iej|ą|e|y|i)\s+[A-ZĄĆĘŁŃÓŚŹŻa-ząćęłńóśźż]+\b"
+                    def repl_3w(m: re.Match) -> str:
+                        noun_w = m.group(1)
+                        return f"{noun_w} {canon_mid} {canon_gen}"
+                    updated_pl = re.sub(three_word_pat, repl_3w, updated_pl, flags=re.IGNORECASE)
+
+        # 3. Fallback: ochrona formy z Fazy 1 (Standard 11.2.23 DEF-01 + Standard 11.2.27 DEF-05 dla wariantów)
         if phase1_pl:
             p1_low = phase1_pl.lower()
             cand_low = updated_pl.lower()
-            trans_low = trans_pl_str.lower()
-            stem_trans = trans_low[:max(4, len(trans_low) - 2)]
-            has_p1 = (
-                trans_low in p1_low
-                or stem_trans in p1_low
-                or _term_preserved_in_candidate(phase1_pl, trans_pl_str)
+            has_p1 = any(
+                v.lower() in p1_low
+                or v.lower()[:max(4, len(v.lower()) - 2)] in p1_low
+                or _term_preserved_in_candidate(phase1_pl, v)
+                for v in pl_variants
             )
-            has_cand = (
-                trans_low in cand_low
-                or stem_trans in cand_low
-                or _term_preserved_in_candidate(updated_pl, trans_pl_str)
+            has_cand = any(
+                v.lower() in cand_low
+                or v.lower()[:max(4, len(v.lower()) - 2)] in cand_low
+                or _term_preserved_in_candidate(updated_pl, v)
+                for v in pl_variants
             )
             if has_p1 and not has_cand:
-                updated_pl = phase1_pl
+                if not (has_variant_sep and re.search(r"[/;]", phase1_pl)):
+                    updated_pl = phase1_pl
 
     return updated_pl
 
@@ -3379,7 +3392,7 @@ class MultimodalTranslator:
                 clean_d = re.sub(r"\s+", " ", clean_d).strip()
                 return clean_d in ("postać epizodyczna / tło", "postać (postać)", "postać", "postać epizodyczna", "tło") or clean_d.startswith("postać (postać")
 
-            # Hotfix 11.2.23a (OBS-02): Deduplikacja generycznych aliasów na podstawie ścisłego porządku rang właścicieli
+            # Hotfix 11.2.23a + Standard 11.2.27 (OBS-02): Deduplikacja generycznych aliasów (w tym wariantów wielkości liter)
             entry_meta: Dict[str, Tuple[bool, Tuple[int, int, int]]] = {}
             alias_owners: Dict[str, List[Tuple[str, Tuple[int, int, int]]]] = {}
             for c_name, c_entry in self.character_registry.items():
@@ -3417,7 +3430,7 @@ class MultimodalTranslator:
                 is_non_generic = not _is_generic_character_desc(desc_check)
                 is_p0 = (priority_val == "P0") or has_verified_val
                 rank = (1 if is_non_generic else 0, len(tokens), 1 if is_p0 else 0)
-                entry_meta[c_low] = (is_non_generic, rank)
+                entry_meta[c_name] = (is_non_generic, rank)
 
                 keys_covered = {c_low}
                 for a in aliases_list:
@@ -3427,7 +3440,7 @@ class MultimodalTranslator:
                 if len(tokens) >= 2:
                     keys_covered.add(tokens[0].lower())
                 for k_cov in keys_covered:
-                    alias_owners.setdefault(k_cov, []).append((c_low, rank))
+                    alias_owners.setdefault(k_cov, []).append((c_name, rank))
 
             for name in sorted(self.character_registry.keys()):
                 raw_val = self.character_registry[name]
@@ -3440,12 +3453,12 @@ class MultimodalTranslator:
 
                 name_low = str(name).strip().lower()
                 is_non_generic, my_rank = entry_meta.get(
-                    name_low,
+                    name,
                     (not _is_generic_character_desc(det_str), (0, len(str(name).split()), 0))
                 )
                 if not is_non_generic:
                     owners = alias_owners.get(name_low, [])
-                    if any(o_low != name_low and o_rank > my_rank for o_low, o_rank in owners):
+                    if any(o_raw != name and o_rank > my_rank for o_raw, o_rank in owners):
                         continue
 
                 clean_det = re.sub(r"\[(?:KOBIETA|MĘŻCZYZNA|PARA DWÓCH|RELACJA HIERARCHICZNA|OCHRONA PRZESKOKÓW|GRUPA|W 2\. os\.|Wymóg|Filar|T-V Invariance)[^\]]*\]", "", det_str, flags=re.IGNORECASE)
