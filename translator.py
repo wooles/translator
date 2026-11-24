@@ -3326,10 +3326,12 @@ class MultimodalTranslator:
                 clean_d = re.sub(r"\s+", " ", clean_d).strip()
                 return clean_d in ("postać epizodyczna / tło", "postać (postać)", "postać", "postać epizodyczna", "tło") or clean_d.startswith("postać (postać")
 
-            # Standard 11.2.23 (OBS-02): Zbieranie aliasów ze zweryfikowanych / bogatszych wpisów kanonicznych
-            covered_aliases = set()
+            # Hotfix 11.2.23a (OBS-02): Deduplikacja generycznych aliasów na podstawie ścisłego porządku rang właścicieli
+            entry_meta: Dict[str, Tuple[bool, Tuple[int, int, int]]] = {}
+            alias_owners: Dict[str, List[Tuple[str, Tuple[int, int, int]]]] = {}
             for c_name, c_entry in self.character_registry.items():
                 c_name_str = str(c_name).strip()
+                c_low = c_name_str.lower()
                 tokens = c_name_str.split()
                 aliases_list: List[str] = []
                 priority_val = None
@@ -3359,21 +3361,20 @@ class MultimodalTranslator:
                                 priority_val = getattr(b_char, "priority", None)
                                 has_verified_val = bool(getattr(b_char, "has_verified_gender", False))
 
-                is_richer = (
-                    len(tokens) >= 2
-                    or priority_val == "P0"
-                    or has_verified_val is True
-                    or not _is_generic_character_desc(desc_check)
-                )
+                is_non_generic = not _is_generic_character_desc(desc_check)
+                is_p0 = (priority_val == "P0") or has_verified_val
+                rank = (1 if is_non_generic else 0, len(tokens), 1 if is_p0 else 0)
+                entry_meta[c_low] = (is_non_generic, rank)
 
-                if is_richer:
-                    for a in aliases_list:
-                        a_low = str(a).strip().lower()
-                        if a_low:
-                            covered_aliases.add(a_low)
-                    if len(tokens) >= 2:
-                        covered_aliases.add(tokens[0].lower())
-                    covered_aliases.add(c_name_str.lower())
+                keys_covered = {c_low}
+                for a in aliases_list:
+                    a_low = str(a).strip().lower()
+                    if a_low:
+                        keys_covered.add(a_low)
+                if len(tokens) >= 2:
+                    keys_covered.add(tokens[0].lower())
+                for k_cov in keys_covered:
+                    alias_owners.setdefault(k_cov, []).append((c_low, rank))
 
             for name in sorted(self.character_registry.keys()):
                 raw_val = self.character_registry[name]
@@ -3385,8 +3386,13 @@ class MultimodalTranslator:
                     det_str = str(raw_val)
 
                 name_low = str(name).strip().lower()
-                if _is_generic_character_desc(det_str):
-                    if name_low in covered_aliases:
+                is_non_generic, my_rank = entry_meta.get(
+                    name_low,
+                    (not _is_generic_character_desc(det_str), (0, len(str(name).split()), 0))
+                )
+                if not is_non_generic:
+                    owners = alias_owners.get(name_low, [])
+                    if any(o_low != name_low and o_rank > my_rank for o_low, o_rank in owners):
                         continue
 
                 clean_det = re.sub(r"\[(?:KOBIETA|MĘŻCZYZNA|PARA DWÓCH|RELACJA HIERARCHICZNA|OCHRONA PRZESKOKÓW|GRUPA|W 2\. os\.|Wymóg|Filar|T-V Invariance)[^\]]*\]", "", det_str, flags=re.IGNORECASE)
@@ -5535,8 +5541,9 @@ class MultimodalTranslator:
         """
         if not prev_item or not curr_item:
             return False
-        spk_prev = (prev_item.get("speaker") or prev_item.get("actor") or "").strip().lower()
-        spk_curr = (curr_item.get("speaker") or curr_item.get("actor") or "").strip().lower()
+        # Hotfix 11.2.23a (DEF-03): Odczyt produkcyjnego klucza speaker_name z zachowaniem zgodności wstecznej
+        spk_prev = (prev_item.get("speaker_name") or prev_item.get("speaker") or prev_item.get("actor") or "").strip().lower()
+        spk_curr = (curr_item.get("speaker_name") or curr_item.get("speaker") or curr_item.get("actor") or "").strip().lower()
         if not spk_prev or not spk_curr or spk_prev == spk_curr:
             return False
 
@@ -7041,7 +7048,12 @@ class MultimodalTranslator:
             f0_by_line=getattr(self, "f0_by_line", None),
             series_bible=self.series_bible
         )
-        discourse_turns = SceneDiscourseGraph.build_discourse_topology(all_events, series_bible=self.series_bible)
+        # Hotfix 11.2.23a (DEF-02): Przekazanie granic scen FFmpeg z poziomu głównego punktu wejścia
+        discourse_turns = SceneDiscourseGraph.build_discourse_topology(
+            all_events,
+            series_bible=self.series_bible,
+            scene_boundaries=getattr(self, "scene_cuts_ms", None)
+        )
         if self.flight_recorder:
             try:
                 batches_sum = [

@@ -3054,19 +3054,22 @@ def build_discourse_topology(
     events: List[Any],
     series_bible: Optional[Any] = None,
     max_turn_gap_ms: int = 2500,
-    max_exchange_gap_ms: int = 5000
+    max_exchange_gap_ms: int = 5000,
+    scene_boundaries: Optional[List[int]] = None
 ) -> List[SpeakerTurn]:
     """
-    Buduje pełną topologię dyskursu scenicznego (Standard 9.0/9.1):
+    Buduje pełną topologię dyskursu scenicznego (Standard 9.0/9.1 + Hotfix 11.2.23a):
     - Przypisuje adresatów dialogu z izolacją kwestii wewnętrznych, narracji i napisów ekranowych (is_sign: true),
     - Zapewnia absolutny priorytet rekordów P0 ze zweryfikowaną płcią (has_verified_gender: true),
-    - Izoluje zdarzenia typu is_sign: true od algebry We_Group i You_Group.
+    - Izoluje zdarzenia typu is_sign: true od algebry We_Group i You_Group,
+    - Przekazuje granice cięć montażowych FFmpeg (scene_boundaries) do resetu adresata między scenami.
     """
     return process_scene_discourse(
         events=events,
         series_bible=series_bible,
         max_turn_gap_ms=max_turn_gap_ms,
-        max_exchange_gap_ms=max_exchange_gap_ms
+        max_exchange_gap_ms=max_exchange_gap_ms,
+        scene_boundaries=scene_boundaries
     )
 
 
@@ -3082,14 +3085,16 @@ class SceneDiscourseGraph:
         series_bible: Optional[Any] = None,
         max_turn_gap_ms: int = 2500,
         max_exchange_gap_ms: int = 5000,
-        f0_by_line: Optional[Dict[int, float]] = None
+        f0_by_line: Optional[Dict[int, float]] = None,
+        scene_boundaries: Optional[List[int]] = None
     ) -> List[SpeakerTurn]:
         actor_consensus = cls.compute_actor_gender_consensus(events, f0_by_line=f0_by_line, series_bible=series_bible)
         return build_discourse_topology(
             events=events,
             series_bible=series_bible,
             max_turn_gap_ms=max_turn_gap_ms,
-            max_exchange_gap_ms=max_exchange_gap_ms
+            max_exchange_gap_ms=max_exchange_gap_ms,
+            scene_boundaries=scene_boundaries
         )
 
     @classmethod
