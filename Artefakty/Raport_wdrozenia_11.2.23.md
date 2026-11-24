@@ -63,3 +63,27 @@ Standard 11.2.23 rozwiązuje 5 kluczowych problemów jakościowych i optymalizac
   - `audit_diff.ps1 -BaseRef "16f574b"`: `WERDYKT: [VICTORY CONFIRMED -- KOD CZYSTY I UOGOLNIONY]`
 - **Ochrona Z16:**
   - `git diff --stat c197db7..HEAD -- verifier.py client_factory.py rules.py avt_linter.py test_system.py verify_purity.py pricing_guard.py main.py context_cache.py series_memory/`: **0 B DIFF (BEZWZGLĘDNA CZYSTOŚĆ)**
+
+
+---
+
+## 3. SUPLEMENT: HOTFIX 11.2.23a (ELIMINACJA 3 LUK Z AUDYTU KONFRONTACYJNEGO 4aae11a)
+
+Hotfix 11.2.23a eliminuje 3 specyficzne luki produkcyjne wykryte w audycie konfrontacyjnym commita `4aae11a`:
+
+1. **BUG #1 (`OBS-02`): Eliminacja samo-usuwania postaci P0 w deduplikacji `character_registry` (`translator.py`):**
+   - W commicie `4aae11a` płaski zbiór `covered_aliases` powodował, że każda postać P0 posiadająca generyczny opis (np. `"postać (Postać)"` lub `"Postać epizodyczna / tło"`) dopisywała swoją własną nazwę do zbioru pokrytych aliasów, przez co usuwała samą siebie z renderowanego promptu (utrata 26 postaci P0 w symulacji produkcyjnej).
+   - Wdrożono mapę `alias_owners` ze ścisłym porządkiem rang `rank = (1 if is_non_generic else 0, len(tokens), 1 if is_p0 else 0)`. Wpis generyczny jest pomijany wyłącznie wtedy, gdy istnieje **inny** właściciel (`o_low != name_low`) o **ściśle wyższej randze** (`o_rank > my_rank`). Ścisła nierówność całkowicie eliminuje samo-przykrycie oraz wycinanie wpisów równej rangi.
+
+2. **BUG #2 (`DEF-03`): Odczyt produkcyjnego klucza `"speaker_name"` w `_is_speaker_change_lowercase` (`translator.py`):**
+   - Produkcyjna pętla Fazy 1 zapisuje etykietę mówcy w słowniku `pass1_items` pod kluczem `"speaker_name"`, podczas gdy funkcja `_is_speaker_change_lowercase` odczytywała wyłącznie `"speaker"` i `"actor"`, zwracając `False` dla 100% linii w środowisku produkcyjnym.
+   - Dodano odczyt `prev_item.get("speaker_name")` oraz `curr_item.get("speaker_name")` z zachowaniem pełnej kompatybilności wstecznej.
+
+3. **BUG #3 (`DEF-02`): Okablowanie `scene_boundaries` z FFmpeg w `SceneDiscourseGraph.build_discourse_topology` (`scene_discourse.py` i `translator.py`):**
+   - Produkcyjny punkt wejścia topologii dyskursu `SceneDiscourseGraph.build_discourse_topology` nie przyjmował parametru `scene_boundaries`, a `translator.py` wywoływało go bez przekazania wykrytych cięć `self.scene_cuts_ms`. W efekcie bramka cięcia FFmpeg dla pauz 2500–3499 ms pozostawała nieaktywna w produkcji.
+   - Dodano parametr `scene_boundaries: Optional[List[int]] = None` do `build_discourse_topology` oraz `SceneDiscourseGraph.build_discourse_topology` i przekazano `scene_boundaries=getattr(self, "scene_cuts_ms", None)` z poziomu `translator.py`.
+
+4. **Commity Hotfixu 11.2.23a:**
+   - Commit 1 (`5f0ba5a`): `fix(pipeline): prevent P0 self-deletion in prompt registry dedup, read speaker_name in DEF-03 detector and wire FFmpeg scene_boundaries into SceneDiscourseGraph (11.2.23a)`
+   - Commit 2 (`d0e23dd`): `test(pipeline): lock production speaker_name schema, P0 anti-self-deletion and SceneDiscourseGraph FFmpeg scene_boundaries wiring (11.2.23a)`
+   - Commit 3 (`HEAD`): `docs(release): certify Hotfix 11.2.23a — P0 dedup rank guard, speaker_name DEF-03 wiring and FFmpeg scene_boundaries pass-through`

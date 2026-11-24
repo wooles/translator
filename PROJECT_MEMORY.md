@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-24 — Standard 11.2.23 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.23 (Inflection-Aware Glossary Lock, Calibrated Speaker-Change Lowercase Risk, Scene-Cut Addressee Reset, Prompt Registry Dedup & RAM-Only Parent Gender Reconciliation)`
-- **Commit certyfikacji kodu:** `44a61cf` (`44a61cf53bf9a8964d50937a8ee9fc605ecf9064`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-24 — Standard 11.2.23a Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.23a (P0 Dedup Rank Guard, Production speaker_name DEF-03 Wiring & FFmpeg scene_boundaries Pass-Through)`
+- **Commit certyfikacji kodu:** `5f0ba5a` (`5f0ba5a5d1297db83178c187e1f46797b5e40e69`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -42,16 +42,17 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.21:** `376e7f4` (Commit 1), `feaa9a0` (Commit 2), `5df315d` (Commit 3)
 - **Commity Hotfixu 11.2.21a:** `9650713` (Commit 1)
 - **Commity Standardu 11.2.22:** `f021602` (Commit 1), `f1b7349` (Commit 2), `16f574b` (Commit 3)
-- **Commity Standardu 11.2.23:**
-  * Commit 1 (`44a61cf`): `fix(pipeline): inflection-aware glossary lock, calibrated speaker-change lowercase risk, scene-cut addressee reset, prompt registry dedup and RAM-only parent gender reconciliation (11.2.23)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 2 (`c33e220`): `test(pipeline): add 5 non-tautological regression tests for DEF-01, DEF-02, DEF-03, OBS-01 (RAM-only) and OBS-02 (11.2.23)`
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.23 — glossary inflection guard, P90 speaker-change risk, scene-cut addressee reset, registry dedup and RAM-only parent gender reconciliation`
-- **Status 11.2.23:** `CERTIFIED / CLOSED (2026-11-24)`
+- **Commity Standardu 11.2.23:** `44a61cf` (Commit 1), `c33e220` (Commit 2), `4aae11a` (Commit 3)
+- **Commity Hotfixu 11.2.23a:**
+  * Commit 1 (`5f0ba5a`): `fix(pipeline): prevent P0 self-deletion in prompt registry dedup, read speaker_name in DEF-03 detector and wire FFmpeg scene_boundaries into SceneDiscourseGraph (11.2.23a)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 2 (`d0e23dd`): `test(pipeline): lock production speaker_name schema, P0 anti-self-deletion and SceneDiscourseGraph FFmpeg scene_boundaries wiring (11.2.23a)`
+  * Commit 3 (`HEAD`): `docs(release): certify Hotfix 11.2.23a — P0 dedup rank guard, speaker_name DEF-03 wiring and FFmpeg scene_boundaries pass-through`
+- **Status 11.2.23a:** `CERTIFIED / CLOSED (2026-11-24)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #14 dla `verifier.py`, bezwzględne 0 B diffu na wszystkich pozostałych plikach chronionych)
 - **Stan metryk:** `420 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `490 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
 - **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (420/420 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.23` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.23: Inflection-Aware Glossary Lock, Calibrated Speaker-Change Lowercase Risk, Scene-Cut Addressee Reset, Prompt Registry Dedup & RAM-Only Parent Gender Reconciliation — zaawansowana ochrona odmienionych terminów wielowyrazowych ze znakami `\N` w glosariuszu zapobiegająca cofaniu poprawnej odmiany z F2 do mianownikowego szkicu F1; skalibrowana waga ryzyka redakcyjnego P90 dla wejścia nowego mówcy małą literą bez eskalacji budżetu myślenia CoT LOW 2048; reset propagacji domyślnego adresata na cięciach scen i pauzach >= 3500 ms eliminujący fałszywe przenoszenie płci rozmówcy; deduplikacja redundantnych aliasów w sekcji ZNANE POSTACIE W ODCINKU redukująca rozmiar promptu o ~1-2k tokenów na paczkę; automatyczne uzgadnianie płci rodzica w RAM w kroku 0e sanetyzacji pamięci przy 0 B mutacji bazy JSON na dysku).
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.23a` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.23a: P0 Dedup Rank Guard, Production speaker_name DEF-03 Wiring & FFmpeg scene_boundaries Pass-Through — eliminacja samo-usuwania postaci P0 w deduplikacji promptu poprzez ścisły porządek rang właścicieli alias_owners; odczyt produkcyjnego klucza speaker_name w detektorze wejścia nowego mówcy małą literą _is_speaker_change_lowercase; okablowanie przekazywania granic scen FFmpeg scene_boundaries przez SceneDiscourseGraph.build_discourse_topology w głównym punkcie wejścia potoku aktywujące reset adresata na cięciach montażowych FFmpeg dla pauz 2500–3499 ms).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
@@ -787,3 +788,8 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
      - `OBS-04` (`pipeline_logger.py` retry log): odłożony do Standardu 11.2.25.
   7. `tests/test_standard_11_2_23.py`:
      - 5 testów jednostkowych weryfikujących DEF-01, DEF-02, DEF-03, OBS-01 (RAM-only) oraz OBS-02.
+
+- **Hotfix 11.2.23a (commity 5f0ba5a, d0e23dd, HEAD):**
+  - BUG #1 (OBS-02): Wprowadzenie porządku rang właścicieli `alias_owners` ze ścisłą nierównością rang, zapobiegające samo-usuwaniu postaci P0 o generycznym opisie (`"postać (Postać)"`).
+  - BUG #2 (DEF-03): Obsługa produkcyjnego klucza `speaker_name` w `_is_speaker_change_lowercase`, przywracająca działanie detektora w produkcyjnym przepływie Fazy 1/Fazy 2.
+  - BUG #3 (DEF-02): Przekazanie `scene_boundaries` przez `build_discourse_topology` i `SceneDiscourseGraph.build_discourse_topology` oraz okablowanie `self.scene_cuts_ms` w `translator.py:7044`, aktywujące reset adresata na cięciach montażowych FFmpeg dla pauz 2500–3499 ms.
