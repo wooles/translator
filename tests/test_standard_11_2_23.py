@@ -12,7 +12,7 @@ import pytest
 import pysubs2
 
 from series_memory import SeriesBible
-from scene_discourse import SpeakerTurn, resolve_all_speaker_turns, process_scene_discourse
+from scene_discourse import SpeakerTurn, resolve_all_speaker_turns, process_scene_discourse, SceneDiscourseGraph
 from translator import MultimodalTranslator, enforce_locked_glossary_terms
 
 
@@ -61,6 +61,7 @@ def test_def03_speaker_change_lowercase_gets_calibrated_p90_priority_in_f2():
     """
     DEF-03: Kwestia nowego mówcy rozpoczynająca się małą literą otrzymuje skalibrowany priorytet P90
     bieżącej paczki, kwalifikując się do selektywnej Fazy 2 przy zachowaniu budżetu CoT LOW (2048).
+    Weryfikacja na produkcyjnym schemacie pass1_items zawierającym wyłącznie klucz 'speaker_name'.
     """
     translator = MultimodalTranslator(
         api_key="mock_k0",
@@ -68,13 +69,12 @@ def test_def03_speaker_change_lowercase_gets_calibrated_p90_priority_in_f2():
         enable_verifier=True
     )
 
-    # Budowa 30 linii o zróżnicowanym bazowym ryzyku
+    # Budowa 30 linii o zróżnicowanym bazowym ryzyku z dokładnym produkcyjnym kluczem speaker_name
     pass1_items = []
     for i in range(28):
         pass1_items.append({
             "id": i,
-            "speaker": "Postac_A",
-            "actor": "Postac_A",
+            "speaker_name": "Postac_A",
             "en": f"Standard test sentence {i} with some dialogue content.",
             "pl": f"Zwykłe zdanie testowe {i}.",
             "calque_score": 0.35 if (i % 3 == 0) else 0.0,
@@ -86,8 +86,7 @@ def test_def03_speaker_change_lowercase_gets_calibrated_p90_priority_in_f2():
     # Linia X (indeks 28): zmiana mówcy (Postac_A -> Postac_B), mała litera po wielokropku
     pass1_items.append({
         "id": 28,
-        "speaker": "Postac_B",
-        "actor": "Postac_B",
+        "speaker_name": "Postac_B",
         "en": "Get some sleep over there.",
         "pl": "prześpij się tam trochę.",
         "notes": ""
@@ -96,8 +95,7 @@ def test_def03_speaker_change_lowercase_gets_calibrated_p90_priority_in_f2():
     # Linia Y (indeks 29): ten sam mówca (Postac_B -> Postac_B), mała litera po wielokropku
     pass1_items.append({
         "id": 29,
-        "speaker": "Postac_B",
-        "actor": "Postac_B",
+        "speaker_name": "Postac_B",
         "en": "We managed to make it.",
         "pl": "udało się zdążyć.",
         "notes": ""
@@ -133,6 +131,7 @@ def test_def02_scene_cut_4s_gap_resets_addressee_propagation(tmp_path):
     DEF-02: Pauza międzyscenowa (>= 3500 ms) lub cięcie sceny FFmpeg (gap >= 2500 ms)
     resetuje dziedziczenie adresata (target_speaker = UNSPECIFIED, target_gender != FEMALE).
     Wymiana wewnątrz sceny (< 2500 ms) zachowuje normalne łączenie z poprzednim mówcą.
+    Część 2 weryfikuje produkcyjny punkt wejścia SceneDiscourseGraph.build_discourse_topology.
     """
     sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
     sm.data["characters"] = {
@@ -188,18 +187,70 @@ def test_def02_scene_cut_4s_gap_resets_addressee_propagation(tmp_path):
     assert t3.target_speaker == "Postac_Meska_1"
     assert t3.target_gender == "MALE"
 
+    # Część 2 (Hotfix 11.2.23a): Weryfikacja produkcyjnego punktu wejścia SceneDiscourseGraph.build_discourse_topology
+    # z cięciem montażowym FFmpeg w przedziale 2500 <= gap < 3500 ms (gap = 3000 ms)
+    ev_a = pysubs2.SSAEvent(start=640000, end=643000, text="Do zobaczenia.", name="Postac_Zenska")
+    ev_b = pysubs2.SSAEvent(start=646000, end=650000, text="Nowa scena po cięciu.", name="Postac_Meska_1")
+
+    # Asercja produkcyjna: z przekazanym cięciem FFmpeg na 644500 ms następuje reset adresata
+    turns_with_cut = SceneDiscourseGraph.build_discourse_topology(
+        [ev_a, ev_b],
+        series_bible=sm,
+        scene_boundaries=[644500]
+    )
+    assert len(turns_with_cut) == 2
+    assert turns_with_cut[1].target_speaker in (None, "UNSPECIFIED")
+    assert turns_with_cut[1].target_gender != "FEMALE"
+
+    # Kontrola nietautologiczna: bez cięcia FFmpeg (scene_boundaries=[]) przy pauzie 3000 ms (< 3500 ms)
+    # adresat zostaje odziedziczony z poprzedniego mówcy
+    turns_without_cut = SceneDiscourseGraph.build_discourse_topology(
+        [ev_a, ev_b],
+        series_bible=sm,
+        scene_boundaries=[]
+    )
+    assert len(turns_without_cut) == 2
+    assert turns_without_cut[1].target_speaker == "Postac_Zenska"
+    assert turns_without_cut[1].target_gender == "FEMALE"
+
 
 @pytest.mark.unit
-def test_obs02_prompt_character_registry_deduplicates_generic_aliases():
+def test_obs02_prompt_character_registry_deduplicates_generic_aliases(tmp_path):
     """
-    OBS-02: Sekcja ZNANE POSTACIE W ODCINKU deduplikuje redundantne aliasy P2
-    o generycznym opisie ("Postać epizodyczna / tło"), gdy istnieje bogatszy wpis kanoniczny.
+    OBS-02 (Hotfix 11.2.23a): Sekcja ZNANE POSTACIE W ODCINKU deduplikuje redundantne aliasy P2
+    o generycznym opisie ("Postać epizodyczna / tło") wyłącznie wtedy, gdy istnieje inny wpis
+    pokrywający dany alias o ściśle wyższej randze. Postacie P0 (nawet z generycznym opisem)
+    są chronione przed samo-usunięciem (rank guard).
     """
+    sm = SeriesBible(anime_title="Seria Testowa", storage_dir=tmp_path)
+    sm.data["characters"] = {
+        "Delta Nowak": {
+            "name": "Delta Nowak",
+            "gender": "MALE",
+            "grammatical_gender": "MASCULINE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["Delta", "Delta Nowak"],
+            "description": "postać (Postać)"
+        },
+        "Gamma": {
+            "name": "Gamma",
+            "gender": "FEMALE",
+            "grammatical_gender": "FEMININE",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["Gamma"],
+            "description": "postać (Postać)"
+        }
+    }
+    sm._rebuild_actor_aliases_index()
+
     translator = MultimodalTranslator(
         api_key="mock_k0",
         model="gemini-4-hydrogen",
         enable_verifier=False
     )
+    translator.series_bible = sm
     translator.character_registry = {
         "Alfa": "Postać epizodyczna / tło",
         "Alfa Kowalska": {
@@ -208,7 +259,10 @@ def test_obs02_prompt_character_registry_deduplicates_generic_aliases():
             "has_verified_gender": True,
             "priority": "P0"
         },
-        "Beta": "postać (Postać)"
+        "Beta": "postać (Postać)",
+        "Delta": "Postać epizodyczna / tło",
+        "Delta Nowak": "postać (Postać)",
+        "Gamma": "postać (Postać)"
     }
 
     dummy_event = pysubs2.SSAEvent(start=1000, end=2000, text="Kwestia testowa.", name="Alfa Kowalska")
@@ -217,10 +271,21 @@ def test_obs02_prompt_character_registry_deduplicates_generic_aliases():
         history_context=[]
     )
 
-    # Asercja: dokładnie 1 wpis dla Alfa Kowalska, 0 wpisów dla generycznego aliasu Alfa, zachowany unikalny wpis Beta
+    # Asercje:
+    # 1. Alfa Kowalska zachowana, generyczny alias Alfa usunięty
     assert "• Alfa Kowalska: kobieta (Bohaterka)" in prompt
     assert "• Alfa: Postać epizodyczna / tło" not in prompt
     assert "• Alfa:" not in prompt
+
+    # 2. Delta Nowak (P0, dwuwyrazowa z generycznym opisem) zachowana, a jej krótki alias Delta usunięty
+    assert "• Delta Nowak: postać (Postać)" in prompt
+    assert "• Delta: Postać epizodyczna / tło" not in prompt
+    assert "• Delta:" not in prompt
+
+    # 3. Gamma (P0, jednowyrazowa z generycznym opisem, bez dłuższego odpowiednika) zachowana (brak samo-usunięcia)
+    assert "• Gamma: postać (Postać)" in prompt
+
+    # 4. Beta (jednowyrazowa postać unikalna) zachowana
     assert "• Beta: postać (Postać)" in prompt or "• Beta:" in prompt
 
 
