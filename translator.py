@@ -3076,33 +3076,77 @@ class MultimodalTranslator:
                 elif bible_gen == "MALE" or cand_lower in MALE_EXCEPTIONS_ON_A:
                     return "mężczyzna", f"{cand_name} (Mężczyzna)"
 
+        # Standard 11.2.25 (Residual DEF-02): Poszanowanie resetu UNSPECIFIED z scene_discourse.py
+        # oraz jednolity rygor cięć scen (>= 3500 ms lub >= 2500 ms z granicą FFmpeg)
+        if (
+            getattr(event, "target_speaker", None) == "UNSPECIFIED"
+            and getattr(event, "target_gender", None) == "UNSPECIFIED"
+            and not getattr(event, "vocative_lock", False)
+            and not raw_norm
+        ):
+            return None, None
+
+        cuts_ms = getattr(self, "scene_cuts_ms", None) or []
+
+        def _is_scene_cut_boundary(t_prev_end: int, t_curr_start: int) -> bool:
+            gap_v = max(0, int(t_curr_start) - int(t_prev_end))
+            if gap_v >= 3500:
+                return True
+            if gap_v >= 2500 and cuts_ms:
+                for b_cut in cuts_ms:
+                    if t_prev_end < b_cut < t_curr_start:
+                        return True
+            return False
+
+        _NON_DIALOGUE_ACTORS = ("sign", "signs", "title", "txt", "szyld", "napis", "caption")
+
         # 2. 1-on-1 Dialogue Alternation (Ping-Pong Turn & Linguistic Context)
         curr_spk = (getattr(event, "name", None) or getattr(event, "actor", None) or "").strip()
         from series_memory import resolve_actor_gender, extract_clean_speaker_name, is_inherently_female_name, is_generic_actor_or_category
 
-        # 1. Multi-Step Backward Interlocutor Search (up to 4 events, delta_t <= 8.0s)
+        # 1. Multi-Step Backward Interlocutor Search (up to 4 events, rygor cięć scen z DEF-02)
         prev_interlocutor = None
         prev_interlocutor_ev = None
         if event_idx > 0 and curr_spk:
             curr_clean = extract_clean_speaker_name(curr_spk).lower()
+            curr_start_ms = int(getattr(event, "start", 0) or 0)
             for b_off in range(1, min(5, event_idx + 1)):
-                cand_item = batch_events[event_idx - b_off]
+                cand_pos = event_idx - b_off
+                if cand_pos < 0 or cand_pos >= len(batch_events):
+                    continue
+                cand_item = batch_events[cand_pos]
                 cand_ev = cand_item[1] if len(cand_item) > 1 else None
+                if cand_ev is None:
+                    continue
+                cand_end_ms = int(getattr(cand_ev, "end", 0) or 0)
+                if _is_scene_cut_boundary(cand_end_ms, curr_start_ms):
+                    break
+                cand_style = (getattr(cand_ev, "style", "") or "").lower()
+                if "italic" in cand_style or getattr(cand_ev, "is_internal_monologue", False):
+                    continue
                 cand_spk = (getattr(cand_ev, "name", None) or getattr(cand_ev, "actor", None) or "").strip()
                 cand_clean = extract_clean_speaker_name(cand_spk).lower()
-                if cand_ev and abs(getattr(event, "start", 0) - getattr(cand_ev, "end", 0)) > 8000:
-                    break
-                if cand_clean and cand_clean != curr_clean:
+                if not cand_clean or cand_clean in _NON_DIALOGUE_ACTORS:
+                    continue
+                if cand_clean != curr_clean:
                     prev_interlocutor = cand_spk
                     prev_interlocutor_ev = cand_ev
                     break
         elif event_idx == 0 and curr_spk:
             curr_clean = extract_clean_speaker_name(curr_spk).lower()
+            curr_start_ms = int(getattr(event, "start", 0) or 0)
             if lookback_history:
                 for cand_h in reversed(lookback_history[-4:]):
+                    cand_end_h = cand_h.get("end_ms")
+                    if cand_end_h is not None and _is_scene_cut_boundary(int(cand_end_h), curr_start_ms):
+                        break
+                    if cand_h.get("is_thought"):
+                        continue
                     cand_spk = (cand_h.get("speaker") or cand_h.get("speaker_name") or "").strip()
                     cand_clean = extract_clean_speaker_name(cand_spk).lower()
-                    if cand_clean and cand_clean != curr_clean:
+                    if not cand_clean or cand_clean in _NON_DIALOGUE_ACTORS:
+                        continue
+                    if cand_clean != curr_clean:
                         prev_interlocutor = cand_spk
                         prev_g = (cand_h.get("speaker_gender") or "").strip().lower()
                         if prev_g in ["kobieta", "female", "żeński"]:
@@ -3139,16 +3183,25 @@ class MultimodalTranslator:
             elif p_res == "MALE":
                 return "mężczyzna", f"{prev_interlocutor} (Mężczyzna)"
 
-        # 2. Forward Interlocutor Lookahead (Turn Opening Dialogue, delta_t <= 6.0s)
+        # 2. Forward Interlocutor Lookahead (Turn Opening Dialogue, rygor cięć scen z DEF-02)
         if len(batch_events) > event_idx + 1:
             curr_clean = extract_clean_speaker_name(curr_spk).lower()
+            curr_end_ms = int(getattr(event, "end", 0) or 0)
             for f_off in range(1, min(4, len(batch_events) - event_idx)):
                 next_item = batch_events[event_idx + f_off]
                 next_ev = next_item[1] if len(next_item) > 1 else None
+                if next_ev is None:
+                    continue
+                next_start_ms = int(getattr(next_ev, "start", 0) or 0)
+                if _is_scene_cut_boundary(curr_end_ms, next_start_ms):
+                    break
+                next_style = (getattr(next_ev, "style", "") or "").lower()
+                if "italic" in next_style or getattr(next_ev, "is_internal_monologue", False):
+                    continue
                 next_spk = (getattr(next_ev, "name", None) or getattr(next_ev, "actor", None) or "").strip()
                 next_clean = extract_clean_speaker_name(next_spk).lower()
-                if next_ev and abs(getattr(next_ev, "start", 0) - getattr(event, "end", 0)) > 6000:
-                    break
+                if not next_clean or next_clean in _NON_DIALOGUE_ACTORS:
+                    continue
                 if next_clean and next_clean != curr_clean:
                     next_res = resolve_actor_gender(next_spk, self.character_registry, getattr(self, "series_bible", None))
                     if getattr(self, "series_bible", None) and hasattr(self.series_bible, "audit_speaker_metadata_against_audio"):
@@ -4306,7 +4359,9 @@ class MultimodalTranslator:
                     "en": prev_clean_en,
                     "pl": prev_pl,
                     "speaker": spk,
-                    "is_thought": is_th
+                    "is_thought": is_th,
+                    "start_ms": int(getattr(prev_event, "start", 0) or 0),
+                    "end_ms": int(getattr(prev_event, "end", 0) or 0)
                 })
         elif history:
             if hasattr(self, "lock"):
