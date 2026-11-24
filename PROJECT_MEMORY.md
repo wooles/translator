@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-24 — Standard 11.2.24 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.24 (Z16-amendment #15 / DEF-04 SSOT Dependent Interrogative Comma Guard)`
-- **Commit certyfikacji kodu:** `6b500a2` (`6b500a204d6cbdb85d8869b5966ae5349f4c39dc`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-24 — Standard 11.2.25 Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.25 (Residual DEF-02 Guard — scene_discourse UNSPECIFIED Reset Enforcement & FFmpeg Scene-Cut Boundaries in translator._resolve_line_addressee / lookback_history)`
+- **Commit certyfikacji kodu:** `22ddc18` (`22ddc185e846a4071fc48d13fc08040de215f629`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -44,22 +44,22 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.22:** `f021602` (Commit 1), `f1b7349` (Commit 2), `16f574b` (Commit 3)
 - **Commity Standardu 11.2.23:** `44a61cf` (Commit 1), `c33e220` (Commit 2), `4aae11a` (Commit 3)
 - **Commity Hotfixu 11.2.23a:** `5f0ba5a` (Commit 1), `d0e23dd` (Commit 2), `e595b52` (Commit 3)
-- **Commity Standardu 11.2.24:**
-  * Commit 1 (`0910539`): `fix(linter): preserve mandatory comma before 'czy' in dependent interrogative clauses via SSOT helper across series_memory and avt_linter (Z16-amendment #15 / DEF-04, 11.2.24)`
-  * Commit 2 (`6b500a2`): `test(linter): verify DEF-04 dependent interrogative comma guard across Test A/B/C/D and all 3 execution points (11.2.24)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.24 (Z16-amendment #15) — DEF-04 dependent interrogative comma guard across all 3 SSOT points`
-- **Status 11.2.24:** `CERTIFIED / CLOSED (2026-11-24)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` — autoryzowany Z16-amendment #15 dla `avt_linter.py`, bezwzględne 0 B diffu na wszystkich 28 pozostałych plikach chronionych)
-- **Stan metryk:** `445 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `515 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (445/445 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.24` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.24: Dependent Interrogative Comma SSOT Guard across series_memory and avt_linter — ochrona obowiązkowego przecinka w zdaniach podrzędnych pytajnych zależnych przed 'czy' po czasownikach epistemicznych i pytajnych, eliminacja przecinka w alternatywie rozłącznej frazowej bez czasownika pytajnego, unifikacja logiki do jednej funkcji SSOT `strip_binary_alt_comma_before_czy`).
+- **Commity Standardu 11.2.24:** `0910539` (Commit 1), `6b500a2` (Commit 2), `6852a5a` (Commit 3)
+- **Commity Standardu 11.2.25:**
+  * Commit 1 (`e4bdf85`): `fix(pipeline): enforce scene_discourse UNSPECIFIED reset and FFmpeg scene-cut boundary in _resolve_line_addressee and lookback_history (residual DEF-02, 11.2.25)`
+  * Commit 2 (`22ddc18`): `test(pipeline): verify residual DEF-02 across all 5 production scene-cut geometries and standalone _resolve_line_addressee guard (11.2.25)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): certify Standard 11.2.25 — residual DEF-02 scene-cut addressee guard in translator._resolve_line_addressee`
+- **Status 11.2.25:** `CERTIFIED / CLOSED (2026-11-24)`
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a`; **bezwzględne 0 B diffu** na wszystkich plikach chronionych Z16 oraz `scene_discourse.py`, `pipeline_logger.py`, `series_memory.py` względem `6852a5a`)
+- **Stan metryk:** `447 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `517 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (447/447 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.25` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard 11.2.25: Residual DEF-02 Guard — poszanowanie resetu `UNSPECIFIED` z `scene_discourse.py` w `translator.py:_resolve_line_addressee`, jednolity rygor cięć scen `>= 3500 ms` lub `>= 2500 ms` z granicą FFmpeg w wyszukiwaniu wstecznym, `lookback_history` i forward lookahead z pominięciem szyldów i myśli wewnętrznych, oraz zapis `start_ms`/`end_ms` w `lookback_history` budowanym z `prev_batch`).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (445 passed w tests/)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (447 passed w tests/)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
-  * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
 ---
@@ -819,4 +819,28 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   4. **Świadome wyłączenia:**
      - `OBS-04` (`pipeline_logger.py` retry log): odłożony do Standardu 11.2.25.
      - `OBS-03` (`pricing_guard.py:379`): poza zakresem.
+
+
+## 🏛️ ARB-077 / INC-AVT-075: Standard 11.2.25 — Domknięcie residualnej luki DEF-02 w `translator._resolve_line_addressee` i `lookback_history`
+
+- **Status:** `RESOLVED (Standard 11.2.25, commity e4bdf85, 22ddc18, HEAD)`
+- **Zidentyfikowano (Residualna luka DEF-02 w przebiegu produkcyjnym na HEAD `6852a5a`):**
+  1. Moduł `scene_discourse.py` poprawnie wyzerował adresata (`target_speaker='UNSPECIFIED'`, `target_gender='UNSPECIFIED'`, `target_confidence=0.0`) na wszystkich 5 liniach granicznych (`#80`, `#189`, `#255`, `#264`, `#293`), jednak wtórna logika w `translator.py` obchodziła ten reset i wstrzykiwała starą postać do `telemetry_tag`.
+  2. Lista `lookback_history` budowana z `prev_batch` (`b_idx > 0`) nie zapisywała pól `start_ms`/`end_ms`, przez co linia graniczna `event_idx == 0` (przypadek `#264`, przerwa `4630 ms`, 2 cięcia FFmpeg) ślepo dziedziczyła poprzedniego mówcę z poprzedniej paczki.
+  3. Metoda `translator.py:_resolve_line_addressee` nie honorowała wcześniejszego resetu `UNSPECIFIED` z `scene_discourse.py` i używała progów `> 8000 ms` / `> 6000 ms` bez sprawdzania cięć `self.scene_cuts_ms` oraz bez pomijania szyldów i myśli wewnętrznych.
+- **Komponenty Naprawy (`translator.py`, 0 B diffu w `scene_discourse.py`):**
+  1. `translator.py` (`lookback_history` z `prev_batch`):
+     - Zapisywanie pól `"start_ms"` oraz `"end_ms"` dla każdego wpisu pochodzącego z `prev_event`.
+  2. `translator.py:_resolve_line_addressee`:
+     - Wczesny powrót `(None, None)` przy zachowaniu priorytetu kroków 1/1b (jawny wołacz), gdy `event` posiada `target_speaker == "UNSPECIFIED"`, `target_gender == "UNSPECIFIED"`, brak `vocative_lock` i brak `raw_norm`.
+     - Jednolity rygor `_is_scene_cut_boundary` (`gap >= 3500 ms` lub `gap >= 2500 ms` z granicą w `self.scene_cuts_ms`) oraz izolacja szyldów i myśli wewnętrznych we wszystkich gałęziach (wyszukiwanie wsteczne, `lookback_history`, forward lookahead).
+  3. `tests/test_standard_11_2_25.py`:
+     - `test_def02_residual_5_production_scene_cuts_do_not_leak_stale_addressee`: weryfikacja wszystkich 5 geometrii granicznych (`#80`, `#189`, `#255`, `#264` przez `lookback_history`, `#293`) na pełnym łańcuchu produkcyjnym.
+     - `test_def02_residual_standalone_resolve_line_addressee_respects_scene_cuts_and_preserves_intrascene`: nietautologiczna weryfikacja bezpośrednia Warstwy 2 wraz z kontrolą zachowawczą wewnątrz sceny (`gap = 640 ms`).
+  4. **Kolejność standardów i status pozostałych obserwacji (`KNOWN GAP` / Roadmap):**
+     - `Standard 11.2.25`: domknięcie residualnej luki `DEF-02` (w `translator.py`).
+     - `Standard 11.2.26` (planowany): `OBS-04` (`pipeline_logger.py:log_retry`).
+     - `Standard 11.2.27` (kandydat): `OBS-05` (`\NI` w Fazie 2).
+     - `DEF-01` / `DEF-04` / `OBS-01`: oznaczone jako `KNOWN GAP` do weryfikacji w kolejnym przebiegu end-to-end; `OBS-03` (`pricing_guard.py:379`) poza zakresem.
+
 
