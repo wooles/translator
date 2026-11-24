@@ -3536,6 +3536,84 @@ CLOTHES_PATTERN = (
     r"sukienk(?:a|ę|i|ce|ą|ach|ami))"
 )
 
+# Standard 11.2.24 (Z16-amendment #15 / DEF-04, Filar LX): Ochrona przecinka w pytaniach zależnych przed 'czy'
+_INTERROGATIVE_EPISTEMIC_PREFIXES = (
+    "pyta", "zapyta", "dopyt", "spyt",
+    "powiedz", "odpowiedz", "wyjaśn", "rozstrzygn", "ustal", "zadecyd", "zdecyduj", "zdecyd",
+    "wiedz", "sprawdz", "sprawdź", "zastanaw", "zastanow", "zastanów",
+    "ciekaw", "pamięta", "upewn", "przekon", "myśl", "pomyśl", "rozważ", "zrozum",
+    "wątp", "podejrzew", "domyśl",
+    "zgadnij", "zgaduj",
+    "zobacz",
+)
+
+_INTERROGATIVE_EPISTEMIC_EXACT = frozenset({
+    "wiem", "wiesz", "wie", "wiemy", "wiecie", "wiedzą",
+    "powiem", "powiesz", "powie", "powiemy", "powiecie",
+    "odpowiem", "odpowiesz", "odpowie", "odpowiemy", "odpowiecie",
+    "zgadnę", "zgadniesz", "zgadnie", "zgadniemy", "zgadniecie", "zgadną", "zgadnąć",
+    "zgadł", "zgadła", "zgadło", "zgadli", "zgadły", "zgadłem", "zgadłam", "zgadłeś", "zgadłaś",
+})
+
+_ALLOWED_CZY_BRIDGE_WORDS = frozenset({
+    "się", "mi", "ci", "mu", "jej", "nam", "wam", "im", "go", "ją", "je",
+    "mnie", "ciebie", "sobie", "szczerze", "proszę", "tylko", "dokładnie",
+    "w", "końcu", "cicho", "szybko", "jeszcze", "raz", "pojęcia",
+})
+
+
+def _is_interrogative_epistemic_verb(tok: str) -> bool:
+    t = tok.lower().strip()
+    if not t or t.startswith("zgadz"):
+        return False
+    if t in _INTERROGATIVE_EPISTEMIC_EXACT:
+        return True
+    return any(t.startswith(pref) for pref in _INTERROGATIVE_EPISTEMIC_PREFIXES)
+
+
+def strip_binary_alt_comma_before_czy(m: re.Match) -> str:
+    """
+    Standard 11.2.24 (Z16-amendment #15 / DEF-04, Filar LX):
+    Usuwa zbędny przecinek w binarnej alternatywie rozłącznej przed 'czy (bez|nie|tak)',
+    zachowując przecinek po inicjalnym wołaczu (Standard 9.4 2B.10) oraz w zdaniach
+    podrzędnych pytajnych zależnych po czasownikach pytajnych i epistemicznych.
+    """
+    prefix_clean = re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip()
+    word = m.group(1)
+    word_low = word.lower()
+
+    # 1. Ochrona inicjalnego wołacza (Standard 9.4 2B.10)
+    is_start_of_sentence = (
+        not prefix_clean
+        or prefix_clean in ("-", "–", "—", '"', "„", "...", "…")
+        or bool(re.search(r"(?:\\N|\\n|[.?!…])\s*[-–—]?\s*$", prefix_clean))
+    )
+    if word and word[0].isupper() and word_low not in ("tak", "nie", "bez", "to") and is_start_of_sentence:
+        return m.group(0)
+
+    # 2. Ochrona pytania zależnego bezpośrednio po czasowniku pytajnym / epistemicznym
+    if _is_interrogative_epistemic_verb(word_low):
+        return m.group(0)
+
+    # 3. Krótkie dozwolone wtrącenie (zaimek/przysłówek/fraza epistemiczna) między czasownikiem a ", czy"
+    if word_low in _ALLOWED_CZY_BRIDGE_WORDS:
+        clause_tail = re.split(r"(?:\\N|\\n|[.?!…,:;])", prefix_clean)[-1]
+        prev_tokens = [t.lower() for t in re.findall(r"[A-Za-ząćęłńóśźż0-9\-]+", clause_tail)]
+        idx = len(prev_tokens) - 1
+        steps = 0
+        while idx >= 0 and steps < 3 and prev_tokens[idx] in _ALLOWED_CZY_BRIDGE_WORDS:
+            idx -= 1
+            steps += 1
+        if idx >= 0:
+            head_tok = prev_tokens[idx]
+            if _is_interrogative_epistemic_verb(head_tok):
+                return m.group(0)
+            if word_low == "pojęcia" and re.match(r"^(?:ma(?:m|sz|my|cie|ją)?|miał\w*|mieli\w*|mieć)$", head_tok):
+                return m.group(0)
+
+    return f"{m.group(1)} czy {m.group(2)}"
+
+
 TYPO_NORMALIZATIONS = [
     # Clothing collocations (Norma Wzorcowa PWN: 'zakładać/wkładać buty', a nie 'ubierać')
     (rf"\b([Uu])bierz(\s+)({CLOTHES_PATTERN})\b",
@@ -3647,9 +3725,8 @@ TYPO_NORMALIZATIONS = [
     (r"(^|[^\w]|\\[Nnh])ouji([!\?…]+)", r"\g<1>książę\g<2>"),
     # Conversational continuation calque (Filar IV / CLVI)
     (r"(^|[^\w]|\\[Nnh])([Ii]|[Aa])\s+co\s+z\s+tego\?(\s*\\N\s*|\s+)(?=[Tt]o\s+wy\b|[Cc]hodzicie\b|[Jj]esteście\b|[Cc]o\s+było\b|[Cc]o\s+dalej\b|[Jj]ak\s+to\b)", r"\g<1>\g<2> co?\g<3>"),
-    # Binary alternative comma eradication: 'w kapciach, czy bez' -> 'w kapciach czy bez' (Filar XCI / Standard 9.4 2B.10 - ochrona wołacza W)
-    (r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b",
-     lambda m: m.group(0) if (m.group(1)[0].isupper() and m.group(1).lower() not in ("tak", "nie", "bez", "to") and (not re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() or re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() in ("-", "–", "—", '"', "„", "...", "…") or re.search(r"(?:\\N|\\n|[.?!…])\s*[-–—]?\s*$", re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip()))) else f"{m.group(1)} czy {m.group(2)}"),
+    # Binary alternative comma eradication: 'w kapciach, czy bez' -> 'w kapciach czy bez' (Filar XCI / Standard 11.2.24 DEF-04)
+    (r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b", strip_binary_alt_comma_before_czy),
     # Trailing cut-off speech attached dash: '<Imię>–' -> '<Imię>...' (Filar XCI)
     (r"([A-Za-ząćęłńóśźż])–(?=\s*\\N|\s*$|[!\?…])", r"\1..."),
     # Deictic temporal syntax normalizations (Filar CLXVIII)

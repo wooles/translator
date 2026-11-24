@@ -20,7 +20,8 @@ from series_memory import (
     GENERIC_CATEGORY_TAGS, is_generic_actor_or_category, ETHNONYMS_AND_COLLECTIVES,
     FEMALE_ROLE_KEYWORDS, MALE_ROLE_KEYWORDS, BOY_ROLE_KEYWORDS,
     resolve_actor_gender, is_plural_actor,
-    INDECLINABLE_FRENCH_TOPONYMS, WORLD_CAPITAL_TOPONYMS
+    INDECLINABLE_FRENCH_TOPONYMS, WORLD_CAPITAL_TOPONYMS,
+    strip_binary_alt_comma_before_czy
 )
 
 MALE_GENDER_TOKENS = tuple("male mezczyzna mężczyzna chłopiec chlopiec chłopak chlopak".upper().split())
@@ -996,9 +997,9 @@ class AVTLinter:
         # Otaku slang & honorifics adaptation (Filar XXVII)
         (r"\b([A-ZĄĆĘŁŃÓŚŹŻ][a-ząćęłńóśźż]+)-(?:senpai|taso|tan)\b", r"\1", "Filar XXVII - Adaptacja Sufiksów Honoryfikatywnych"),
 
-        # Binary alternative comma eradication (Filar LX, Standard 9.4 2B.10 - ochrona wołacza inicjalnego W)
+        # Binary alternative comma eradication (Filar LX, Standard 11.2.24 / Z16-amendment #15 - ochrona wołacza W i pytań zależnych)
         (r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b",
-         lambda m: m.group(0) if (m.group(1)[0].isupper() and m.group(1).lower() not in ("tak", "nie", "bez", "to") and (not re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() or re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip() in ("-", "–", "—", '"', "„", "...", "…") or re.search(r"(?:\\N|\\n|[.?!…])\s*[-–—]?\s*$", re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip()))) else f"{m.group(1)} czy {m.group(2)}",
+         strip_binary_alt_comma_before_czy,
          "Filar LX - Eliminacja Przecinka przed Czy w Alternatywie Rozłącznej"),
 
         # Trailing cut-off speech attached dash (Filar LX)
@@ -11399,22 +11400,10 @@ class EpisodeQualityGate:
             ev.text = re.sub(r"~", "", ev.text)
             if ev.text != old_t:
                 fixes.append(f"[Episode Quality Gate - Filar LX Typografia] {line_lbl}: usunięto japońską tyldę i znormalizowano wykrzykniki")
-        # Remove comma before "czy" in direct binary alternatives (Filar LX, Standard 9.4 2B.10 - ochrona wołacza W)
-        def _strip_alt_comma(m):
-            prefix_clean = re.sub(r"\{[^}]*\}", "", m.string[:m.start(1)]).strip()
-            word = m.group(1)
-            is_start_of_sentence = (
-                not prefix_clean
-                or prefix_clean in ("-", "–", "—", '"', "„", "...", "…")
-                or bool(re.search(r"(?:\\N|\\n|[.?!…])\s*[-–—]?\s*$", prefix_clean))
-            )
-            if word and word[0].isupper() and word.lower() not in ("tak", "nie", "bez", "to") and is_start_of_sentence:
-                return m.group(0)
-            return f"{m.group(1)} czy {m.group(2)}"
-
+        # Remove comma before "czy" in direct binary alternatives (Filar LX, Standard 11.2.24 / Z16-amendment #15)
         if re.search(r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b", ev.text):
             old_t = ev.text
-            ev.text = re.sub(r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b", _strip_alt_comma, ev.text)
+            ev.text = re.sub(r"\b([A-Za-ząćęłńóśźż0-9\-]+),\s+czy\s+(bez|nie|tak)\b", strip_binary_alt_comma_before_czy, ev.text)
             if ev.text != old_t:
                 fixes.append(f"[Episode Quality Gate - Filar LX Interpunkcja] {line_lbl}: usunięto zbędny przecinek przed 'czy' w alternatywie rozłącznej")
         # Replace trailing cut-off speech glued en-dash with ellipsis (Filar LX)
