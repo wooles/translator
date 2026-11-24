@@ -402,3 +402,66 @@ def test_t11_1_7_b3_eqg_preserves_question_mark_and_intentional_repetition_when_
     assert fixed_events[4].text == r"{\i1}Bum... bum... bum...{\i0}"
     assert fixed_events[5].text == "Chcę to odebrać."
 
+
+@pytest.mark.unit
+@pytest.mark.parametrize(
+    "raw_input,expected_output",
+    [
+        # Test A — Pytania zależne po czasownikach pytajnych i epistemicznych (przecinek ZACHOWANY)
+        ("pytała, czy nie chciałabym tu zostać.", "pytała, czy nie chciałabym tu zostać."),
+        ("Nie wiem, czy nie lepiej zostać.", "Nie wiem, czy nie lepiej zostać."),
+        ("Zastanawiam się, czy tak powinno być.", "Zastanawiam się, czy tak powinno być."),
+        ("Zastanów się, czy tak powinno być.", "Zastanów się, czy tak powinno być."),
+        ("Sprawdź, czy nie zamknęli bramy.", "Sprawdź, czy nie zamknęli bramy."),
+        ("Zobacz, czy nie zostało coś w środku.", "Zobacz, czy nie zostało coś w środku."),
+        ("Zgadnij, czy nie miałem racji.", "Zgadnij, czy nie miałem racji."),
+        ("Zgaduj, czy tak to zadziała.", "Zgaduj, czy tak to zadziała."),
+        ("Zgadnę, czy tak to działa.", "Zgadnę, czy tak to działa."),
+        ("Powiem ci, czy nie przesadził.", "Powiem ci, czy nie przesadził."),
+        ("Wątpię, czy tak to zadziała.", "Wątpię, czy tak to zadziała."),
+        # Test B — Alternatywa rozłączna bez czasownika pytajnego (przecinek USUNIĘTY)
+        ("Będziesz w kapciach, czy bez?", "Będziesz w kapciach czy bez?"),
+        ("Pójdziesz tam dzisiaj, czy nie?", "Pójdziesz tam dzisiaj czy nie?"),
+        ("Zrobisz to, czy tak po prostu odejdziesz?", "Zrobisz to czy tak po prostu odejdziesz?"),
+        # Test C — Przypadki graniczne: fraza epistemiczna, dopełnienia, wykluczenie niepytajnego zgadz* oraz rzeczownik po zobacz
+        ("Nie mam pojęcia, czy nie zapomniał.", "Nie mam pojęcia, czy nie zapomniał."),
+        ("Powiedz mi szczerze, czy nie żartujesz.", "Powiedz mi szczerze, czy nie żartujesz."),
+        ("Zapytała go cicho, czy nie wejdzie.", "Zapytała go cicho, czy nie wejdzie."),
+        ("Zgadzam się, czy nie?", "Zgadzam się czy nie?"),
+        ("Zgadza się, czy nie?", "Zgadza się czy nie?"),
+        ("Zobacz ten obraz, czy nie?", "Zobacz ten obraz czy nie?"),
+        ("Zobacz obraz, czy rzeźbę.", "Zobacz obraz, czy rzeźbę."),
+        # Test D — Podwójne 'czy' (lokalna analiza kontekstu przed każdym wystąpieniem)
+        ("Nie wiem, czy nie idzie, czy tak.", "Nie wiem, czy nie idzie czy tak."),
+        ("Powiedział, czy nie woli herbaty, czy tak.", "Powiedział, czy nie woli herbaty czy tak."),
+        ("Powiedział, czy woli herbatę, czy nie.", "Powiedział, czy woli herbatę czy nie."),
+        ("Nie wiem, czy woli herbatę, czy nie.", "Nie wiem, czy woli herbatę czy nie."),
+    ]
+)
+def test_standard_11_2_24_def04_dependent_interrogative_comma_ssot(raw_input, expected_output):
+    """
+    Standard 11.2.24 (Z16-amendment #15 / DEF-04):
+    Weryfikuje spójność reguły Filaru LX we wszystkich 3 punktach potoku:
+    1) series_memory.sanitize_lexical_text,
+    2) AVTLinter.lint_and_fix_line (strict_positive_domain=False -> FIXED_REPLACEMENTS),
+    3) EpisodeQualityGate.audit_and_fix_entire_episode.
+    """
+    from series_memory import sanitize_lexical_text
+
+    # 1. Ścieżka sanitize_lexical_text (series_memory.py:TYPO_NORMALIZATIONS)
+    assert sanitize_lexical_text(raw_input) == expected_output
+
+    # 2. Ścieżka AVTLinter.FIXED_REPLACEMENTS
+    fixed_line, _ = AVTLinter.lint_and_fix_line(
+        raw_input,
+        strict_positive_domain=False
+    )
+    assert fixed_line == expected_output
+
+    # 3. Ścieżka końcowa EpisodeQualityGate
+    subs = pysubs2.SSAFile()
+    subs.events.append(pysubs2.SSAEvent(start=1000, end=3000, text=raw_input, style="Default"))
+    subs_fixed, _ = EpisodeQualityGate.audit_and_fix_entire_episode(subs, strict_positive_domain=True)
+    assert subs_fixed.events[0].text == expected_output
+
+
