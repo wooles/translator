@@ -4087,6 +4087,59 @@ class MultimodalTranslator:
 
     build_phase1_prompt = _prepare_batch_prompt
 
+    @staticmethod
+    def _classify_retry_error_type(exc: Any) -> str:
+        """
+        Standard 11.2.26 (OBS-04): Klasyfikuje wyjątek lub komunikat błędu API do kanonicznego
+        identyfikatora telemetrii ponowień ('503', '429', '504', 'TimeoutError', itp.).
+        """
+        import concurrent.futures as _cf
+        if isinstance(exc, (TimeoutError, _cf.TimeoutError)):
+            return "TimeoutError"
+        err_s = str(exc or "").lower()
+        if "503" in err_s or "unavailable" in err_s or "high demand" in err_s:
+            return "503"
+        if "429" in err_s or "quota" in err_s or "resource_exhausted" in err_s or "rate" in err_s:
+            return "429"
+        if "504" in err_s or "deadline" in err_s:
+            return "504"
+        if "timeout" in err_s or "timed out" in err_s:
+            return "TimeoutError"
+        if "403" in err_s or "cachedcontent" in err_s or "permission" in err_s:
+            return "403"
+        if "404" in err_s or "not found" in err_s:
+            return "404"
+        if "500" in err_s or "internal" in err_s:
+            return "500"
+        return type(exc).__name__ if isinstance(exc, BaseException) else "unknown"
+
+    def _log_retry_telemetry(
+        self,
+        batch_id: Optional[int],
+        phase: str,
+        error_type: str,
+        attempt_number: int,
+        wait_ms: int,
+        model: str,
+        error_detail: str = ""
+    ) -> None:
+        """Standard 11.2.26 (OBS-04): Bezpiecznie zapisuje telemetrię ponowienia API w EpisodeFlightRecorder."""
+        fr = getattr(self, "flight_recorder", None)
+        if not fr:
+            return
+        try:
+            fr.log_retry(
+                batch_id=batch_id,
+                phase=phase,
+                error_type=error_type,
+                attempt_number=attempt_number,
+                wait_ms=wait_ms,
+                model=model,
+                error_detail=error_detail
+            )
+        except Exception:
+            logger.debug(f"Rejestracja ponowienia {phase} zakończona wyjątkiem", exc_info=True)
+
     def _call_gemini_with_retry(self, contents: List[Any], schema_class, batch_idx: Optional[int] = None) -> Any:
         """
         Reliable API call with automated handling of rate limits (429) and server overloads (503).
@@ -4227,6 +4280,15 @@ class MultimodalTranslator:
                     with MultimodalTranslator._STATUS_LOCK:
                         print(f"\n[Context Cache]: Wykryto unieważniony cache serwerowy na kluczu -> automatyczna regeneracja...")
                     cached_name = None
+                    self._log_retry_telemetry(
+                        batch_id=batch_idx,
+                        phase="F1",
+                        error_type=self._classify_retry_error_type(e),
+                        attempt_number=attempt,
+                        wait_ms=500,
+                        model=current_model,
+                        error_detail=str(e)
+                    )
                     time.sleep(0.5)
                     continue
 
@@ -4264,6 +4326,15 @@ class MultimodalTranslator:
                     if is_not_found or (attempt >= max(2, num_keys * 2) and (is_unavailable or is_timeout)):
                         fallback_model = active_models.get("flash", "gemini-3.8-flash")
                         print(f"\n[Fallback Model Faza 1]: Przełączenie z {current_model} na {fallback_model} (próba {attempt})...")
+                        self._log_retry_telemetry(
+                            batch_id=batch_idx,
+                            phase="F1",
+                            error_type=self._classify_retry_error_type(e),
+                            attempt_number=attempt,
+                            wait_ms=500,
+                            model=current_model,
+                            error_detail=f"{e} -> fallback:{fallback_model}"
+                        )
                         current_model = fallback_model
                         time.sleep(0.5)
                         continue
@@ -4286,6 +4357,15 @@ class MultimodalTranslator:
                         print(f"\n[Status / Faza 1]: {friendly_msg} -> oczekiwanie na serwery Google i automatyczna rotacja kluczy...")
                         MultimodalTranslator._STATUS_ACTIVE = True
 
+                self._log_retry_telemetry(
+                    batch_id=batch_idx,
+                    phase="F1",
+                    error_type=self._classify_retry_error_type(e),
+                    attempt_number=attempt,
+                    wait_ms=int(round(wait_time * 1000)),
+                    model=current_model,
+                    error_detail=str(e)
+                )
                 time.sleep(wait_time)
 
     def _resolve_bible_path(self, title_or_path: str) -> Path:
@@ -5801,21 +5881,50 @@ class MultimodalTranslator:
                 phase2_focused_rules = get_focused_rules_for_batch(verifier_batch_items, max_rules=5 if len(verifier_batch_items) > 40 else 3)
                 # INC-AVT-060: Offset klucza dla Fazy 2 zapobiegający kolizji pamięci TPU z Fazą 1
                 f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx
-                refined_lines: List[RefinedLine] = self.verifier.verify_batch(
-                    batch_items=verifier_batch_items,
-                    scene_summary=scene_desc or "",
-                    episode_profile_str=episode_profile_str,
-                    user_feedback_str=user_feedback_str,
-                    glossary_str=glossary_str,
-                    focused_rules_str=phase2_focused_rules,
-                    series_bible_str=scoped_series_bible_str,
-                    manga_canon_str=manga_canon_str,
-                    history_context=lookback_history,
-                    lookahead_events=lookahead_events,
-                    character_registry=self.character_registry,
-                    scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
-                    batch_idx=f2_affinity_idx
-                )
+                # Standard 11.2.26 (OBS-04): Scoped obserwator ponowień F2 bez modyfikacji chronionego Z16 verifier.py
+                _v_pool = getattr(self.verifier, "client_pool", None)
+                _orig_v_report_error = getattr(_v_pool, "report_error", None) if _v_pool is not None else None
+                if self.flight_recorder and _v_pool is not None and callable(_orig_v_report_error):
+                    _f2_attempt_box = [0]
+                    _v_num_keys = len(getattr(_v_pool, "clients", []) or [1])
+
+                    def _observed_f2_report_error(client_obj: Any, error_str: str) -> Any:
+                        _f2_attempt_box[0] += 1
+                        _att = _f2_attempt_box[0]
+                        _err_t = self._classify_retry_error_type(error_str if str(error_str or "").strip() else TimeoutError())
+                        _est_wait_ms = 1500 if _err_t in ("503", "504", "TimeoutError") else (200 if _att % max(1, _v_num_keys) != 0 else 600)
+                        self._log_retry_telemetry(
+                            batch_id=b_idx,
+                            phase="F2",
+                            error_type=_err_t,
+                            attempt_number=_att,
+                            wait_ms=_est_wait_ms,
+                            model=str(getattr(self.verifier, "model", "") or ""),
+                            error_detail=str(error_str or "")
+                        )
+                        return _orig_v_report_error(client_obj, error_str)
+
+                    _v_pool.report_error = _observed_f2_report_error
+
+                try:
+                    refined_lines: List[RefinedLine] = self.verifier.verify_batch(
+                        batch_items=verifier_batch_items,
+                        scene_summary=scene_desc or "",
+                        episode_profile_str=episode_profile_str,
+                        user_feedback_str=user_feedback_str,
+                        glossary_str=glossary_str,
+                        focused_rules_str=phase2_focused_rules,
+                        series_bible_str=scoped_series_bible_str,
+                        manga_canon_str=manga_canon_str,
+                        history_context=lookback_history,
+                        lookahead_events=lookahead_events,
+                        character_registry=self.character_registry,
+                        scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
+                        batch_idx=f2_affinity_idx
+                    )
+                finally:
+                    if _v_pool is not None and _orig_v_report_error is not None:
+                        _v_pool.report_error = _orig_v_report_error
                 elapsed_phase2 = round(max(0.0, time.perf_counter() - t0_phase2), 2)
                 _vtl = getattr(self.verifier, "_thread_local", None)
                 p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}

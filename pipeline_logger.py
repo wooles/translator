@@ -310,6 +310,37 @@ class EpisodeFlightRecorder:
         self.record_event("scene_discourse", payload)
         self.write_log_section("[KROK 7: GRAF DYSKURSU SCENICZNEGO I ADAPTACYJNE PACZKI]", "\n".join(text_lines))
 
+    def log_retry(
+        self,
+        batch_id: Optional[int],
+        phase: str,
+        error_type: str,
+        attempt_number: int,
+        wait_ms: int,
+        model: str = "",
+        error_detail: str = ""
+    ) -> None:
+        """
+        Standard 11.2.26 (OBS-04): Rejestruje zdarzenie ponowienia zapytania API
+        (503 / 429 / 504 / TimeoutError) w events.jsonl oraz full_trace.log.
+        """
+        ts_now = datetime.now().isoformat()
+        payload = {
+            "batch_id": batch_id,
+            "phase": str(phase or "F1"),
+            "error_type": str(error_type or "unknown"),
+            "attempt_number": int(attempt_number),
+            "wait_ms": int(max(0, wait_ms)),
+            "timestamp": ts_now,
+            "model": str(model or ""),
+            "error_detail": str(error_detail or "")[:300]
+        }
+        msg = (
+            f"[RETRY | {payload['phase']} | Paczka {batch_id} | Próba #{payload['attempt_number']}] "
+            f"Typ: {payload['error_type']} | Oczekiwanie: {payload['wait_ms']} ms | Model: {payload['model']}"
+        )
+        self.record_event("retry", payload, batch_id=batch_id, message=msg)
+
     def log_phase1_batch(
         self,
         batch_id: int,
