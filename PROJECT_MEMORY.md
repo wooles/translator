@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-25 — Standard 11.2.28 Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 11.2.28 (OBS-12 Cyrillic Homoglyphs, OBS-14 Snapper Overlap Clamp, OBS-15a/b/c Bible/Glossary/Prompt Hygiene, OBS-09 Wuj/Ciotka Hints & OBS-11 ASS Linebreak Hygiene)`
-- **Commit certyfikacji kodu:** `0933e73` (`0933e737db39f86be0ae6b4a579d609c6ae77231`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-25 — Hotfix 11.2.28a Certyfikowany Baseline)
+- **Aktualny certyfikowany standard produkcyjny:** `Hotfix 11.2.28a (Mikro-Hotfix na bazie Standardu 11.2.28 — BUG #1 Ochrona apostrofów, BUG #2 Bogate opisy postaci, ev.name SIGN/EPTITLE, test negatywny OBS-09 oraz synchronizacja rejestru OBS-03..OBS-15 & KNOWN GAP)`
+- **Commit certyfikacji kodu:** `818f1ec` (`818f1ec5c4620b444bdcffd066fcf9a7a867ae50`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -48,20 +48,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Standardu 11.2.25:** `e4bdf85` (Commit 1), `22ddc18` (Commit 2), `0961c31` (Commit 3)
 - **Commity Standardu 11.2.26:** `96f5730` (Commit 1), `58a362d` (Commit 2), `a5eee94` (Commit 3)
 - **Commity Standardu 11.2.27:** `5b940f2` (Commit 1), `ffa8bdb` (Commit 2), `6f1b310` (Commit 3)
-- **Commity Standardu 11.2.28:**
-  * Commit 1 (`22cbbd1`): `fix(pipeline): Standard 11.2.28 — OBS-12, OBS-14, OBS-15a/b/c, OBS-09, OBS-11 (0 B diff Z16)`
-  * Commit 2 (`0933e73`): `test(pipeline): Standard 11.2.28 — non-tautological regression tests (tests/test_standard_11_2_28.py)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): Standard 11.2.28 — PROJECT_MEMORY (ARB-080, OBS-07..OBS-15) & Raport_wdrozenia_11.2.28`
-- **Status 11.2.28:** `CERTIFIED / CLOSED (2026-11-25)`
+- **Commity Standardu 11.2.28:** `22cbbd1` (Commit 1), `0933e73` (Commit 2), `d853d79` (Commit 3)
+- **Commity Mikro-Hotfixu 11.2.28a:**
+  * Commit 1 (`56cebbf`): `fix(pipeline): Hotfix 11.2.28a — BUG #1 (OBS-15c quotes), BUG #2 (OBS-15b rich desc), scene_snapper ev.name (0 B diff Z16)`
+  * Commit 2 (`818f1ec`): `test(pipeline): Hotfix 11.2.28a — regression tests for BUG #1, BUG #2, OBS-09 negative (LUKA #4) & ev.name` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): Hotfix 11.2.28a — sync OBS-03..OBS-15 & KNOWN GAP registry in PROJECT_MEMORY & Raport_wdrozenia_11.2.28`
+- **Status 11.2.28a:** `CERTIFIED / READY FOR PROD VERIFICATION (2026-11-25)`
 - **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a`; **bezwzględne 0 B diffu** na wszystkich 29 plikach chronionych Z16 oraz `scene_discourse.py` względem `6f1b310`)
-- **Stan metryk:** `466 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `536 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (466/466 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 11.2.28` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard 11.2.28: normalizacja cyrylickich homogliffów wizualnych `OBS-12` w `translator.py:sanitize_sub_text`, ograniczenie wydłużania krótkich replik do `next_same_layer_start` `OBS-14` w `scene_snapper.py`, ochrona glosariusza Tier 1 przed Profilerem Tier 3 `OBS-15a`, filtrowanie generycznych wpisów `mężczyzna/kobieta (postać)` `OBS-15b`, zastąpienie `[Imię]` przez `<Imię>` i RAM-only czyszczenie zagnieżdżonych/osieroconych ogonów `RELACJA HIERARCHICZNA` z 0 B diffu na dysku `OBS-15c`, wskazówki płci dla `WUJ`/`CIOTKA` `OBS-09` w `whisper_disambiguator.py`, oraz redukcja `\N\N -> \N` i warunkowa higiena łamania linii Fazy 2 `OBS-11` w `translator.py`).
+- **Stan metryk:** `472 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `542 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (472/472 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Hotfix 11.2.28a` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Hotfix 11.2.28a na bazie `11.2.28`: `BUG #1` ochrona poprawnych apostrofów w `_strip_hierarchical_relation_leaks` i `_reconcile_registry_gender_in_memory`, `BUG #2` ochrona bogatych opisów zaczynających się od `mężczyzna (postać), ...` w `_is_generic_character_desc`, obsługa `ev.name` `SIGN`/`EPTITLE` w `SceneShotSnapper._is_top_or_sign_event`, test negatywny `OBS-09` oraz zsynchronizowany rejestr `OBS-03..OBS-15` & `KNOWN GAP`).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (466 passed w tests/)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (472 passed w tests/)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -888,26 +889,32 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   - **`KNOWN GAP` do kolejnego przebiegu kontrolnego:** `DEF-04` (przecinek przed `, czy (bez|nie|tak)` w pytaniach zależnych) oraz `OBS-01` (uzgadnianie płci rodzica w JSON); `DEF-01`, `DEF-02`, `DEF-03` potwierdzone jako zamknięte produkcyjnie; `OBS-03` (`pricing_guard.py:379`) poza zakresem.
 
 
-## 🏛️ ARB-080 / INC-AVT-078: Standard 11.2.28 — Naprawa `OBS-12`, `OBS-14`, `OBS-15a/b/c`, `OBS-09`, `OBS-11` oraz Zbiorczy Rejestr `OBS-07 → OBS-15`
+## 🏛️ ARB-080 / INC-AVT-078: Standard 11.2.28 + Mikro-Hotfix 11.2.28a — `OBS-12`, `OBS-14`, `OBS-15a/b/c`, `OBS-09`, `OBS-11`, `BUG #1/#2`, `ev.name` oraz Zbiorczy Rejestr `OBS-03 → OBS-15`
 
-- **Status:** `RESOLVED (Standard 11.2.28, commity 22cbbd1, 0933e73, HEAD)`
-- **Zidentyfikowano i naprawiono w 4 modułach poza Z16 (`translator.py`, `scene_snapper.py`, `series_memory.py`, `whisper_disambiguator.py`; 0 B diffu w Z16 oraz odroczonym `scene_discourse.py`):**
-  1. **`OBS-12` (`translator.py`):** Dodano deterministyczną normalizację cyrylickich homogliffów wizualnych w tekście łacińskim/polskim (`_CYRILLIC_TO_LATIN_HOMOGLYPHS` + `_normalize_cyrillic_homoglyphs_in_latin` wywoływane w `sanitize_sub_text`) dla tokenów mieszanych oraz samotnych jednoliterowych homogliffów (także po `\N`), przy pełnej ochronie prawdziwych cytatów cyrylickich i zapisów JP/EN oraz zachowaniu idempotentności.
-  2. **`OBS-14` (`scene_snapper.py`):** W `SceneShotSnapper.snap_subtitles_to_cuts` dodano wykrywanie napisów ekranowych/górnych (`_is_top_or_sign_event`) i przycinanie wydłużenia krótkich replik (`min_duration_ms=700`) oraz dosunięcia `cut - 80` do `next_same_layer_start` dla kolejnych niepokrywających się kwestii tej samej warstwy (tolerancja `<= 20 ms`), eliminując sztuczne nakładki na sąsiednim dialogu dolnym.
-  3. **`OBS-15a` (`series_memory.py`, `translator.py`):** Dodano parametr `overwrite_existing_glossary: bool = True` do `SeriesBible.update_from_episode_profile`; Profiler Tier 3 przekazuje `False` (nie nadpisuje istniejącego Kanonu Mangi Tier 1 ani glosariusza serii), a Kanon Mangi Tier 1 przekazuje `True`.
-  4. **`OBS-15b` (`translator.py`):** Rozszerzono `_is_generic_character_desc` w `_prepare_batch_prompt` o generyczne opisy wyłącznie płci (`"mężczyzna (postać)"`, `"kobieta (postać)"`, itp.) przy zachowaniu prawdziwych ról fabularnych.
-  5. **`OBS-15c` (`series_memory.py`, `translator.py`):** Zmieniono placeholder `'Pan / Panie [Imię]'` na `'Pan / Panie <Imię>'` w `_sanitize_character_entry` oraz wdrożono czyszczenie zarówno zagnieżdżonych klauzul `[RELACJA HIERARCHICZNA ... [Imię] ... -sama]`, jak i osieroconych ogonów `', eliminacja hybryd ... -sama]` w `_sanitize_loaded_bible_in_ram` (ściśle w RAM z **0 B diffu na dysku**) i w `translator.py:_prepare_batch_prompt`.
-  6. **`OBS-09` (`whisper_disambiguator.py`):** W `format_compact_ssot_tag` dodano wskazówki rodzaju dla `kinship_role == "WUJ"` (`"Relacja: Wuj/starszy mężczyzna (MĘŻCZYZNA)"`) oraz `"CIOTKA"` (`"Relacja: Ciotka/starsza kobieta (KOBIETA)"`), odporne na filtr `K1`/`K3`.
-  7. **`OBS-11` (`translator.py`):** W `sanitize_sub_text` zwinięto puste `\N\N` / `\N \N` do pojedynczego `\N`, a w `_process_phase2_only` dodano warunkowy pomocnik `_append_phase2_linebreak_hygiene_rule` wstrzykujący regułę higieny łamania linii ASS wyłącznie wtedy, gdy paczka Fazy 2 zawiera `\N`.
-- **Rejestr Zbiorczy `OBS-07 → OBS-15` i Status `KNOWN GAP`:**
-  - `OBS-07`: `CLOSED / WONTFIX` (jednostkowa wariacja stylistyczna LLM).
-  - `OBS-08`: `OPEN (deferred)` (poza zakresem `11.2.28`).
-  - `OBS-09`: `RESOLVED (11.2.28)`.
-  - `OBS-10`: `OPEN (deferred)` (poza zakresem `11.2.28`).
-  - `OBS-11`, `OBS-12`, `OBS-14`, `OBS-15a/b/c`: `RESOLVED (11.2.28)`.
-  - `OBS-13a/b/c`: `DEFERRED → 11.2.29` (`scene_discourse.py` oraz `translator.py:_resolve_line_addressee` pozostają zamrożone z 0 B diffu).
-  - **`KNOWN GAP` do `11.2.29`:** `OBS-13a/b/c`, `DEF-04`, `OBS-01`, `OBS-03`, `OBS-06`, `OBS-08`, `OBS-10`.
-- **Testy regresyjne:** `tests/test_standard_11_2_28.py` (14 / 14 PASSED) oraz dokumentacja `Artefakty/Raport_wdrozenia_11.2.28.md`.
+- **Status:** `RESOLVED IN CODE — AWAITING PROD VERIFICATION (11.2.28: 22cbbd1, 0933e73, d853d79; 11.2.28a: 56cebbf, 818f1ec, HEAD)`
+- **Zidentyfikowano i naprawiono w 4 modułach poza Z16 (`translator.py`, `scene_snapper.py`, `series_memory.py`, `whisper_disambiguator.py`; 0 B diffu w Z16, `avt_linter.py` oraz odroczonym `scene_discourse.py`):**
+  1. **`OBS-12` (`WYSOKI`, `translator.py`):** Dodano deterministyczną normalizację cyrylickich homogliffów wizualnych w tekście łacińskim/polskim (`_CYRILLIC_TO_LATIN_HOMOGLYPHS` + `_normalize_cyrillic_homoglyphs_in_latin` wywoływane w `sanitize_sub_text`) dla tokenów mieszanych oraz samotnych jednoliterowych homogliffów (także po `\N`), przy pełnej ochronie prawdziwych cytatów cyrylickich i zapisów JP/EN oraz zachowaniu idempotentności.
+  2. **`OBS-14` (`NISKI`, `scene_snapper.py`):** W `SceneShotSnapper.snap_subtitles_to_cuts` dodano wykrywanie napisów ekranowych/górnych (`_is_top_or_sign_event`, rozszerzone w `11.2.28a` o `ev.name`/`ev.actor` zaczynające się od `sign` lub równe `eptitle`) i przycinanie wydłużenia krótkich replik (`min_duration_ms=700`) oraz dosunięcia `cut - 80` do `next_same_layer_start` dla kolejnych niepokrywających się kwestii tej samej warstwy (tolerancja `<= 20 ms`), eliminując sztuczne nakładki na sąsiednim dialogu dolnym (`0 B` diffu w `avt_linter.py`).
+  3. **`OBS-15a` (`NISKI`, `series_memory.py`, `translator.py`):** Dodano parametr `overwrite_existing_glossary: bool = True` do `SeriesBible.update_from_episode_profile`; Profiler Tier 3 przekazuje `False` (nie nadpisuje istniejącego Kanonu Mangi Tier 1 ani glosariusza serii), a Kanon Mangi Tier 1 przekazuje `True`.
+  4. **`OBS-15b` (`NISKI`, `translator.py` + `BUG #2` w `11.2.28a`):** Rozszerzono `_is_generic_character_desc` w `_prepare_batch_prompt` o ścisłe generyczne opisy wyłącznie płci (`"mężczyzna (postać)"`, `"kobieta (postać)"`, `"mężczyzna/kobieta (postać drugoplanowa|epizodyczna)"`), usuwając w `11.2.28a` nadmiarowe `startswith(("mężczyzna (postać", "kobieta (postać"))` tak, aby bogate opisy P0 (`"mężczyzna (postać), ..."`) pozostawały nienaruszone w prompcie.
+  5. **`OBS-15c` (`NISKI`, `series_memory.py`, `translator.py` + `BUG #1` w `11.2.28a`):** Zmieniono placeholder `'Pan / Panie [Imię]'` na `'Pan / Panie <Imię>'` w `_sanitize_character_entry`; w `_strip_hierarchical_relation_leaks` oraz w `_reconcile_registry_gender_in_memory` wyeliminowano bezwarunkowe wycinanie `r"'\s*,"` (`BUG #1` w `11.2.28a`: sprzątanie wyłącznie przy wykrytym wycieku, pochłanianie prowadzącego `',`/`'` przez same reguły wycinające i ograniczenie do `r"\]\s*'(?!\s*\w)"` -> `"]"`), chroniąc poprawne apostrofy i tytuły w RAM przy **0 B diffu na dysku**.
+  6. **`OBS-09` (`NISKI`, `whisper_disambiguator.py`):** W `format_compact_ssot_tag` dodano wskazówki rodzaju dla `kinship_role == "WUJ"` (`"Relacja: Wuj/starszy mężczyzna (MĘŻCZYZNA)"`) oraz `"CIOTKA"` (`"Relacja: Ciotka/starsza kobieta (KOBIETA)"`), odporne na filtr `K1`/`K3`, wraz z testem negatywnym w `11.2.28a` (`LUKA #4`).
+  7. **`OBS-11` (`NISKI`, `translator.py`):** W `sanitize_sub_text` zwinięto puste `\N\N` / `\N \N` do pojedynczego `\N`, a w `_process_phase2_only` dodano warunkowy pomocnik `_append_phase2_linebreak_hygiene_rule` wstrzykujący regułę higieny łamania linii ASS wyłącznie wtedy, gdy paczka Fazy 2 zawiera `\N`.
+- **Rejestr Zbiorczy `OBS-03 → OBS-15` i Status `KNOWN GAP` (`11.2.28a`):**
+  - **`OBS-03` (`NISKI`):** `OPEN (non-blocking)` — `pricing_guard.py:379` — kosmetyka logu (Z16, poza zakresem).
+  - **`OBS-05` (`NISKI`):** `CLOSED` — 4. czysty przebieg z rzędu (0/25 F2, skumulowanie 1/139 = 0.72% w 6 przebiegach).
+  - **`OBS-06` (`NISKI`):** `OPEN (non-blocking)` — współbieżność obserwatora F2 przy `max_workers_f2 >= 2`.
+  - **`OBS-07` (`NISKI`):** `OPEN (non-blocking)` — byty nieludzkie z `UNKNOWN` płcią + wysokie F0.
+  - **`OBS-08` (`NISKI`):** `CLOSED (zastrzeżenie)` — `DEF-03` przepuszczony przez `batch_cap` — reopen przy `>= 3` wypchniętych liniach `is_spk_ch` w jednym przebiegu.
+  - **`OBS-10` (`NISKI`):** `CLOSED` — mutacje `AVTLinter` w `strict_positive_domain=True` — `0/412` w przebiegu kontrolnym, jednorazowy problem starej bazy.
+  - **`OBS-09` (`NISKI`):** `OPEN (non-blocking)` — mechanizm wdrożony w `11.2.28`, test negatywny dodany w `11.2.28a`; oczekuje na przebieg produkcyjny z `ojisan`/`obasan` (nie zamykać bez produkcji).
+  - **`OBS-11` (`NISKI`):** `OPEN (non-blocking)` — mechanizm wdrożony w `11.2.28`; oczekuje na przebieg produkcyjny z `\N\N` (nie zamykać bez produkcji).
+  - **`OBS-12` (`WYSOKI`):** `OPEN (non-blocking)` — homoglif cyrylicki U+043E w F2 — mechanizm wdrożony w `11.2.28`; oczekuje na przebieg produkcyjny z homoglifem (nie zamykać bez produkcji).
+  - **`OBS-13a/b/c` (`ŚREDNI`):** `DEFERRED → 11.2.29` — płeć/liczba adresata i chóru — celowe zamrożenie (`0 B` diffu w `scene_discourse.py` oraz `_resolve_line_addressee`).
+  - **`OBS-14` (`NISKI`):** `OPEN (non-blocking)` — nakładki po wydłużeniu krótkich replik do `700 ms` — mechanizm wdrożony w `11.2.28` + `ev.name` w `11.2.28a`; replay potwierdził `0 ms` nakładek, ale wymagany przebieg produkcyjny (nie zamykać bez produkcji).
+  - **`OBS-15a/b/c` (`NISKI`):** `OPEN (non-blocking)` — dryf terminologii, generyczne duplikaty płci i osierocony ogon `SeriesBible` — mechanizmy wdrożone w `11.2.28` + `BUG #1/#2` w `11.2.28a`; wymagany przebieg produkcyjny (nie zamykać bez produkcji).
+  - **`KNOWN GAP` (pełna lista):** **`DEF-04`, `OBS-01`, `OBS-04`, `DEF-05`** — pokryte jednostkowo, wymagają dedykowanych wyzwalaczy w przebiegu produkcyjnym.
+- **Testy regresyjne:** `tests/test_standard_11_2_28.py` (**20 / 20 PASSED**: `14` z `11.2.28` + `6` z `11.2.28a`) oraz dokumentacja [Raport_wdrozenia_11.2.28.md](file:///c:/Users/Piotrek/Desktop/translator/Artefakty/Raport_wdrozenia_11.2.28.md).
 
 
 
