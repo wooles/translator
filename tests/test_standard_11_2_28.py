@@ -381,3 +381,201 @@ def test_obs11_phase2_linebreak_hygiene_rule_injected_only_when_needed():
     res_yes = _append_phase2_linebreak_hygiene_rule("BAZOWE_REGULY", with_breaks)
     assert res_yes.startswith("BAZOWE_REGULY\n")
     assert "HIGIENA ŁAMANIA LINII ASS (\\N)" in res_yes
+
+
+# =====================================================================
+# Hotfix 11.2.28a: BUG #1, BUG #2, LUKA #4 (OBS-09 negatyw) & ev.name
+# =====================================================================
+
+@pytest.mark.unit
+def test_bug1_preserves_apostrophes_in_clean_description(tmp_path):
+    """
+    BUG #1 (11.2.28a): Czysty opis postaci/relacji bez wycieków RELACJA HIERARCHICZNA /
+    eliminacja hybryd zachowuje w RAM nienaruszone pojedyncze apostrofy przed przecinkiem
+    (np. "'Kronika Gwiazd',"), a plik na dysku pozostaje nietknięty (0 B diff).
+    """
+    bible_file = tmp_path / "bug1_clean_apostrophes.json"
+    clean_desc = "mężczyzna (postać), twórca, autor 'Kronika Gwiazd', tytulatura: 'mistrz Autor_X'"
+    clean_rel = "twórca 'Kronika Gwiazd', serdeczna współpraca"
+    payload = {
+        "episodes_translated": ["EP01"],
+        "characters": {
+            "Autor_X": {
+                "description": clean_desc,
+                "gender": "MALE",
+                "grammatical_gender": "MASCULINE",
+                "confidence": 0.99,
+                "priority": "P0",
+                "has_verified_gender": True,
+                "aliases": [],
+            }
+        },
+        "relations": {"Autor_X -> Uczennica_B": clean_rel},
+        "glossary": {},
+        "declensions": {},
+        "plot_anchors": {},
+    }
+    raw_bytes = json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
+    bible_file.write_bytes(raw_bytes)
+
+    bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
+
+    assert bible_file.read_bytes() == raw_bytes
+    assert bible.data["characters"]["Autor_X"]["description"] == clean_desc
+    assert "'Kronika Gwiazd'," in bible.data["characters"]["Autor_X"]["description"]
+    assert bible.data["relations"]["Autor_X -> Uczennica_B"] == clean_rel
+
+
+@pytest.mark.unit
+def test_bug1_removes_orphan_tail_with_apostrophe(tmp_path):
+    """
+    BUG #1 (11.2.28a): Gdy wpis zawiera jednocześnie poprawny cytat z apostrofem przed
+    przecinkiem ORAZ wyciek / osierocony ogon ', eliminacja hybryd ... -sama]',
+    ogon zostaje usunięty w RAM przy 100% zachowaniu poprawnego cytatu i 0 B diffu na dysku.
+    """
+    bible_file = tmp_path / "bug1_mixed_tail_apostrophes.json"
+    mixed_desc = (
+        "autor 'Kronika Gwiazd', uczennica', "
+        "eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]"
+    )
+    payload = {
+        "episodes_translated": ["EP01"],
+        "characters": {
+            "Uczennica_B": {
+                "description": mixed_desc,
+                "gender": "FEMALE",
+                "grammatical_gender": "FEMININE",
+                "confidence": 0.99,
+                "priority": "P0",
+                "has_verified_gender": True,
+                "aliases": [],
+            }
+        },
+        "relations": {"Uczennica_B -> Autor_X": mixed_desc},
+        "glossary": {},
+        "declensions": {},
+        "plot_anchors": {},
+    }
+    raw_bytes = json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
+    bible_file.write_bytes(raw_bytes)
+
+    bible = SeriesBible(bible_path=bible_file, storage_dir=tmp_path)
+
+    assert bible_file.read_bytes() == raw_bytes
+    for val in (
+        bible.data["characters"]["Uczennica_B"]["description"],
+        bible.data["relations"]["Uczennica_B -> Autor_X"],
+    ):
+        assert "eliminacja hybryd" not in val
+        assert "-sama]" not in val
+        assert "autor 'Kronika Gwiazd', uczennica" in val
+
+
+@pytest.mark.unit
+def test_bug2_rich_description_starting_with_mezczyzna_postac_is_not_generic():
+    """
+    BUG #2 (11.2.28a): Bogaty opis postaci zaczynający się od 'mężczyzna (postać), ...'
+    (np. rola, zawód, autorstwo) nie jest klasyfikowany jako generyczny i pozostaje w prompcie.
+    """
+    tr = MultimodalTranslator(
+        api_key="mock_k0",
+        model="gemini-4-hydrogen",
+        enable_verifier=False,
+    )
+    rich_desc = "mężczyzna (postać), twórca, autor 'Kronika Gwiazd', tytulatura: 'mistrz'"
+    tr.character_registry = {
+        "Autor_X": {
+            "description": rich_desc,
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["Autor_X"],
+        },
+        "Autor_X Nazwisko": {
+            "description": "Twórca z gildii pisarzy",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["Autor_X", "Autor_X Nazwisko"],
+        },
+    }
+
+    ev = pysubs2.SSAEvent(start=1000, end=2000, text="Test line.", name="Autor_X")
+    prompt = tr._prepare_batch_prompt(
+        batch_events=[(0, ev, "Test line.", "")],
+        history_context=[],
+    )
+
+    assert "• Autor_X:" in prompt
+    assert "'Kronika Gwiazd'" in prompt
+
+
+@pytest.mark.unit
+def test_bug2_exact_generic_mezczyzna_postac_is_generic():
+    """
+    BUG #2 (11.2.28a): Ścisłe generyczne placeholdery 'mężczyzna (postać)' oraz
+    'mężczyzna (postać drugoplanowa)' nadal są wycinane z promptu obok bogatszego aliasu P0.
+    """
+    tr = MultimodalTranslator(
+        api_key="mock_k0",
+        model="gemini-4-hydrogen",
+        enable_verifier=False,
+    )
+    tr.character_registry = {
+        "MENTOR_Y": "mężczyzna (postać)",
+        "MENTOR_Z": "mężczyzna (postać drugoplanowa)",
+        "Mentor_Y Nazwisko": {
+            "description": "Główny mentor akademii rycerskiej",
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["MENTOR_Y", "MENTOR_Z", "Mentor_Y Nazwisko"],
+        },
+    }
+
+    ev = pysubs2.SSAEvent(start=1000, end=2000, text="Test line.", name="MENTOR_Y")
+    prompt = tr._prepare_batch_prompt(
+        batch_events=[(0, ev, "Test line.", "")],
+        history_context=[],
+    )
+
+    assert "• MENTOR_Y:" not in prompt
+    assert "• MENTOR_Z:" not in prompt
+    assert "• Mentor_Y Nazwisko:" in prompt
+
+
+@pytest.mark.unit
+def test_obs09_no_annotation_without_ojisan_obasan():
+    """
+    LUKA #4 (11.2.28a): Neutralna kwestia bez 'ojisan'/'obasan' i markerów płci/rejestru
+    nie uruchamia fałszywej anotacji kinship_role i zwraca pusty compact SSOT tag (0 tokenów).
+    """
+    for en_line, jp_line in (
+        ("It is raining today.", "今日は雨だ"),
+        ("Wait a moment.", "ちょっと待って"),
+    ):
+        tag = WhisperDisambiguator.disambiguate_line(
+            clean_en=en_line,
+            jp_audio=jp_line,
+        )
+        assert tag.kinship_role is None
+        assert WhisperDisambiguator.format_compact_ssot_tag(tag) == ""
+
+
+@pytest.mark.unit
+def test_scene_snapper_ev_name_sign_eptitle_not_blocked():
+    """
+    Zadanie 3 (11.2.28a): Napisy z aktorem SIGN / SIGN BIG / EPTITLE przy stylu Default
+    są izolowane od warstwy dolnego dialogu i nie blokują wydłużania repliki do 700 ms.
+    """
+    ev_sign_name = pysubs2.SSAEvent(start=1400, end=2500, style="Default", name="SIGN", text="SKLEP")
+    ev_eptitle_name = pysubs2.SSAEvent(start=1400, end=2500, style="Default", name="EPTITLE", text="TYTUŁ")
+    assert SceneShotSnapper._is_top_or_sign_event(ev_sign_name) is True
+    assert SceneShotSnapper._is_top_or_sign_event(ev_eptitle_name) is True
+
+    ev_diag_1 = pysubs2.SSAEvent(start=1000, end=1400, style="Default", name="Bohater", text="Dobrze!")
+    events, snapped = SceneShotSnapper.snap_subtitles_to_cuts(
+        events=[ev_diag_1, ev_sign_name],
+        scene_cuts_ms=[1500],
+        snap_window_ms=250,
+        min_duration_ms=700,
+    )
+    assert snapped >= 1
+    assert events[0].end == 1700
