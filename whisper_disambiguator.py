@@ -556,6 +556,10 @@ class WhisperDisambiguator:
             parts.append("Relacja: Starsza siostra")
         elif tag.kinship_role == "MLODSZA_SIOSTRA":
             parts.append("Relacja: Młodsza siostra")
+        elif tag.kinship_role == "WUJ":
+            parts.append("Relacja: Wuj/starszy mężczyzna (MĘŻCZYZNA)")
+        elif tag.kinship_role == "CIOTKA":
+            parts.append("Relacja: Ciotka/starsza kobieta (KOBIETA)")
 
         if tag.benefactive == "FOR_ME":
             parts.append("Kierunek: Dla mnie (kureru)")

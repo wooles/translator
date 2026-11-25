@@ -1397,6 +1397,85 @@ def get_audio_semantic_anchor(jp_text: str, en_text: str = "") -> Optional[str]:
 
     return None
 
+_CYRILLIC_TO_LATIN_HOMOGLYPHS: Dict[str, str] = {
+    "\u0410": "A", "\u0412": "B", "\u0415": "E", "\u041a": "K", "\u041c": "M",
+    "\u041d": "H", "\u041e": "O", "\u0420": "P", "\u0421": "C", "\u0422": "T",
+    "\u0425": "X", "\u0406": "I", "\u0401": "E", "\u0405": "S", "\u0408": "J",
+    "\u0430": "a", "\u0435": "e", "\u0456": "i", "\u043e": "o", "\u0440": "p",
+    "\u0441": "c", "\u0443": "y", "\u0445": "x", "\u0451": "e", "\u0455": "s",
+    "\u0458": "j",
+}
+
+
+def _normalize_cyrillic_homoglyphs_in_latin(text: str) -> str:
+    """
+    Normalizes accidental Cyrillic visual homoglyphs inside Latin/Polish subtitle text
+    while preserving genuine Cyrillic words/quotes (which contain non-homoglyph Cyrillic
+    letters or adjoin genuine Cyrillic tokens).
+    """
+    if not text or not any("\u0400" <= ch <= "\u04ff" for ch in text):
+        return text
+
+    parts = re.split(r"(\{\\[^}]*\}|\\[Nn]|<[^>]+>|[^\w]+)", text)
+
+    def _is_latin_ch(ch: str) -> bool:
+        return ("A" <= ch <= "Z") or ("a" <= ch <= "z") or ch in "ĄĆĘŁŃÓŚŹŻąćęłńóśźżÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÑÒÓÔÕÖØÙÚÛÜÝàáâãäåæçèéêëìíîïñòóôõöøùúûüý"
+
+    def _is_cyrillic_ch(ch: str) -> bool:
+        return "\u0400" <= ch <= "\u04ff"
+
+    word_indices: List[int] = []
+    token_flags: Dict[int, Tuple[bool, bool, bool]] = {}
+    has_any_latin = False
+
+    for idx, tok in enumerate(parts):
+        if not tok or tok.startswith("{") or tok.startswith("<") or tok in ("\\N", "\\n") or not any(c.isalnum() for c in tok):
+            continue
+        has_lat = any(_is_latin_ch(c) for c in tok)
+        has_cyr = any(_is_cyrillic_ch(c) for c in tok)
+        has_non_homoglyph_cyr = any(_is_cyrillic_ch(c) and c not in _CYRILLIC_TO_LATIN_HOMOGLYPHS for c in tok)
+        if has_lat:
+            has_any_latin = True
+        word_indices.append(idx)
+        token_flags[idx] = (has_lat, has_cyr, has_non_homoglyph_cyr)
+
+    if not has_any_latin:
+        return text
+
+    for pos, idx in enumerate(word_indices):
+        has_lat, has_cyr, has_non_homoglyph_cyr = token_flags[idx]
+        if not has_cyr or has_non_homoglyph_cyr:
+            continue
+        tok = parts[idx]
+        if has_lat:
+            # Mixed-script token (Latin + Cyrillic homoglyphs only)
+            parts[idx] = "".join(_CYRILLIC_TO_LATIN_HOMOGLYPHS.get(c, c) for c in tok)
+        elif len(tok) == 1:
+            # Isolated single-letter Cyrillic homoglyph in Latin context (e.g. "А jak?", "w о...")
+            prev_non_h = token_flags[word_indices[pos - 1]][2] if pos > 0 else False
+            next_non_h = token_flags[word_indices[pos + 1]][2] if pos + 1 < len(word_indices) else False
+            if not prev_non_h and not next_non_h:
+                parts[idx] = _CYRILLIC_TO_LATIN_HOMOGLYPHS.get(tok, tok)
+
+    return "".join(parts)
+
+
+def _append_phase2_linebreak_hygiene_rule(
+    focused_rules_str: str,
+    batch_items: List[Dict[str, Any]],
+) -> str:
+    """Appends ASS line-break hygiene guidance for Phase 2 only when the batch contains \\N."""
+    if not batch_items or not any("\\N" in str(it.get("pl") or it.get("text") or "") for it in batch_items):
+        return focused_rules_str or ""
+    rule_note = (
+        "HIGIENA ŁAMANIA LINII ASS (\\N): W kwestiach zawierających \\N weryfikuj naturalność "
+        "podziału na dwie linijki — unikaj sierot (pojedynczych spójników/przyimków typu w, i, o, a, z "
+        "na końcu pierwszej linijki), nie rozrywaj grup składniowych i zachowaj pojedyncze \\N (bez pustych \\N\\N)."
+    )
+    base = (focused_rules_str or "").strip()
+    return f"{base}\n{rule_note}" if base else rule_note
+
+
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
     """
     Cleans subtitle text from broken tags, unclosed brackets, and artifacts,
@@ -1417,6 +1496,8 @@ def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
         # Deduplicate repeated adjacent tags (e.g. {\i1}{\i1} -> {\i1})
         text = re.sub(r"(\{\\i[01]\})+", r"\1", text)
         text = re.sub(r"(\{\\b[01]\})+", r"\1", text)
+        # Collapse empty/repeated ASS line breaks (\N\N, \N \N -> \N)
+        text = re.sub(r"\\N(?:[ \t]*\\N)+", r"\\N", text)
     else:
         # For SRT: convert ASS tags to HTML
         text = re.sub(r"\{\\i1\}(.*?)\{\\i0\}", r"<i>\1</i>", text)
@@ -1426,6 +1507,8 @@ def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
         # Strip unwanted HTML tags except <i>, </i>, <b>, </b>
         text = re.sub(r"</?(?!(?:i|b)\b)[a-zA-Z][^>]*>", "", text)
 
+    # Normalize Cyrillic visual homoglyphs inside Latin/Polish subtitle text
+    text = _normalize_cyrillic_homoglyphs_in_latin(text)
     # Normalize whitespace and line breaks
     text = re.sub(r"[ \t]+", " ", text).strip()
     return text
@@ -3386,11 +3469,34 @@ class MultimodalTranslator:
         if self.character_registry:
             lines.append("--- ZNANE POSTACIE W ODCINKU (spójność ról, statusu i płci) ---")
 
+            def _strip_relation_meta_tags(raw_text: str, lowercase: bool = False) -> str:
+                txt = str(raw_text or "").strip()
+                if lowercase:
+                    txt = txt.lower()
+                if "-sama" in txt.lower():
+                    txt = re.sub(r"(?:\\N|\s*\[)?RELACJA HIERARCHICZNA.*?-sama\s*\]?\)?\]?", "", txt, flags=re.IGNORECASE)
+                    txt = re.sub(r"',?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd.*?-sama\s*\]?\)?\]?", "", txt, flags=re.IGNORECASE)
+                txt = re.sub(r"',?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd[^]]*\]?", "", txt, flags=re.IGNORECASE)
+                txt = re.sub(r"\[(?:KOBIETA|MĘŻCZYZNA|PARA DWÓCH|RELACJA HIERARCHICZNA|OCHRONA PRZESKOKÓW|GRUPA|W 2\. os\.|Wymóg|Filar|T-V Invariance)[^\]]*\]", "", txt, flags=re.IGNORECASE)
+                return re.sub(r"\s+", " ", txt).strip()
+
             def _is_generic_character_desc(desc_text: str) -> bool:
-                d = str(desc_text or "").strip().lower()
-                clean_d = re.sub(r"\[(?:KOBIETA|MĘŻCZYZNA|PARA DWÓCH|RELACJA HIERARCHICZNA|OCHRONA PRZESKOKÓW|GRUPA|W 2\. os\.|Wymóg|Filar|T-V Invariance)[^\]]*\]", "", d, flags=re.IGNORECASE)
-                clean_d = re.sub(r"\s+", " ", clean_d).strip()
-                return clean_d in ("postać epizodyczna / tło", "postać (postać)", "postać", "postać epizodyczna", "tło") or clean_d.startswith("postać (postać")
+                clean_d = _strip_relation_meta_tags(desc_text, lowercase=True).strip(" .,;:-")
+                return clean_d in (
+                    "",
+                    "unknown",
+                    "postać epizodyczna / tło",
+                    "postać (postać)",
+                    "postać",
+                    "postać epizodyczna",
+                    "tło",
+                    "mężczyzna (postać)",
+                    "kobieta (postać)",
+                    "mężczyzna",
+                    "kobieta",
+                    "postać męska",
+                    "postać żeńska",
+                ) or clean_d.startswith(("postać (postać", "mężczyzna (postać", "kobieta (postać"))
 
             # Hotfix 11.2.23a + Standard 11.2.27 (OBS-02): Deduplikacja generycznych aliasów (w tym wariantów wielkości liter)
             entry_meta: Dict[str, Tuple[bool, Tuple[int, int, int]]] = {}
@@ -3461,9 +3567,8 @@ class MultimodalTranslator:
                     if any(o_raw != name and o_rank > my_rank for o_raw, o_rank in owners):
                         continue
 
-                clean_det = re.sub(r"\[(?:KOBIETA|MĘŻCZYZNA|PARA DWÓCH|RELACJA HIERARCHICZNA|OCHRONA PRZESKOKÓW|GRUPA|W 2\. os\.|Wymóg|Filar|T-V Invariance)[^\]]*\]", "", det_str, flags=re.IGNORECASE)
-                clean_det = re.sub(r"\s+", " ", clean_det).strip()
-                lines.append(f"• {name}: {clean_det or det_str}")
+                clean_det = _strip_relation_meta_tags(det_str)
+                lines.append(f"• {name}: {clean_det or 'postać'}")
             lines.append("-----------------------------------------------------------------\n")
 
         # =========================================================================
@@ -5892,6 +5997,7 @@ class MultimodalTranslator:
 
                 t0_phase2 = time.perf_counter()
                 phase2_focused_rules = get_focused_rules_for_batch(verifier_batch_items, max_rules=5 if len(verifier_batch_items) > 40 else 3)
+                phase2_focused_rules = _append_phase2_linebreak_hygiene_rule(phase2_focused_rules, verifier_batch_items)
                 # INC-AVT-060: Offset klucza dla Fazy 2 zapobiegający kolizji pamięci TPU z Fazą 1
                 f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx
                 # Standard 11.2.26 (OBS-04): Scoped obserwator ponowień F2 bez modyfikacji chronionego Z16 verifier.py
@@ -6856,7 +6962,8 @@ class MultimodalTranslator:
                 characters=char_dict,
                 glossary=gloss_dict,
                 plot_anchors=plot_anchors_dict,
-                relationships=rels_dict
+                relationships=rels_dict,
+                overwrite_existing_glossary=False,
             )
 
         # Standard 9.0: Synchronize SeriesBible and CharacterRegistry from Krok 3 & 5
@@ -6898,7 +7005,8 @@ class MultimodalTranslator:
                 self.series_bible.update_from_episode_profile(
                     episode_name="Kanon Mangi",
                     characters={},
-                    glossary=manga_canon_entry["glossary"]
+                    glossary=manga_canon_entry["glossary"],
+                    overwrite_existing_glossary=True,
                 )
 
         series_bible_str = self.series_bible.format_for_prompt()

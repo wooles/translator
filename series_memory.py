@@ -7243,18 +7243,35 @@ class SeriesBible:
                             del self.data["declensions"][k]
                         bible_modified = True
 
-# 8c. Higiena relacji - usuwanie przecieków promptów
+            # 8c. Higiena relacji i metadanych w RAM (usuwanie zagnieżdżonych/osieroconych przecieków promptów bez zapisu na dysk)
             for rel_name in ("relations", "relationships"):
                 if rel_name in self.data and isinstance(self.data[rel_name], dict):
                     rels = self.data[rel_name]
                     for rk, rv in list(rels.items()):
                         if isinstance(rv, str):
-                            clean_v = re.sub(r"\\NRELACJA HIERARCHICZNA[^\]]*\]", "]", rv)
-                            clean_v = re.sub(r"\[RELACJA HIERARCHICZNA[^\]]*\]\s*", "", clean_v)
-                            clean_v = re.sub(r"\s{2,}", " ", clean_v).strip()
+                            clean_v = self._strip_hierarchical_relation_leaks(rv)
                             if clean_v != rv:
                                 rels[rk] = clean_v
-                                bible_modified = True
+                        elif isinstance(rv, dict) and isinstance(rv.get("description"), str):
+                            clean_v = self._strip_hierarchical_relation_leaks(rv["description"])
+                            if clean_v != rv["description"]:
+                                rv["description"] = clean_v
+
+            for ch_k, ch_v in list((self.data.get("characters") or {}).items()):
+                if isinstance(ch_v, dict) and isinstance(ch_v.get("description"), str):
+                    clean_c = self._strip_hierarchical_relation_leaks(ch_v["description"], only_orphaned_or_nested=True)
+                    if clean_c != ch_v["description"]:
+                        ch_v["description"] = clean_c
+                elif isinstance(ch_v, str):
+                    clean_c = self._strip_hierarchical_relation_leaks(ch_v, only_orphaned_or_nested=True)
+                    if clean_c != ch_v:
+                        self.data["characters"][ch_k] = clean_c
+
+            for pa_k, pa_v in list((self.data.get("plot_anchors") or {}).items()):
+                if isinstance(pa_v, str):
+                    clean_pa = self._strip_hierarchical_relation_leaks(pa_v, only_orphaned_or_nested=True)
+                    if clean_pa != pa_v:
+                        self.data["plot_anchors"][pa_k] = clean_pa
 
             if bible_modified:
                 try:
@@ -9856,7 +9873,7 @@ class SeriesBible:
         is_master_or_superior = any(w in clean_desc.lower() for w in ["mistrz", "arcymag", "pan ", "mentor", "zwierzchnik", "lord"])
         if is_subordinate_or_disciple or is_master_or_superior:
             if "t-v invariance" not in clean_desc.lower() and "panie" not in clean_desc.lower():
-                clean_desc = f"{clean_desc} [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie [Imię]', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]".strip()
+                clean_desc = f"{clean_desc} [RELACJA HIERARCHICZNA (T-V Invariance): stały zwrot formalny 'Pan / Panie <Imię>', eliminacja hybryd 'Imię... ma pan' oraz odporność na opuszczanie -sama]".strip()
 
         # Safeguard temporal continuity & scene boundary protection (Filar CLXV)
         is_private_relationship = any(w in clean_desc.lower() for w in ["na osobności", "w cztery oczy", "prywatn", "zaufan", "sekret"])
@@ -9866,6 +9883,37 @@ class SeriesBible:
 
         return clean_desc
 
+    @staticmethod
+    def _strip_hierarchical_relation_leaks(text: str, only_orphaned_or_nested: bool = False) -> str:
+        """Strips nested [RELACJA HIERARCHICZNA ... [Imię] ... -sama] clauses and orphaned tails cleanly in RAM."""
+        if not text or not isinstance(text, str):
+            return text
+        cleaned = text
+        has_nested_rel = bool(re.search(r"\[RELACJA HIERARCHICZNA[^\]]*\[", cleaned, flags=re.IGNORECASE))
+        if "-sama" in cleaned.lower():
+            if not only_orphaned_or_nested or has_nested_rel:
+                cleaned = re.sub(
+                    r"(?:\\N|\s*\[)?RELACJA HIERARCHICZNA.*?-sama\s*\]?\)?\]?",
+                    "",
+                    cleaned,
+                    flags=re.IGNORECASE,
+                )
+            cleaned = re.sub(
+                r"',?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd.*?-sama\s*\]?\)?\]?",
+                "",
+                cleaned,
+                flags=re.IGNORECASE,
+            )
+        cleaned = re.sub(r"\\NRELACJA HIERARCHICZNA[^\]]*\]", "]", cleaned, flags=re.IGNORECASE)
+        if not only_orphaned_or_nested or has_nested_rel:
+            cleaned = re.sub(r"(?:\\N|\s*\[)?RELACJA HIERARCHICZNA[^]]*\]?\s*", "", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"',?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd[^]]*\]?", "", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r",?\s*wykluczona forma\s+'[^']*'\s*\([^)]*\)\s*\]?", "]", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(r"\]\s*'", "]", cleaned)
+        cleaned = re.sub(r"'\s*,", ",", cleaned)
+        cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
+        return cleaned
+
     def update_from_episode_profile(
         self,
         episode_name: str = "",
@@ -9873,6 +9921,7 @@ class SeriesBible:
         glossary: Optional[Dict[str, str]] = None,
         plot_anchors: Optional[Dict[str, str]] = None,
         relationships: Optional[Dict[str, str]] = None,
+        overwrite_existing_glossary: bool = True,
     ):
         """Updates glossary, character registry, relationships, and plot anchors based on Profiler output of a new episode (Thread-Safe)."""
         with self._lock:
@@ -9944,7 +9993,7 @@ class SeriesBible:
                                         # Strict Non-Terminal / Speaker Slot Isolation (R3.2 & Anti-Bleed):
                                         # Non-terminal participants must NEVER inherit addressee traits or 2nd person markers!
                                         p_details = re.sub(r"\[[^\]]*\bAdresat(?:ka|ce|ki|ek|om|ami|ach|em|owi)?\b[^\]]*\]", "", p_details, flags=re.IGNORECASE)
-                                        p_details = re.sub(r"\[RELACJA HIERARCHICZNA[^\]]*\]", "", p_details, flags=re.IGNORECASE)
+                                        p_details = self._strip_hierarchical_relation_leaks(p_details)
                                         p_details = re.sub(r"\b(?:byłaś|zrobiłaś|jesteś pewna|byłeś|zrobiłeś|jesteś pewien|2\.\s*os\.\s*lp\.)\b", "", p_details, flags=re.IGNORECASE)
                                         p_details = re.sub(r"\b(?:jesteś\s+(?:moją|moim)\s+\w+)\b", "", p_details, flags=re.IGNORECASE)
 
@@ -10087,9 +10136,15 @@ class SeriesBible:
                         if clean_k and clean_v:
                             # Case-insensitive update to prevent duplicate collisions
                             norm_k = clean_k.lower()
-                            for old_k in list(self.data["glossary"].keys()):
-                                if old_k.lower() == norm_k and old_k != clean_k:
-                                    del self.data["glossary"][old_k]
+                            existing_key = next(
+                                (old_k for old_k in self.data["glossary"].keys() if old_k.lower() == norm_k),
+                                None,
+                            )
+                            existing_val = str(self.data["glossary"].get(existing_key, "") or "").strip() if existing_key is not None else ""
+                            if not overwrite_existing_glossary and existing_val:
+                                continue
+                            if existing_key is not None and existing_key != clean_k:
+                                del self.data["glossary"][existing_key]
                             self.data["glossary"][clean_k] = clean_v
                             # Auto-generate 7-case declension for characters/anthroponyms in glossary
                             if len(clean_v) >= 3 and not any(ch in clean_v for ch in "{}[]():;"):

@@ -69,6 +69,17 @@ class SceneShotSnapper:
 
         return sorted(list(set(cuts_ms)))
 
+    @staticmethod
+    def _is_top_or_sign_event(ev: Any) -> bool:
+        """Returns True for signs/top-aligned overlays isolated from bottom dialogue layer."""
+        style = str(getattr(ev, "style", "") or "").strip().lower()
+        text = str(getattr(ev, "text", "") or "").lower()
+        if any(tok in style for tok in ("sign", "top", "title", "napis", "tytu", "karaoke", "song")):
+            return True
+        if style and re.search(r"\b(?:op|ed)\b", style):
+            return True
+        return bool(re.search(r"\\(?:an[789]|pos\(|move\()", text))
+
     @classmethod
     def snap_subtitles_to_cuts(
         cls,
@@ -87,13 +98,34 @@ class SceneShotSnapper:
             return events, 0
 
         snapped_count = 0
+        orig_timings = [
+            (
+                idx,
+                getattr(e, "start", None),
+                getattr(e, "end", None),
+                cls._is_top_or_sign_event(e),
+            )
+            for idx, e in enumerate(events)
+        ]
 
-        for ev in events:
+        for idx, ev in enumerate(events):
             if not hasattr(ev, "start") or not hasattr(ev, "end"):
                 continue
 
             orig_start = ev.start
             orig_end = ev.end
+            is_sign = orig_timings[idx][3]
+
+            # Find earliest non-overlapping subsequent event on the same layer (<= 20 ms tolerance)
+            next_same_layer_start: Optional[int] = None
+            for other_i, other_start, other_end, other_is_sign in orig_timings:
+                if other_i == idx or other_start is None or other_end is None:
+                    continue
+                if other_is_sign != is_sign:
+                    continue
+                if other_start > orig_start and other_start >= orig_end - 20:
+                    if next_same_layer_start is None or other_start < next_same_layer_start:
+                        next_same_layer_start = other_start
 
             # 1. Snap start timestamp
             for cut in scene_cuts_ms:
@@ -108,6 +140,8 @@ class SceneShotSnapper:
             for cut in scene_cuts_ms:
                 if abs(ev.end - cut) <= snap_window_ms:
                     target_end = max(ev.start + min_duration_ms, cut - 80)
+                    if next_same_layer_start is not None:
+                        target_end = min(target_end, max(ev.start + 1, next_same_layer_start))
                     if target_end > ev.start:
                         # CPS-Aware Safety Guard: ensure snapping does not spike CPS above readable limits (> 17.0 cps)
                         txt = getattr(ev, "plaintext", None) or getattr(ev, "text", "") or ""
@@ -117,14 +151,18 @@ class SceneShotSnapper:
                         if len(clean_txt) > 20 and post_cps > 17.0:
                             # Do not snap if it hurts human eye readability
                             continue
-                        ev.end = target_end
-                        snapped_count += 1
+                        if target_end != orig_end:
+                            ev.end = target_end
+                            snapped_count += 1
                         break
 
             # Safeguard integrity
             if ev.end <= ev.start:
                 ev.start = orig_start
-                ev.end = max(ev.start + min_duration_ms, orig_end)
+                fallback_end = max(ev.start + min_duration_ms, orig_end)
+                if next_same_layer_start is not None:
+                    fallback_end = min(fallback_end, max(ev.start + 1, next_same_layer_start))
+                ev.end = fallback_end
 
         return events, snapped_count
 
