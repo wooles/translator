@@ -1567,6 +1567,206 @@ def _resolve_active_dramatic_sequence(
     return f"{seq_name} | Ton: {dom_tone} | {summary[:180]}".strip(" |")
 
 
+def _build_ssot_lean_bible_str(
+    series_bible: Any,
+    episode_profile: Any = None,
+) -> str:
+    """
+    Zero-Cache Lean SSOT Series Bible formatter (Standard 12.0.0 F-2/C-1):
+    Includes ONLY active series relationships, non-dossier characters, and plot anchors,
+    never duplicating episode_profile character_dossiers or locked glossary_str.
+    """
+    if not series_bible or not hasattr(series_bible, "data"):
+        return ""
+
+    dossier_names: set = set()
+    if episode_profile is not None:
+        dossiers = (
+            episode_profile.get("character_dossiers")
+            if isinstance(episode_profile, dict)
+            else getattr(episode_profile, "character_dossiers", None)
+        )
+        for cd in dossiers or []:
+            cd_name = str(cd.get("name", "") if isinstance(cd, dict) else getattr(cd, "name", "") or "").strip()
+            if cd_name:
+                dossier_names.add(cd_name.lower())
+                dossier_names.add(extract_clean_speaker_name(cd_name).lower())
+
+    with getattr(series_bible, "_lock", contextlib.nullcontext()):
+        data = series_bible.data or {}
+        chars_dict = data.get("characters", {}) or {}
+        rels_dict = (
+            series_bible.get_relations_snapshot()
+            if hasattr(series_bible, "get_relations_snapshot")
+            else (data.get("relationships", {}) or {})
+        )
+        anchors_dict = data.get("plot_anchors", {}) or {}
+        ep_count = len(data.get("episodes_translated", []) or [])
+        anime_title = getattr(series_bible, "anime_title", "") or data.get("anime_title", "")
+
+    lines: List[str] = []
+    extra_chars = []
+    for cname, cinfo in chars_dict.items():
+        if "->" in str(cname):
+            continue
+        c_low = str(cname).strip().lower()
+        c_clean_low = extract_clean_speaker_name(str(cname)).lower()
+        if c_low in dossier_names or c_clean_low in dossier_names:
+            continue
+        desc = cinfo.get("description", "") if isinstance(cinfo, dict) else str(cinfo)
+        if desc:
+            extra_chars.append((cname, desc))
+
+    rel_items = list(rels_dict.items())[:12]
+    anchor_items = list(anchors_dict.items())[:8]
+
+    if not (extra_chars or rel_items or anchor_items):
+        return ""
+
+    lines.append("--- BIBLIA SERIALU (SSOT LEAN — RELACJE I KOTWICE SEZONU) ---")
+    lines.append(f"Seria: '{anime_title}' (Przetłumaczono odcinków: {ep_count})")
+    if extra_chars:
+        lines.append("• Postacie uzupełniające z sezonu:")
+        for cname, desc in extra_chars[:8]:
+            lines.append(f"  - {cname}: {desc}")
+    if rel_items:
+        lines.append("• Relacje i formy zwrotu (T-V / Honoryfikatywność):")
+        for rk, rv in rel_items:
+            rdesc = rv.get("description", "") if isinstance(rv, dict) else str(rv)
+            lines.append(f"  - {rk}: {rdesc}")
+    if anchor_items:
+        lines.append("• Kotwice fabularne:")
+        for ak, av in anchor_items:
+            lines.append(f"  - {ak}: {av}")
+    lines.append("-------------------------------------------------------------")
+    return "\n".join(lines)
+
+
+def _deduplicate_episode_signs(
+    raw_all_entries: List[Tuple[int, Any, str, str]],
+    style_report: Optional[Any] = None,
+) -> Tuple[List[Tuple[int, Any, str, str]], Dict[int, int], set]:
+    """
+    Deduplicates identical on-screen signs across the entire episode (Standard 12.0.0 F-3),
+    preserving STAFF_METADATA bypass and FBF animation compression.
+    Returns: (raw_entries, sub_to_master, all_caps_sign_orig_indices)
+    """
+    raw_entries: List[Tuple[int, Any, str, str]] = []
+    sub_to_master: Dict[int, int] = {}
+    all_caps_sign_orig_indices: set = set()
+    seen_sign_masters: Dict[Tuple[str, bool], int] = {}
+
+    last_text = None
+    last_style = None
+    last_end = -1
+    current_master_orig_idx = None
+
+    for orig_idx, ev, clean, ts_prefix in raw_all_entries:
+        is_staff_evt = False
+        if style_report is not None and hasattr(style_report, "classify_single_event"):
+            from style_matrix import EventRole
+            st_r, _ = style_report.classify_single_event(ev)
+            if st_r == EventRole.STAFF_METADATA:
+                is_staff_evt = True
+
+        if is_staff_evt:
+            sub_to_master[orig_idx] = orig_idx
+            continue
+
+        is_fbf_animation = (
+            last_text is not None
+            and clean.strip().lower() == last_text.strip().lower()
+            and ev.style == last_style
+            and (ev.start <= last_end + 200)
+            and ((ev.end - ev.start) <= 300 or r"\pos" in ts_prefix or r"\move" in ts_prefix or r"\fsc" in ts_prefix or r"\clip" in ts_prefix)
+        )
+
+        if is_fbf_animation and current_master_orig_idx is not None:
+            sub_to_master[orig_idx] = current_master_orig_idx
+            last_end = max(last_end, ev.end)
+            continue
+
+        vtype_ev = detect_event_visual_type(ev, ts_prefix, style_report=style_report)
+        is_sign_evt = bool(vtype_ev.get("is_sign", False)) and not is_song_line(ev, clean)
+        if is_sign_evt:
+            clean_key = clean.strip()
+            has_letters = bool(re.search(r"[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]", clean_key))
+            is_all_caps = has_letters and not bool(re.search(r"[a-ząćęłńóśźż]", clean_key))
+            if is_all_caps:
+                all_caps_sign_orig_indices.add(orig_idx)
+            sign_key = (clean_key, is_all_caps)
+            if sign_key in seen_sign_masters:
+                master_id = seen_sign_masters[sign_key]
+                sub_to_master[orig_idx] = master_id
+                if is_all_caps:
+                    all_caps_sign_orig_indices.add(master_id)
+                continue
+            seen_sign_masters[sign_key] = orig_idx
+
+        current_master_orig_idx = orig_idx
+        raw_entries.append((orig_idx, ev, clean, ts_prefix))
+        sub_to_master[orig_idx] = current_master_orig_idx
+        last_text = clean
+        last_style = ev.style
+        last_end = ev.end
+
+    return raw_entries, sub_to_master, all_caps_sign_orig_indices
+
+
+def _build_clean_f2_character_registry(
+    character_registry: Optional[Dict[str, Any]],
+    episode_profile: Any = None,
+    dedup_dossiers: bool = False,
+) -> Dict[str, str]:
+    """
+    Normalizes character_registry entries into clean 1-line strings for DialogueVerifier (F-2/C-1),
+    eliminating raw Python dicts ({'gender': ..., 'aliases': ...}) from F2 prompts.
+    """
+    if not character_registry:
+        return {}
+
+    dossier_names: set = set()
+    if dedup_dossiers and episode_profile is not None:
+        dossiers = (
+            episode_profile.get("character_dossiers")
+            if isinstance(episode_profile, dict)
+            else getattr(episode_profile, "character_dossiers", None)
+        )
+        for cd in dossiers or []:
+            cd_name = str(cd.get("name", "") if isinstance(cd, dict) else getattr(cd, "name", "") or "").strip()
+            if cd_name:
+                dossier_names.add(cd_name.lower())
+                dossier_names.add(extract_clean_speaker_name(cd_name).lower())
+
+    clean_reg: Dict[str, str] = {}
+    for c_name, raw_val in character_registry.items():
+        name_s = str(c_name or "").strip()
+        if not name_s:
+            continue
+        if dedup_dossiers and (name_s.lower() in dossier_names or extract_clean_speaker_name(name_s).lower() in dossier_names):
+            continue
+        if isinstance(raw_val, dict):
+            g_raw = str(raw_val.get("gender") or "").strip().upper()
+            g_pl = "KOBIETA" if g_raw in ("FEMALE", "KOBIETA") else ("MĘŻCZYZNA" if g_raw in ("MALE", "MĘŻCZYZNA") else "")
+            desc = str(raw_val.get("description") or raw_val.get("role") or "").strip()
+            desc = re.sub(r"\[(?:KOBIETA|MĘŻCZYZNA|PARA DWÓCH|RELACJA HIERARCHICZNA|OCHRONA PRZESKOKÓW|GRUPA|W 2\. os\.|Wymóg|Filar|T-V Invariance)[^\]]*\]", "", desc, flags=re.IGNORECASE)
+            desc = re.sub(r"\s+", " ", desc).strip()
+            if g_pl and desc:
+                clean_reg[name_s] = desc if g_pl.lower() in desc.lower() else f"{g_pl} ({desc})"
+            elif desc:
+                clean_reg[name_s] = desc
+            elif g_pl:
+                clean_reg[name_s] = g_pl
+            else:
+                clean_reg[name_s] = "postać"
+        elif hasattr(raw_val, "description"):
+            desc = str(getattr(raw_val, "description", "") or "").strip()
+            clean_reg[name_s] = desc or "postać"
+        else:
+            clean_reg[name_s] = str(raw_val or "").strip() or "postać"
+    return clean_reg
+
+
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
     """
     Cleans subtitle text from broken tags, unclosed brackets, and artifacts,
@@ -3558,7 +3758,21 @@ class MultimodalTranslator:
 
         # Full deterministic character registry sorted alphabetically (Zero-JIT Scoping)
         if self.character_registry:
-            lines.append("--- ZNANE POSTACIE W ODCINKU (spójność ról, statusu i płci) ---")
+            dossier_names_f1: set = set()
+            from model_resolver import is_gemini_4_or_hydrogen_model
+            is_h_lean_f1 = is_gemini_4_or_hydrogen_model(getattr(self, "model_phase1", self.model))
+            has_ep_brief_in_f1 = bool(episode_profile_str) or bool(getattr(self, "_episode_knowledge_cached", False))
+            if is_h_lean_f1 and has_ep_brief_in_f1 and episode_profile is not None:
+                dossiers_f1 = (
+                    episode_profile.get("character_dossiers")
+                    if isinstance(episode_profile, dict)
+                    else getattr(episode_profile, "character_dossiers", None)
+                )
+                for cd_f1 in dossiers_f1 or []:
+                    cd_n1 = str(cd_f1.get("name", "") if isinstance(cd_f1, dict) else getattr(cd_f1, "name", "") or "").strip()
+                    if cd_n1:
+                        dossier_names_f1.add(cd_n1.lower())
+                        dossier_names_f1.add(extract_clean_speaker_name(cd_n1).lower())
 
             def _strip_relation_meta_tags(raw_text: str, lowercase: bool = False) -> str:
                 txt = str(raw_text or "").strip()
@@ -3643,6 +3857,7 @@ class MultimodalTranslator:
                 for k_cov in keys_covered:
                     alias_owners.setdefault(k_cov, []).append((c_name, rank))
 
+            rendered_char_lines: List[str] = []
             for name in sorted(self.character_registry.keys()):
                 raw_val = self.character_registry[name]
                 if isinstance(raw_val, dict):
@@ -3653,6 +3868,8 @@ class MultimodalTranslator:
                     det_str = str(raw_val)
 
                 name_low = str(name).strip().lower()
+                if dossier_names_f1 and (name_low in dossier_names_f1 or extract_clean_speaker_name(str(name)).lower() in dossier_names_f1):
+                    continue
                 is_non_generic, my_rank = entry_meta.get(
                     name,
                     (not _is_generic_character_desc(det_str), (0, len(str(name).split()), 0))
@@ -3663,8 +3880,12 @@ class MultimodalTranslator:
                         continue
 
                 clean_det = _strip_relation_meta_tags(det_str)
-                lines.append(f"• {name}: {clean_det or 'postać'}")
-            lines.append("-----------------------------------------------------------------\n")
+                rendered_char_lines.append(f"• {name}: {clean_det or 'postać'}")
+
+            if rendered_char_lines:
+                lines.append("--- ZNANE POSTACIE W ODCINKU (spójność ról, statusu i płci) ---")
+                lines.extend(rendered_char_lines)
+                lines.append("-----------------------------------------------------------------\n")
 
         # =========================================================================
         # 2. DYNAMIC USER SUFFIX (Dołączany wyłącznie po stałym prefiksie)
@@ -5890,15 +6111,43 @@ class MultimodalTranslator:
             score += 30
 
         notes_low = str(item.get("notes") or "").lower()
-        if any(k in notes_low for k in ("pułapka_profilera", "kwestia-wizytówka", "gra słowna", "zmiana trybu")):
+        word_cnt = len(str(item.get("en") or "").split())
+        has_profiler_alert = any(k in notes_low for k in ("pułapka_profilera", "kwestia-wizytówka", "gra słowna"))
+        if has_profiler_alert:
+            score += 35
+        if "zmiana trybu" in notes_low:
             score += 50
+
+        has_rel_pivot = "przełom relacji" in notes_low or "przelom_relacji" in notes_low
+        if has_rel_pivot and word_cnt >= 4:
+            score += 25
+
+        tone_low = str(item.get("active_scene_tone") or "").lower()
+        if word_cnt >= 5 and any(t in tone_low for t in ("komed", "satyr", "iron", "dramat", "emocj", "wzrusz", "napięt")):
+            score += 15
 
         if item.get("relation_tag") or item.get("pragmatic_register"):
             score += 20
 
-        word_cnt = len(str(item.get("en") or "").split())
         if word_cnt >= 9:
             score += 15 + min(15, word_cnt - 8)
+
+        # D-2 (12.0.0): Suppress trivial <=3-word replies when free of critical/editorial alerts
+        is_trivial_short = (
+            word_cnt <= 3
+            and not item.get("is_missing_translation")
+            and not item.get("is_blind_draft")
+            and not item.get("is_song")
+            and calque_sc < 0.25
+            and not item.get("condensation_directive")
+            and not item.get("cps_warning")
+            and not item.get("audio_alert")
+            and not item.get("ambiguity_note")
+            and not has_profiler_alert
+            and not has_rel_pivot
+        )
+        if is_trivial_short:
+            score = max(0, score - 25)
 
         return score, critical_cot
 
@@ -6156,6 +6405,14 @@ class MultimodalTranslator:
                     except Exception:
                         logger.debug("Rozwiązanie aktywnej sekwencji dramaturgicznej F2 nieudane", exc_info=True)
 
+                clean_f2_registry = _build_clean_f2_character_registry(
+                    getattr(self, "character_registry", None),
+                    episode_profile=episode_profile,
+                    dedup_dossiers=bool(
+                        is_h_lean_f2
+                        and (bool(episode_profile_str) or bool(getattr(self.verifier, "_episode_knowledge_cached", False)))
+                    ),
+                )
                 try:
                     refined_lines: List[RefinedLine] = self.verifier.verify_batch(
                         batch_items=verifier_batch_items,
@@ -6168,7 +6425,7 @@ class MultimodalTranslator:
                         manga_canon_str=manga_canon_str,
                         history_context=lookback_history,
                         lookahead_events=lookahead_events,
-                        character_registry=self.character_registry,
+                        character_registry=clean_f2_registry,
                         scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
                         batch_idx=f2_affinity_idx
                     )
@@ -6830,42 +7087,11 @@ class MultimodalTranslator:
                 continue
             raw_all_entries.append((i, ev, clean, ts_prefix))
 
-        # Compress animated typesetting (e.g. 1100 sub-frames of 'CHIN' reduced to 1 API call)
-        raw_entries = []
-        sub_to_master = {}
-        last_text = None
-        last_style = None
-        last_end = -1
-        current_master_orig_idx = None
-
-        for orig_idx, ev, clean, ts_prefix in raw_all_entries:
-            is_staff_evt = False
-            if getattr(self, "style_report", None) is not None and hasattr(self.style_report, "classify_single_event"):
-                from style_matrix import EventRole
-                st_r, _ = self.style_report.classify_single_event(ev)
-                if st_r == EventRole.STAFF_METADATA:
-                    is_staff_evt = True
-
-            is_fbf_animation = (
-                last_text is not None and
-                clean.strip().lower() == last_text.strip().lower() and
-                ev.style == last_style and
-                (ev.start <= last_end + 200) and
-                ((ev.end - ev.start) <= 300 or r"\pos" in ts_prefix or r"\move" in ts_prefix or r"\fsc" in ts_prefix or r"\clip" in ts_prefix)
-            )
-
-            if is_staff_evt:
-                sub_to_master[orig_idx] = orig_idx
-            elif is_fbf_animation and current_master_orig_idx is not None:
-                sub_to_master[orig_idx] = current_master_orig_idx
-                last_end = max(last_end, ev.end)
-            else:
-                current_master_orig_idx = orig_idx
-                raw_entries.append((orig_idx, ev, clean, ts_prefix))
-                sub_to_master[orig_idx] = current_master_orig_idx
-                last_text = clean
-                last_style = ev.style
-                last_end = ev.end
+        # Compress FBF animations & deduplicate identical on-screen signs across the episode (F-3)
+        raw_entries, sub_to_master, all_caps_sign_masters = _deduplicate_episode_signs(
+            raw_all_entries,
+            style_report=getattr(self, "style_report", None),
+        )
         # 1c. Deictic Discourse & Dual-Voice Turn-Taking Resolution (0.00 PLN)
         for re_idx, (orig_idx, ev, clean, ts_prefix) in enumerate(raw_entries):
             if DualVoiceTagPreserver.is_dual_voice(ev.text):
@@ -7154,7 +7380,13 @@ class MultimodalTranslator:
                     overwrite_existing_glossary=True,
                 )
 
-        series_bible_str = self.series_bible.format_for_prompt()
+        from model_resolver import is_gemini_4_or_hydrogen_model
+        _is_zero_cache_lean = is_gemini_4_or_hydrogen_model(getattr(self, "model_phase1", self.model))
+        series_bible_str = (
+            _build_ssot_lean_bible_str(self.series_bible, episode_profile=episode_profile)
+            if _is_zero_cache_lean
+            else self.series_bible.format_for_prompt()
+        )
         if series_bible_str:
             print(f"  [Biblia Serialu]: Wczytano ciągłość sezonu dla serii '{series_title or self.series_bible.slug}'")
 
@@ -7256,7 +7488,14 @@ class MultimodalTranslator:
         glossary_str = self.glossary_manager.format_for_prompt(combined_glossary)
         if manga_canon_entry and not manga_canon_str:
             manga_canon_str = self.manga_canon.format_canon_for_prompt(manga_canon_entry)
-        episode_profile_str = format_lean_episode_brief(episode_profile) if episode_profile else ""
+        episode_profile_str = (
+            format_lean_episode_brief(
+                episode_profile,
+                include_glossary=not (_is_zero_cache_lean and bool(glossary_str)),
+            )
+            if episode_profile
+            else ""
+        )
 
         if episode_profile:
             if not manga_canon_entry and episode_profile.manga_canon_source:
@@ -8034,6 +8273,9 @@ class MultimodalTranslator:
 
                     # Sign Contrast & Visibility Guard (Filar AVT Contrast Invariance)
                     ts_prefix_applied = TypesettingColorMatcher.ensure_sign_contrast(ts_prefix_applied, style=target_style)
+
+            if is_sign_flag and (master_id in all_caps_sign_masters or orig_idx in all_caps_sign_masters):
+                clean_translated_text = clean_translated_text.upper()
 
             # Reattach Typesetting tags to translated text
             full_event_text = f"{ts_prefix_applied}{clean_translated_text}" if ts_prefix_applied else clean_translated_text
