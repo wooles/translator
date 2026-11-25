@@ -1508,6 +1508,65 @@ def _filter_dialogue_audio_events(
     return dialogue_audio_tuples
 
 
+def _resolve_active_dramatic_sequence(
+    episode_profile: Any,
+    batch_start_ms: int,
+    batch_end_ms: int,
+) -> str:
+    """
+    Finds the dramatic_sequence in episode_profile with maximum time overlap against [batch_start_ms, batch_end_ms].
+    Returns a compact 1-line string '<sequence_name> | Ton: <dominant_tone> | <summary[:180]>' or ''.
+    """
+    if not episode_profile:
+        return ""
+    seqs = (
+        episode_profile.get("dramatic_sequences")
+        if isinstance(episode_profile, dict)
+        else getattr(episode_profile, "dramatic_sequences", None)
+    )
+    if not seqs:
+        return ""
+
+    from profiler import parse_approx_time_ms
+
+    best_seq = None
+    best_overlap = 0
+    b_start = min(int(batch_start_ms), int(batch_end_ms))
+    b_end = max(int(batch_start_ms), int(batch_end_ms))
+
+    for seq in seqs:
+        tr_str = seq.get("time_range", "") if isinstance(seq, dict) else getattr(seq, "time_range", "")
+        if not tr_str or "-" not in str(tr_str) and "–" not in str(tr_str) and "—" not in str(tr_str):
+            continue
+        parts = re.split(r"\s*[-–—]\s*", str(tr_str).strip(), maxsplit=1)
+        if len(parts) != 2:
+            continue
+        s_ms = parse_approx_time_ms(parts[0])
+        e_ms = parse_approx_time_ms(parts[1])
+        if s_ms is None or e_ms is None or e_ms < s_ms:
+            continue
+        overlap = min(b_end, e_ms) - max(b_start, s_ms)
+        if overlap > best_overlap:
+            best_overlap = overlap
+            best_seq = seq
+
+    if not best_seq or best_overlap <= 0:
+        return ""
+
+    seq_name = str(
+        best_seq.get("sequence_name", "") if isinstance(best_seq, dict) else getattr(best_seq, "sequence_name", "")
+    ).strip()
+    dom_tone = str(
+        best_seq.get("dominant_tone", "") if isinstance(best_seq, dict) else getattr(best_seq, "dominant_tone", "")
+    ).strip()
+    summary = str(
+        best_seq.get("dramatic_summary", "") if isinstance(best_seq, dict) else getattr(best_seq, "dramatic_summary", "")
+    ).strip()
+    if not (seq_name or dom_tone or summary):
+        return ""
+    return f"{seq_name} | Ton: {dom_tone} | {summary[:180]}".strip(" |")
+
+
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
     """
     Cleans subtitle text from broken tags, unclosed brackets, and artifacts,
@@ -3610,6 +3669,17 @@ class MultimodalTranslator:
         # =========================================================================
         # 2. DYNAMIC USER SUFFIX (Dołączany wyłącznie po stałym prefiksie)
         # =========================================================================
+        if episode_profile and batch_events:
+            try:
+                _b_starts = [int(getattr(it[1], "start", 0)) for it in batch_events if len(it) > 1 and hasattr(it[1], "start")]
+                _b_ends = [int(getattr(it[1], "end", 0)) for it in batch_events if len(it) > 1 and hasattr(it[1], "end")]
+                if _b_starts and _b_ends:
+                    active_seq_str = _resolve_active_dramatic_sequence(episode_profile, min(_b_starts), max(_b_ends))
+                    if active_seq_str:
+                        lines.append(f"[AKTYWNA SEKWENCJA DRAMATURGICZNA]: {active_seq_str}\n")
+            except Exception:
+                logger.debug("Rozwiązanie aktywnej sekwencji dramaturgicznej F1 nieudane", exc_info=True)
+
         # Focused Scene Rules (Dynamic per-batch)
         if focused_rules_str:
             lines.append("--- REGULARNE WYTYCZNE I REGUŁY SCENY (REZYDUALNE) ---")
@@ -5660,7 +5730,11 @@ class MultimodalTranslator:
                 "is_sign": vtype["is_sign"],
                 "visual_type": vtype["type_label"],
                 "visual_details": vtype["visual_details"],
-                "is_song": is_song_line(event, clean_en)
+                "is_song": is_song_line(event, clean_en),
+                "active_scene_tone": (
+                    (m_ton.group(1).strip() if (m_ton := re.search(r"Ton:\s*([^|]+)", _resolve_active_dramatic_sequence(episode_profile, getattr(event, "start", 0), getattr(event, "end", 0)))) else "")
+                    if episode_profile else ""
+                ),
             })
 
         # Determine speakers and scene-level informal status (Filar CLVII - T-V Invariance & Honorific Vocative Shield)
@@ -6070,10 +6144,22 @@ class MultimodalTranslator:
 
                     _v_pool.report_error = _observed_f2_report_error
 
+                f2_scene_summary = scene_desc or ""
+                if episode_profile and verifier_batch_items:
+                    try:
+                        _p2_starts = [int(it.get("start_ms", 0)) for it in verifier_batch_items if it.get("start_ms") is not None]
+                        _p2_ends = [int(it.get("end_ms", 0)) for it in verifier_batch_items if it.get("end_ms") is not None]
+                        if _p2_starts and _p2_ends:
+                            _p2_seq = _resolve_active_dramatic_sequence(episode_profile, min(_p2_starts), max(_p2_ends))
+                            if _p2_seq:
+                                f2_scene_summary = f"{f2_scene_summary}\n[AKTYWNA SEKWENCJA DRAMATURGICZNA]: {_p2_seq}".strip()
+                    except Exception:
+                        logger.debug("Rozwiązanie aktywnej sekwencji dramaturgicznej F2 nieudane", exc_info=True)
+
                 try:
                     refined_lines: List[RefinedLine] = self.verifier.verify_batch(
                         batch_items=verifier_batch_items,
-                        scene_summary=scene_desc or "",
+                        scene_summary=f2_scene_summary,
                         episode_profile_str=episode_profile_str,
                         user_feedback_str=user_feedback_str,
                         glossary_str=glossary_str,
@@ -6915,42 +7001,13 @@ class MultimodalTranslator:
         if song_lines_preserved > 0:
             print(f"  [Kanon OP/ED]: Zachowano {song_lines_preserved} wersów piosenek (Opening/Ending) w oryginalnej wersji bez wysyłania do AI (0 PLN).")
 
-        # 0. Episode Profiler (Pre-pass Glossary & Relationship Matrix)
-        profile_cache_path = None
-        if subs_path:
-            profile_cache_path = str(Path(subs_path).with_suffix(".profile.json"))
-        elif video_path:
-            profile_cache_path = str(Path(video_path).with_suffix(".profile.json"))
-
-        all_dialogue_sample = "\n".join([f"{e.name or 'Postać'}: {sanitize_sub_text(e.text)}" for _, e, _, _ in raw_entries])
-        
-        print("\n[Profiler Odcinka]: Analiza fabuły, relacji postaci, realiów epoki i budowanie słowniczka...")
-        episode_profile = self.profiler.profile_episode(
-            subs_text_sample=all_dialogue_sample,
-            anime_metadata_str=anime_context_str,
-            cache_path=profile_cache_path
-        )
-        episode_profile_str = format_lean_episode_brief(episode_profile) if episode_profile else ""
-
-        if self.flight_recorder:
-            try:
-                cache_st = "hit" if (profile_cache_path and os.path.exists(profile_cache_path)) else "computed"
-                self.flight_recorder.log_profile_prepass(
-                    cache_status=cache_st,
-                    episode_profile=episode_profile,
-                    profile_brief=episode_profile_str
-                )
-            except Exception:
-                logger.debug("Rejestracja profilu odcinka zakończona wyjątkiem", exc_info=True)
-
-        # 0b. Initialize and load Series Bible (Cross-Episode Continuity)
+        # 0a. Initialize and load Series Bible BEFORE Profiler (B-3: read-only feed to existing_glossary)
         series_title = ""
         if anime_meta:
             series_title = anime_meta.get("title_romaji") or anime_meta.get("title_english") or ""
         ref_path = video_path or subs_path or ""
-        if not series_title:
-            if ref_path:
-                series_title = Path(ref_path).stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
+        if not series_title and ref_path:
+            series_title = Path(ref_path).stem.split(" - ")[0].replace("[ASW]", "").replace("[Erai-raws]", "").strip()
 
         from metadata import extract_canonical_series_and_season
         ref_stem = Path(ref_path).stem if ref_path else ""
@@ -6972,6 +7029,40 @@ class MultimodalTranslator:
                         clean_p = p.strip()
                         if len(clean_p) >= 3 and clean_p not in self.character_registry:
                             self.character_registry[clean_p] = b_desc
+
+        # 0b. Episode Profiler (Pre-pass Glossary & Relationship Matrix)
+        profile_cache_path = None
+        if subs_path:
+            profile_cache_path = str(Path(subs_path).with_suffix(".profile.json"))
+        elif video_path:
+            profile_cache_path = str(Path(video_path).with_suffix(".profile.json"))
+
+        all_dialogue_sample = "\n".join([f"{e.name or 'Postać'}: {sanitize_sub_text(e.text)}" for _, e, _, _ in raw_entries])
+        existing_bible_glossary = (
+            self.series_bible.data.get("glossary", {})
+            if getattr(self, "series_bible", None) and hasattr(self.series_bible, "data")
+            else None
+        )
+
+        print("\n[Profiler Odcinka]: Analiza fabuły, relacji postaci, realiów epoki i budowanie słowniczka...")
+        episode_profile = self.profiler.profile_episode(
+            subs_text_sample=all_dialogue_sample,
+            anime_metadata_str=anime_context_str,
+            cache_path=profile_cache_path,
+            existing_glossary=existing_bible_glossary,
+        )
+        episode_profile_str = format_lean_episode_brief(episode_profile) if episode_profile else ""
+
+        if self.flight_recorder:
+            try:
+                cache_st = "hit" if (profile_cache_path and os.path.exists(profile_cache_path)) else "computed"
+                self.flight_recorder.log_profile_prepass(
+                    cache_status=cache_st,
+                    episode_profile=episode_profile,
+                    profile_brief=episode_profile_str
+                )
+            except Exception:
+                logger.debug("Rejestracja profilu odcinka zakończona wyjątkiem", exc_info=True)
 
         if episode_profile:
             # Pre-populate global Character Registry from Episode Profile dossiers and declensions first

@@ -257,7 +257,12 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
     return "\n".join(lines)
 
 
-def format_lean_episode_brief(profile: Any, character_audio_transcriptions: Optional[Dict[str, str]] = None, **kwargs) -> str:
+def format_lean_episode_brief(
+    profile: Any,
+    character_audio_transcriptions: Optional[Dict[str, str]] = None,
+    include_glossary: bool = True,
+    **kwargs,
+) -> str:
     """Formats episode profile into a lean, ultra-focused brief (< 400-500 words) to prevent cognitive saturation."""
     if not profile:
         return ""
@@ -279,9 +284,43 @@ def format_lean_episode_brief(profile: Any, character_audio_transcriptions: Opti
     tone = _get(profile, "tone_and_genre")
     if setting or tone:
         genre_info = f"{setting or ''} | {tone or ''}".strip(" |")
+        g_low = genre_info.lower()
         lines.append(f"• Gatunek i Rejestr: {genre_info}")
-        if any(h in genre_info.lower() for h in ["historyczn", "dworsk", "feudal", "średniowiecz", "starożytn", "mongol"]):
+        if any(h in g_low for h in ["historyczn", "dworsk", "feudal", "średniowiecz", "starożytn", "mongol"]):
             lines.append("  Puryzm rejestru historycznego: eliminacja współczesnego słownictwa potocznego i slangu na rzecz stylizowanej polszczyzny.")
+        elif any(c in g_low for c in ["komed", "slapstick", "parodi", "gag", "absurd", "satyr"]):
+            lines.append("  Rejestr komediowy: lekki, żywy rytm potoczny, dynamiczne riposty i naturalne puentowanie żartów sytuacyjnych.")
+        elif any(d in g_low for d in ["dramat", "thriller", "psychologiczn", "obyczaj", "tajemnic", "mrok"]):
+            lines.append("  Rejestr dramatyczno-obyczajowy: skupiony, naturalny ton bez przesadnego slangu młodzieżowego.")
+        elif any(f in g_low for f in ["fantasy", "sci-fi", "magiczn", "kosmicz", "cyber"]):
+            lines.append("  Rejestr fantasy/sci-fi: spójna terminologia świata przedstawionego bez nieuzasadnionych anachronizmów.")
+
+    ep_sum = str(_get(profile, "episode_summary") or "").strip()
+    if ep_sum:
+        lines.append(f"• Fabuła odcinka: {ep_sum[:277] + '...' if len(ep_sum) > 280 else ep_sum}")
+    dial_sty = str(_get(profile, "dialogue_stylization") or "").strip()
+    if dial_sty:
+        lines.append(f"• Stylizacja i Rejestry Frakcji: {dial_sty[:217] + '...' if len(dial_sty) > 220 else dial_sty}")
+    dom_exp = str(_get(profile, "domain_expertise") or "").strip()
+    if dom_exp:
+        lines.append(f"• Dziedzina i Realia: {dom_exp[:177] + '...' if len(dom_exp) > 180 else dom_exp}")
+
+    conventions = list(_get(profile, "key_conventions") or [])[:3]
+    idioms = list(_get(profile, "yojijukugo_and_idioms") or [])[:5]
+    if conventions or idioms:
+        lines.append("• Konwencje i Idiomy:")
+        for conv in conventions:
+            c_s = str(conv or "").strip()
+            if c_s:
+                lines.append(f"  - {c_s[:137] + '...' if len(c_s) > 140 else c_s}")
+        for id_it in idioms:
+            if isinstance(id_it, str):
+                lines.append(f"  - {id_it[:140]}")
+            else:
+                t_en = str(_get(id_it, "term_en", "") or "").strip()
+                t_pl = str(_get(id_it, "translation_pl", "") or "").strip()
+                if t_en and t_pl:
+                    lines.append(f"  - Idiom {t_en} = {t_pl}")
 
     # Characters with confirmed gender and appositions
     dossiers = _get(profile, "character_dossiers")
@@ -332,7 +371,7 @@ def format_lean_episode_brief(profile: Any, character_audio_transcriptions: Opti
                         lines.append(f"    OCHRONA PŁCI ({name}): KOBIETA – konsekwentne stosowanie żeńskich końcówek czasu przeszłego i trybu przypuszczającego (-łam, -łabym, -łaś).") # Standard 9.0 Invariant
         if rels:
             if isinstance(rels, dict):
-                for spk, info in list(rels.items())[:8]:
+                for spk, info in list(rels.items())[:20]:
                     role = _get(info, "role", "") or _get(info, "age_and_role", "")
                     g = _get(info, "gender", "")
                     if not g and is_inherently_female_name(spk):
@@ -342,7 +381,7 @@ def format_lean_episode_brief(profile: Any, character_audio_transcriptions: Opti
                     if spk_audio and RE_JP_DIALECT_MARKERS.search(str(spk_audio)):
                         lines.append("    Rejestr: wyrazista gwara / stylizacja środowiskowa")
             else:
-                for rel in rels[:8]:
+                for rel in rels[:20]:
                     spk = _get(rel, "speaker")
                     lis = _get(rel, "listener")
                     addr = _get(rel, "address_form")
@@ -361,7 +400,7 @@ def format_lean_episode_brief(profile: Any, character_audio_transcriptions: Opti
                 lines.append(f"  - {c_name}: {summary}")
 
     gloss = _get(profile, "glossary")
-    if gloss:
+    if include_glossary and gloss:
         lines.append("• Zablokowana Terminologia:")
         if isinstance(gloss, dict):
             for t_en, t_pl in list(gloss.items())[:10]:
@@ -563,7 +602,8 @@ class EpisodeProfiler:
         self,
         subs_text_sample: str,
         anime_metadata_str: str = "",
-        cache_path: Optional[str] = None
+        cache_path: Optional[str] = None,
+        existing_glossary: Optional[Dict[str, str]] = None,
     ) -> EpisodeProfile:
         """
         Generates or loads episode profile from cache (Profiler 4.0 Pre-pass).
@@ -576,6 +616,21 @@ class EpisodeProfiler:
                     return EpisodeProfile.model_validate(data)
             except Exception as e:
                 logger.warning(f"Error reading profile cache ({e}), regenerating...")
+
+        existing_glossary_block = ""
+        if existing_glossary and isinstance(existing_glossary, dict):
+            g_lines = []
+            for gk, gv in list(existing_glossary.items())[:40]:
+                k_s = str(gk or "").strip()
+                v_s = str(gv or "").strip()
+                if k_s and v_s:
+                    g_lines.append(f"- {k_s} => {v_s}")
+            if g_lines:
+                existing_glossary_block = (
+                    "\nUTRWALONY GLOSARIUSZ SEZONU — zachowaj 100% zgodności nazw w analizie i słowniczku:\n"
+                    + "\n".join(g_lines)
+                    + "\n"
+                )
 
         prompt = f"""Jesteś Głównym Reżyserem, Konsultantem Merytorycznym i Script Doctorem Lokalizacji Anime (Profiler 4.0).
 • Głos seiyū stanowi nadrzędny punkt odniesienia: PIERWOTNE ŹRÓDŁO PRAWDY dla rejestru emocjonalnego, intonacji i afektu.
@@ -674,7 +729,7 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza całego skryptu odcinka, a
    - Eliminacja dublowania deskryptorów kategorialnych przy toponimach.
    - Ontologiczna kategoryzacja bytów na ANTHROPONYM, TOPONYM oraz CHREMATONYM z poprawną rekcją przyimkową.
 
-METADANE Z BAZY ANILIST:
+{existing_glossary_block}METADANE Z BAZY ANILIST:
 {anime_metadata_str}
 
 PEŁNY SKRYPT DIALOGOWY CAŁEGO ODCINKA (100% TREŚCI):
@@ -914,6 +969,37 @@ def resolve_profile_alerts_to_events(
                         best_idx = idx
 
             if best_idx is not None:
+                if best_idx not in resolved_alerts:
+                    resolved_alerts[best_idx] = []
+                if tag not in resolved_alerts[best_idx]:
+                    resolved_alerts[best_idx].append(tag)
+
+    # 4. Resolve relationship_pivots (+-20000 ms)
+    if getattr(profile, "relationship_pivots", None):
+        for rp in profile.relationship_pivots:
+            target_ms = parse_approx_time_ms(getattr(rp, "approx_time", ""))
+            chars_inv = str(getattr(rp, "characters_involved", "") or "").strip()
+            guidance = str(getattr(rp, "relational_guidance", "") or "").strip()
+            if not guidance:
+                continue
+            char_tokens = _tokenize(chars_inv)
+            best_idx = None
+            best_score = -1e9
+            for idx, s_ms, e_ms, txt, ev_tokens in parsed_events:
+                time_dist_ms = abs(s_ms - target_ms) if target_ms is not None else 0
+                if target_ms is not None and time_dist_ms > 20000:
+                    continue
+                ev_item = subs_events[idx]
+                ev_obj = ev_item[1] if isinstance(ev_item, (list, tuple)) and len(ev_item) > 1 else ev_item
+                spk_str = str(getattr(ev_obj, "name", "") or "").lower()
+                spk_match = any(ct in spk_str for ct in char_tokens) if char_tokens else False
+                txt_overlap = len(char_tokens & ev_tokens)
+                score = (50.0 if spk_match else 0.0) + (15.0 * txt_overlap) - (time_dist_ms / 1000.0)
+                if score > best_score:
+                    best_score = score
+                    best_idx = idx
+            if best_idx is not None:
+                tag = f"[🔄 PRZEŁOM RELACJI ({chars_inv or 'Postacie'}): {guidance}]"
                 if best_idx not in resolved_alerts:
                     resolved_alerts[best_idx] = []
                 if tag not in resolved_alerts[best_idx]:

@@ -12,11 +12,22 @@ from translator import (
     MultimodalTranslator,
     sanitize_sub_text,
     _filter_dialogue_audio_events,
+    _resolve_active_dramatic_sequence,
 )
 import whisper_engine
 from whisper_engine import JapaneseWhisperEngine
 from style_matrix import StyleMatrixReport, EventRole
 from series_memory import SeriesBible
+from profiler import (
+    EpisodeProfile,
+    EpisodeProfiler,
+    GlossaryTerm,
+    CharacterRelationship,
+    DramaticSequence,
+    RelationshipPivot,
+    format_lean_episode_brief,
+    resolve_profile_alerts_to_events,
+)
 
 
 # =====================================================================
@@ -192,3 +203,149 @@ def test_e2_all_homoglyph_short_polish_words_normalized_while_ru_preserved():
         'Krzyknął "О, привет!" i wyszedł.',
     ):
         assert sanitize_sub_text(ru_quote, is_ass=True) == ru_quote
+
+
+# =====================================================================
+# COMMIT 2: Most stylistyczny Profilera, ton sekwencji i kanon glosariusza (B-1, B-2, B-3, D-1)
+# =====================================================================
+
+@pytest.mark.unit
+def test_b1_lean_brief_includes_stylization_summary_domain_idioms_and_pivots_resolved():
+    """
+    B-1: format_lean_episode_brief() zawiera Fabuła odcinka, Stylizacja i Rejestry Frakcji,
+    Dziedzina i Realia, Konwencje i Idiomy, nie ucina relacji na 8 (do 20) oraz wspiera include_glossary=False.
+    resolve_profile_alerts_to_events() podpina relationship_pivots w oknie +-20000 ms.
+    """
+    rels = [
+        CharacterRelationship(
+            speaker=f"Postac_{i}",
+            listener="Bohater_A",
+            address_form="per ty",
+            relationship_type="sojusznicy",
+        )
+        for i in range(1, 13)
+    ]
+    profile = EpisodeProfile(
+        episode_summary="Bohater_A wyrusza na zwiad do Gildii Światła.",
+        dialogue_stylization="Arystokracja mówi podniośle; najemnicy potocznie.",
+        domain_expertise="Alchemia kryształów i sztuka oblężnicza.",
+        key_conventions=["Zwięzłe riposty w scenach walki."],
+        yojijukugo_and_idioms=[GlossaryTerm(term_en="once in a lifetime", translation_pl="raz na całe życie", explanation="idiom")],
+        glossary=[GlossaryTerm(term_en="Radiant Guild", translation_pl="Gildia Światła", explanation="nazwa")],
+        characters=rels,
+        relationship_pivots=[
+            RelationshipPivot(
+                approx_time="00:01:00",
+                characters_involved="Bohater_A -> Mistrzyni_B",
+                nature_of_shift="Przełamanie dystansu",
+                relational_guidance="Przejście z formy oficjalnej na ty po wspólnej walce.",
+            )
+        ],
+    )
+
+    brief_full = format_lean_episode_brief(profile, include_glossary=True)
+    assert "• Fabuła odcinka:" in brief_full
+    assert "• Stylizacja i Rejestry Frakcji:" in brief_full
+    assert "• Dziedzina i Realia:" in brief_full
+    assert "• Konwencje i Idiomy:" in brief_full
+    assert "Idiom once in a lifetime = raz na całe życie" in brief_full
+    assert "Postac_12 -> Bohater_A: per ty" in brief_full
+    assert "• Zablokowana Terminologia:" in brief_full
+
+    brief_no_gloss = format_lean_episode_brief(profile, include_glossary=False)
+    assert "• Zablokowana Terminologia:" not in brief_no_gloss
+
+    ev_pivot = pysubs2.SSAEvent(start=61000, end=63500, name="Bohater_A", text="Od teraz mów mi po imieniu.")
+    ev_other = pysubs2.SSAEvent(start=5000, end=7000, name="Kupiec_C", text="Ładna pogoda.")
+    alerts = resolve_profile_alerts_to_events(profile, [(10, ev_other, ev_other.text, ""), (42, ev_pivot, ev_pivot.text, "")])
+    assert 42 in alerts
+    assert any("PRZEŁOM RELACJI" in tag and "Przejście z formy oficjalnej" in tag for tag in alerts[42])
+
+
+@pytest.mark.unit
+def test_b2_active_dramatic_sequence_tone_injected_into_f1_batch_and_f2_context():
+    """
+    B-2: _resolve_active_dramatic_sequence dobiera sekwencję o największym pokryciu czasowym,
+    a _prepare_batch_prompt wstrzykuje [AKTYWNA SEKWENCJA DRAMATURGICZNA] z dominant_tone.
+    """
+    profile = EpisodeProfile(
+        dramatic_sequences=[
+            DramaticSequence(
+                sequence_name="Akt 1: Narada",
+                time_range="00:00 - 01:00",
+                dramatic_summary="Spokojna wymiana argumentów.",
+                dominant_tone="chłodna powaga dworska",
+            ),
+            DramaticSequence(
+                sequence_name="Akt 2: Pościg",
+                time_range="01:00 - 02:00",
+                dramatic_summary="Kłótnia przyjaciół podczas ucieczki.",
+                dominant_tone="dynamiczny humor i akcja",
+            ),
+        ]
+    )
+
+    seq_str = _resolve_active_dramatic_sequence(profile, 65000, 95000)
+    assert "Akt 2: Pościg" in seq_str
+    assert "Ton: dynamiczny humor i akcja" in seq_str
+
+    tr = MultimodalTranslator(api_key="mock_k0", model="gemini-4-hydrogen", enable_verifier=False)
+    ev = pysubs2.SSAEvent(start=68000, end=71000, name="Bohater_A", text="Szybciej!")
+    prompt = tr._prepare_batch_prompt(
+        batch_events=[(0, ev, "Szybciej!", "")],
+        history_context=[],
+        episode_profile=profile,
+    )
+    assert "[AKTYWNA SEKWENCJA DRAMATURGICZNA]: Akt 2: Pościg | Ton: dynamiczny humor i akcja" in prompt
+
+
+@pytest.mark.unit
+def test_b3_profiler_receives_existing_series_bible_glossary():
+    """
+    B-3: EpisodeProfiler.profile_episode(..., existing_glossary=...) wstrzykuje utrwalone
+    terminy z SeriesBible do promptu Profilera (limit do 40 terminów).
+    """
+    captured_prompts = []
+
+    class _FakeModels:
+        def generate_content(self, model=None, contents=None, config=None):
+            captured_prompts.append(contents)
+            return types.SimpleNamespace(text=EpisodeProfile().model_dump_json())
+
+    fake_client = types.SimpleNamespace(models=_FakeModels(), clients=[1])
+    fake_client.get_client = lambda: fake_client
+    profiler = EpisodeProfiler(client=fake_client, model="gemini-4-hydrogen")
+    glossary_seed = {"Radiant Beast": "Promienista Bestia"}
+    for i in range(1, 50):
+        glossary_seed[f"Term_{i:02d}"] = f"Termin_{i:02d}"
+
+    profiler.profile_episode(
+        subs_text_sample="Bohater_A: Look at the Radiant Beast!",
+        existing_glossary=glossary_seed,
+    )
+
+    assert len(captured_prompts) == 1
+    sent_prompt = captured_prompts[0]
+    assert "UTRWALONY GLOSARIUSZ SEZONU" in sent_prompt
+    assert "Radiant Beast => Promienista Bestia" in sent_prompt
+    assert sent_prompt.count(" => ") <= 40
+
+
+@pytest.mark.unit
+def test_d1_genre_register_directive_adapts_to_comedy_drama_and_historical():
+    """
+    D-1: Dyrektywa rejestrowa w format_lean_episode_brief() dynamicznie dopasowuje się
+    do gatunku: komedii, dramatu i historycznego puryzmu.
+    """
+    p_comedy = EpisodeProfile(tone_and_genre="Komedia / Slapstick", setting_and_era="Współczesne miasto")
+    p_drama = EpisodeProfile(tone_and_genre="Dramat psychologiczny", setting_and_era="Szkoła średnia")
+    p_hist = EpisodeProfile(tone_and_genre="Epopeja", setting_and_era="Feudalna epoka historyczna")
+
+    b_comedy = format_lean_episode_brief(p_comedy)
+    b_drama = format_lean_episode_brief(p_drama)
+    b_hist = format_lean_episode_brief(p_hist)
+
+    assert "Rejestr komediowy:" in b_comedy
+    assert "historycznego" not in b_comedy
+    assert "Rejestr dramatyczno-obyczajowy:" in b_drama
+    assert "Puryzm rejestru historycznego:" in b_hist
