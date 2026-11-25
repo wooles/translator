@@ -4754,6 +4754,7 @@ class SeriesBible:
     def __init__(self, anime_title: str = "Nieznana Seria", storage_dir: Optional[Union[Path, str]] = None, db_path: Optional[str] = None, **kwargs):
         self._lock = threading.RLock()
         self.db_path = db_path
+        self.keep_honorifics: bool = bool(kwargs.get("keep_honorifics", True))
         slug_arg = kwargs.get("slug")
         title_arg = kwargs.get("title") or kwargs.get("anime_title")
         if slug_arg and (not anime_title or anime_title == "Nieznana Seria"):
@@ -5841,6 +5842,50 @@ class SeriesBible:
                 self.data.setdefault("entity_categories", {})[tok] = EntityCategory.TOPONYM.value
         if existing:
             self.data["institutional_toponyms"] = sorted(existing)
+
+    def _strip_honorifics_from_registry_in_ram(self) -> None:
+        """
+        RAM-only removal of trailing Japanese honorific suffixes (-san/-kun/-chan/-sama/-senpai/-sensei/-dono)
+        from character registry keys and aliases when keep_honorifics=False (Standard 12.0.0 E-1; 0 B disk diff).
+        """
+        if getattr(self, "keep_honorifics", True):
+            return
+        chars = self.data.get("characters")
+        if not isinstance(chars, dict):
+            return
+        hon_pat = re.compile(r"^(.+?)-(?:san|kun|chan|sama|senpai|sensei|dono)$", re.IGNORECASE)
+        decl = self.data.setdefault("declensions", {})
+        for char_k in list(chars.keys()):
+            if "->" in str(char_k):
+                continue
+            m = hon_pat.match(str(char_k).strip())
+            rec = chars.get(char_k)
+            if isinstance(rec, dict) and isinstance(rec.get("aliases"), list):
+                clean_als: List[str] = []
+                for al in rec["aliases"]:
+                    al_s = str(al).strip()
+                    m_al = hon_pat.match(al_s)
+                    clean_al = m_al.group(1).strip() if m_al else al_s
+                    if clean_al and clean_al not in clean_als:
+                        clean_als.append(clean_al)
+                rec["aliases"] = clean_als
+            if not m:
+                continue
+            base_k = m.group(1).strip()
+            if not base_k or base_k == char_k:
+                continue
+            popped = chars.pop(char_k)
+            existing = chars.get(base_k)
+            if isinstance(existing, dict) and isinstance(popped, dict):
+                for k_sub, v_sub in popped.items():
+                    if k_sub not in existing or not existing[k_sub]:
+                        existing[k_sub] = v_sub
+            elif base_k not in chars:
+                chars[base_k] = popped
+            if char_k in decl:
+                d_val = decl.pop(char_k)
+                if base_k not in decl:
+                    decl[base_k] = d_val
 
     def _sanitize_loaded_bible_in_ram(self):
         """
@@ -7278,6 +7323,9 @@ class SeriesBible:
                     self.save()
                 except Exception:
                     logger.warning("Zapis zmodyfikowanej bazy serii zakończony wyjątkiem", exc_info=True)
+
+            # E-1 (12.0.0): RAM-only usunięcie japońskich honoryfikatorów z kluczy/aliasów przy keep_honorifics=False (0 B diffu na dysku)
+            self._strip_honorifics_from_registry_in_ram()
 
             # 8. Bezwarunkowa synchronizacja klucza "gender" i regeneracja paradygmatów FEMALE w declensions (Operacje H2 i H5)
             decl_dict = self.data.setdefault("declensions", {})

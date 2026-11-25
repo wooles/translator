@@ -152,11 +152,27 @@ class StyleMatrixReport:
         has_p1 = r"\p1" in text_raw
         has_frz = r"\frz" in text_raw or r"\org" in text_raw
 
-        # Structural uppercase / ALL-CAPS sign (Standard 9.0)
+        # 0. Credits / fansub staff metadata (must precede ALL-CAPS rule A-3)
         clean_t = re.sub(r"\{[^}]*\}", "", text_raw).strip()
         has_letters = bool(re.search(r"[a-zA-ZąćęłńóśźżĄĆĘŁŃÓŚŹŻ]", clean_t))
         has_lowercase = bool(re.search(r"[a-ząćęłńóśźż]", clean_t))
-        if has_letters and not has_lowercase:
+        is_all_caps = has_letters and not has_lowercase
+        is_credits_context = (
+            (profile is not None and profile.default_role == EventRole.STAFF_METADATA)
+            or any(k in style_lower for k in ("sign", "top", "credits", "staff"))
+            or any(k in actor_lower for k in ("sign", "top", "credits", "staff"))
+            or is_all_caps
+        )
+        m_cred = re.search(
+            r"(?:^|\\N)\s*(TRANSLATION|TIMING|EDITING|(?:FINAL\s+)?QUALITY\s+CONTROL|QC|TYPESETTING|KARAOKE|ENCODE|ENCODER|SUBTITLES\s+BY|TL|TLC)\s*:",
+            clean_t,
+            re.IGNORECASE,
+        )
+        if m_cred and (is_credits_context or m_cred.group(1).isupper()):
+            return EventRole.STAFF_METADATA, f"Napis ekipy produkcyjnej / stopka wydania (styl='{style_name}')"
+
+        # Structural uppercase / ALL-CAPS sign (Standard 9.0)
+        if is_all_caps:
             return EventRole.SIGN_OVERLAY, "Tekst bez małych liter (ALL CAPS)"
 
         # 1. Staff / Credits

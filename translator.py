@@ -1450,12 +1450,12 @@ def _normalize_cyrillic_homoglyphs_in_latin(text: str) -> str:
         if has_lat:
             # Mixed-script token (Latin + Cyrillic homoglyphs only)
             parts[idx] = "".join(_CYRILLIC_TO_LATIN_HOMOGLYPHS.get(c, c) for c in tok)
-        elif len(tok) == 1:
-            # Isolated single-letter Cyrillic homoglyph in Latin context (e.g. "А jak?", "w о...")
+        elif 1 <= len(tok) <= 4:
+            # Short all-homoglyph Cyrillic token (1-4 chars, e.g. "А", "о", "То", "со", "оса") in Latin context (E-2)
             prev_non_h = token_flags[word_indices[pos - 1]][2] if pos > 0 else False
             next_non_h = token_flags[word_indices[pos + 1]][2] if pos + 1 < len(word_indices) else False
             if not prev_non_h and not next_non_h:
-                parts[idx] = _CYRILLIC_TO_LATIN_HOMOGLYPHS.get(tok, tok)
+                parts[idx] = "".join(_CYRILLIC_TO_LATIN_HOMOGLYPHS.get(c, c) for c in tok)
 
     return "".join(parts)
 
@@ -1474,6 +1474,38 @@ def _append_phase2_linebreak_hygiene_rule(
     )
     base = (focused_rules_str or "").strip()
     return f"{base}\n{rule_note}" if base else rule_note
+
+
+def _filter_dialogue_audio_events(
+    events_tuples: List[Any],
+    style_report: Optional[Any] = None,
+) -> List[Any]:
+    """
+    Filters scene events for AudioProsodyEngine / SpeakerVoiceClassifier (Standard 12.0.0 A-1).
+    Excludes only SIGN_OVERLAY, SIGN_LOCATIONAL, SONG_LYRICS, and STAFF_METADATA.
+    Never excludes DIALOGUE_TOP or DIALOGUE_BOTTOM.
+    """
+    dialogue_audio_tuples: List[Any] = []
+    for item_ev in events_tuples:
+        ev_a, clean_a, ts_a = item_ev[1], item_ev[2], item_ev[3]
+        if style_report is not None and hasattr(style_report, "classify_single_event"):
+            from style_matrix import EventRole
+            ev_role, _ = style_report.classify_single_event(ev_a)
+            if ev_role in (
+                EventRole.SIGN_OVERLAY,
+                EventRole.SIGN_LOCATIONAL,
+                EventRole.SONG_LYRICS,
+                EventRole.STAFF_METADATA,
+            ):
+                continue
+            if ev_role not in (EventRole.DIALOGUE_TOP, EventRole.DIALOGUE_BOTTOM) and is_song_line(ev_a, clean_a):
+                continue
+        else:
+            vtype_a = detect_event_visual_type(ev_a, ts_a, style_report=None)
+            if vtype_a.get("is_sign", False) or is_song_line(ev_a, clean_a):
+                continue
+        dialogue_audio_tuples.append(item_ev)
+    return dialogue_audio_tuples
 
 
 def sanitize_sub_text(text: str, is_ass: bool = True) -> str:
@@ -4778,19 +4810,28 @@ class MultimodalTranslator:
                         whisper_transcriptions
                     )
 
-                    # 2. Local prosody analysis (RMS dBFS / whisper / shout)
-                    prosody_tags = AudioProsodyEngine.analyze_scene_prosody(
-                        wav_path=temp_audio_file,
-                        batch_start_ms=batch_start,
-                        events=events_tuples
+                    dialogue_audio_tuples = _filter_dialogue_audio_events(
+                        events_tuples,
+                        style_report=getattr(self, "style_report", None),
                     )
 
-                    # 3. Local diarization and F0 pitch estimation
-                    speaker_tags = SpeakerVoiceClassifier.classify_scene_speakers(
-                        wav_path=temp_audio_file,
-                        batch_start_ms=batch_start,
-                        events=events_tuples
-                    )
+                    if dialogue_audio_tuples:
+                        # 2. Local prosody analysis (RMS dBFS / whisper / shout)
+                        prosody_tags = AudioProsodyEngine.analyze_scene_prosody(
+                            wav_path=temp_audio_file,
+                            batch_start_ms=batch_start,
+                            events=dialogue_audio_tuples,
+                        )
+
+                        # 3. Local diarization and F0 pitch estimation
+                        speaker_tags = SpeakerVoiceClassifier.classify_scene_speakers(
+                            wav_path=temp_audio_file,
+                            batch_start_ms=batch_start,
+                            events=dialogue_audio_tuples,
+                        )
+                    else:
+                        prosody_tags = {}
+                        speaker_tags = {}
             except Exception as e:
                 pbar.write(f" ├─ [Ostrzeżenie Audio/Whisper]: {e}")
                 pass
@@ -6629,7 +6670,7 @@ class MultimodalTranslator:
             _, title_season = extract_canonical_series_and_season(title_name) if title_name else ("", None)
             effective_title = f"{title_name} S{ref_season}" if (ref_season is not None and title_season is None) else title_name
             if not getattr(self, "series_bible", None):
-                self.series_bible = SeriesBible(anime_title=effective_title)
+                self.series_bible = SeriesBible(anime_title=effective_title, keep_honorifics=self.keep_honorifics)
 
             for c in anime_meta.get("characters", []):
                 c_name = c.get("name")
@@ -6712,6 +6753,13 @@ class MultimodalTranslator:
         current_master_orig_idx = None
 
         for orig_idx, ev, clean, ts_prefix in raw_all_entries:
+            is_staff_evt = False
+            if getattr(self, "style_report", None) is not None and hasattr(self.style_report, "classify_single_event"):
+                from style_matrix import EventRole
+                st_r, _ = self.style_report.classify_single_event(ev)
+                if st_r == EventRole.STAFF_METADATA:
+                    is_staff_evt = True
+
             is_fbf_animation = (
                 last_text is not None and
                 clean.strip().lower() == last_text.strip().lower() and
@@ -6720,7 +6768,9 @@ class MultimodalTranslator:
                 ((ev.end - ev.start) <= 300 or r"\pos" in ts_prefix or r"\move" in ts_prefix or r"\fsc" in ts_prefix or r"\clip" in ts_prefix)
             )
 
-            if is_fbf_animation and current_master_orig_idx is not None:
+            if is_staff_evt:
+                sub_to_master[orig_idx] = orig_idx
+            elif is_fbf_animation and current_master_orig_idx is not None:
                 sub_to_master[orig_idx] = current_master_orig_idx
                 last_end = max(last_end, ev.end)
             else:
@@ -6911,7 +6961,7 @@ class MultimodalTranslator:
 
         from series_memory import SeriesBible
         if not getattr(self, "series_bible", None):
-            self.series_bible = SeriesBible(anime_title=series_title)
+            self.series_bible = SeriesBible(anime_title=series_title, keep_honorifics=self.keep_honorifics)
         # Pre-populate global Character Registry from persistent Series Bible
         if self.series_bible and hasattr(self.series_bible, "data"):
             bible_chars = self.series_bible.data.get("characters", {})
@@ -7804,8 +7854,13 @@ class MultimodalTranslator:
         for orig_idx, orig_event, _, ts_prefix in raw_all_entries:
             master_id = sub_to_master.get(orig_idx, orig_idx)
             
-            # If line is an OP/ED song, preserve original event text, styling and karaoke tags exactly 1:1
-            if is_song_line(orig_event, orig_event.text):
+            # If line is an OP/ED song or fansub staff metadata, preserve original event 1:1
+            is_staff_flag = False
+            if getattr(self, "style_report", None) is not None and hasattr(self.style_report, "classify_single_event"):
+                from style_matrix import EventRole
+                st_r_out, _ = self.style_report.classify_single_event(orig_event)
+                is_staff_flag = st_r_out == EventRole.STAFF_METADATA
+            if is_staff_flag or is_song_line(orig_event, orig_event.text):
                 new_event = orig_event.copy()
                 final_subs.events.append(new_event)
                 continue

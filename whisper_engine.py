@@ -250,6 +250,14 @@ class JapaneseWhisperEngine:
             result_segs: Dict[int, List[str]] = {b_id: [] for b_id, _ in events}
             
             for seg in segments_list:
+                nsp_raw = getattr(seg, "no_speech_prob", None)
+                alp_raw = getattr(seg, "avg_logprob", None)
+                nsp = float(nsp_raw) if isinstance(nsp_raw, (int, float)) and not isinstance(nsp_raw, bool) else None
+                alp = float(alp_raw) if isinstance(alp_raw, (int, float)) and not isinstance(alp_raw, bool) else None
+                if (nsp is not None and nsp > 0.85) or (
+                    nsp is not None and alp is not None and nsp > 0.75 and alp < -1.2
+                ):
+                    continue
                 seg_text = seg.text.strip()
                 if not seg_text:
                     continue
