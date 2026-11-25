@@ -73,10 +73,13 @@ class SceneShotSnapper:
     def _is_top_or_sign_event(ev: Any) -> bool:
         """Returns True for signs/top-aligned overlays isolated from bottom dialogue layer."""
         style = str(getattr(ev, "style", "") or "").strip().lower()
+        name = str(getattr(ev, "name", "") or getattr(ev, "actor", "") or "").strip().lower()
         text = str(getattr(ev, "text", "") or "").lower()
         if any(tok in style for tok in ("sign", "top", "title", "napis", "tytu", "karaoke", "song")):
             return True
         if style and re.search(r"\b(?:op|ed)\b", style):
+            return True
+        if name.startswith("sign") or name == "eptitle":
             return True
         return bool(re.search(r"\\(?:an[789]|pos\(|move\()", text))
 

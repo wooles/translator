@@ -8202,27 +8202,12 @@ class SeriesBible:
                 is_informal = any(k in d_lower for k in ["per ty", "per-ty", "poufał", "koleżeńsk", "przyjaciel", "blisk", "nieformaln", "swobodn"])
                 is_hierarchical = "relacja hierarchiczna" in d_lower or "hierarchiczn" in d_lower
 
-                new_desc = desc_str
-                # Czyszczenie ewentualnych osieroconych fragmentów po dawnych uszkodzeniach regexu
-                if "-sama" in new_desc.lower():
-                    new_desc = re.sub(r"',?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd.*?-sama\s*\]?\)?\]?", "", new_desc, flags=re.IGNORECASE).strip()
-                new_desc = re.sub(r"',?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd[^]]*\]", "", new_desc, flags=re.IGNORECASE).strip()
-                new_desc = re.sub(r",?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd[^]]*\]?", "", new_desc, flags=re.IGNORECASE).strip()
-                new_desc = re.sub(r",?\s*wykluczona forma\s+'[^']*'\s*\([^)]*\)\s*\]?", "]", new_desc, flags=re.IGNORECASE).strip()
-                new_desc = re.sub(r"\]\s*'", "]", new_desc).strip()
-                new_desc = re.sub(r"'\s*,", ",", new_desc).strip()
-                new_desc = re.sub(r"\s+", " ", new_desc).strip()
-                if is_informal and is_hierarchical:
-                    # Standard 9.5 (Operacja 2C.4): Dopasowanie pełnego bloku klauzuli hierarchicznej z zagnieżdżonym [Imię] aż do -sama]
-                    if "-sama" in new_desc.lower():
-                        new_desc = re.sub(r"(?:\\N|\s*\[)?RELACJA HIERARCHICZNA.*?-sama\s*\]?\)?\]?", "", new_desc, flags=re.IGNORECASE).strip()
-                    new_desc = re.sub(r"(?:\\N|\s*\[)?RELACJA HIERARCHICZNA[^]]*\]?", "", new_desc, flags=re.IGNORECASE).strip()
-                    new_desc = re.sub(r"\s+", " ", new_desc).strip()
-                    if "reżim:" not in new_desc.lower():
-                        new_desc = f"{new_desc} [reżim: POUFNY]".strip()
-                    else:
-                        new_desc = re.sub(r"reżim:\s*\w+", "reżim: POUFNY", new_desc, flags=re.IGNORECASE)
-                elif is_informal:
+                # Czyszczenie ewentualnych osieroconych/zagnieżdżonych fragmentów z ochroną poprawnych apostrofów (Hotfix 11.2.28a BUG #1)
+                new_desc = self._strip_hierarchical_relation_leaks(
+                    desc_str,
+                    only_orphaned_or_nested=not (is_informal and is_hierarchical),
+                )
+                if is_informal:
                     if "reżim:" not in new_desc.lower():
                         new_desc = f"{new_desc} [reżim: POUFNY]".strip()
                     else:
@@ -9893,25 +9878,30 @@ class SeriesBible:
         if "-sama" in cleaned.lower():
             if not only_orphaned_or_nested or has_nested_rel:
                 cleaned = re.sub(
-                    r"(?:\\N|\s*\[)?RELACJA HIERARCHICZNA.*?-sama\s*\]?\)?\]?",
+                    r"(?:',\s*|'\s*)?(?:\\N|\s*\[)?RELACJA HIERARCHICZNA.*?-sama\s*\]?\)?\]?",
                     "",
                     cleaned,
                     flags=re.IGNORECASE,
                 )
             cleaned = re.sub(
-                r"',?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd.*?-sama\s*\]?\)?\]?",
+                r"(?:',\s*|'\s*|,\s*)?(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd.*?-sama\s*\]?\)?\]?",
                 "",
                 cleaned,
                 flags=re.IGNORECASE,
             )
         cleaned = re.sub(r"\\NRELACJA HIERARCHICZNA[^\]]*\]", "]", cleaned, flags=re.IGNORECASE)
         if not only_orphaned_or_nested or has_nested_rel:
-            cleaned = re.sub(r"(?:\\N|\s*\[)?RELACJA HIERARCHICZNA[^]]*\]?\s*", "", cleaned, flags=re.IGNORECASE)
-        cleaned = re.sub(r"',?\s*(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd[^]]*\]?", "", cleaned, flags=re.IGNORECASE)
+            cleaned = re.sub(r"(?:',\s*|'\s*)?(?:\\N|\s*\[)?RELACJA HIERARCHICZNA[^]]*\]?\s*", "", cleaned, flags=re.IGNORECASE)
+        cleaned = re.sub(
+            r"(?:',\s*|'\s*|,\s*)?(?:eliminacja|z[a]kaz|wykluczon\w+)\s+hybryd[^]]*\]?",
+            "",
+            cleaned,
+            flags=re.IGNORECASE,
+        )
         cleaned = re.sub(r",?\s*wykluczona forma\s+'[^']*'\s*\([^)]*\)\s*\]?", "]", cleaned, flags=re.IGNORECASE)
-        cleaned = re.sub(r"\]\s*'", "]", cleaned)
-        cleaned = re.sub(r"'\s*,", ",", cleaned)
-        cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
+        if cleaned != text:
+            cleaned = re.sub(r"\]\s*'(?!\s*\w)", "]", cleaned)
+            cleaned = re.sub(r"\s{2,}", " ", cleaned).strip()
         return cleaned
 
     def update_from_episode_profile(

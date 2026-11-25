@@ -3492,11 +3492,15 @@ class MultimodalTranslator:
                     "tło",
                     "mężczyzna (postać)",
                     "kobieta (postać)",
+                    "mężczyzna (postać drugoplanowa)",
+                    "kobieta (postać drugoplanowa)",
+                    "mężczyzna (postać epizodyczna)",
+                    "kobieta (postać epizodyczna)",
                     "mężczyzna",
                     "kobieta",
                     "postać męska",
                     "postać żeńska",
-                ) or clean_d.startswith(("postać (postać", "mężczyzna (postać", "kobieta (postać"))
+                ) or clean_d.startswith("postać (postać")
 
             # Hotfix 11.2.23a + Standard 11.2.27 (OBS-02): Deduplikacja generycznych aliasów (w tym wariantów wielkości liter)
             entry_meta: Dict[str, Tuple[bool, Tuple[int, int, int]]] = {}
