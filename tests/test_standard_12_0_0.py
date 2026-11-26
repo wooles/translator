@@ -3,10 +3,17 @@ Zestaw nienaruszalnych, nietautologicznych testów regresyjnych dla Standardu 12
 - Commit 1 (5 testów): A-1, A-2, A-3, E-1, E-2
 """
 
+import concurrent.futures
 import json
+import threading
 import types
+import httpx
 import pytest
 import pysubs2
+from google import genai
+from google.genai import types as genai_types
+
+from pipeline_logger import EpisodeFlightRecorder
 
 from translator import (
     MultimodalTranslator,
@@ -797,3 +804,235 @@ def test_d2_offline_recall_on_representative_edited_vs_null_lines():
 
     trivial_selected = len(trivial_null_ids & selected_ids)
     assert trivial_selected <= 0.60 * len(trivial_null_ids)
+
+
+# =====================================================================
+# COMMIT 4: Konsolidacja F2 (F-1) i Thread-Safe Obserwator F2 (H-3 / OBS-06)
+# =====================================================================
+
+class _DummyPbarF2:
+    def write(self, msg: str) -> None:
+        pass
+
+    def set_postfix_str(self, s: str) -> None:
+        pass
+
+    def refresh(self) -> None:
+        pass
+
+    def update(self, n: int = 1) -> None:
+        pass
+
+
+def _make_mock_genai_client(handler) -> genai.Client:
+    http_client = httpx.Client(transport=httpx.MockTransport(handler))
+    c = genai.Client(api_key="test_k0", http_options=genai_types.HttpOptions(httpx_client=http_client))
+    if getattr(c._api_client, "_httpx_client", None) is not http_client:
+        c._api_client._httpx_client = http_client
+    return c
+
+
+@pytest.mark.unit
+def test_f1_phase2_consolidation_merges_batches_and_maps_results_back_losslessly(monkeypatch):
+    """
+    F-1: 8 paczek F1 (po 14 kandydatów F2 = 112 linii) konsoliduje się w <= 3 wywołania F2
+    (<= 48 linii każde), a _execute_consolidated_phase2_group + _process_phase2_only bezstratnie
+    odtwarza wszystkie 112 wyników do oryginalnych paczek i oryginalnych ID linii.
+    """
+    monkeypatch.setenv("AVT_CONSOLIDATE_F2", "1")
+    monkeypatch.setattr("time.sleep", lambda s: None)
+    monkeypatch.setattr("client_factory.global_rate_limiter.acquire", lambda: None)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        raw_req = json.loads(request.content.decode("utf-8"))
+        prompt_txt = str(raw_req)
+        import re as _re
+        ids_found = sorted({int(m) for m in _re.findall(r"\[LINIA #(\d+)\]", prompt_txt)})
+        if not ids_found:
+            ids_found = list(range(1, 49))
+        lines_out = [
+            {"id": lid, "refined_pl": f"Szlif_cons_{lid}", "changes_made": "Redakcja"}
+            for lid in ids_found
+        ]
+        body = {
+            "candidates": [{"content": {"role": "model", "parts": [{"text": json.dumps({"lines": lines_out})}]}}],
+            "usageMetadata": {"promptTokenCount": 14000, "cachedContentTokenCount": 0, "candidatesTokenCount": 400, "thoughtsTokenCount": 80},
+        }
+        return httpx.Response(200, json=body)
+
+    tr = MultimodalTranslator(api_key="mock_k0", model="gemini-4-hydrogen", enable_verifier=True)
+    mock_c = _make_mock_genai_client(handler)
+    tr.verifier.client_pool.clients = [mock_c]
+    tr.verifier.client = mock_c
+
+    phase1_outputs = {}
+    for b_idx in range(8):
+        p1_items = []
+        untranslated = []
+        for local_i in range(1, 29):
+            orig_i = b_idx * 28 + (local_i - 1)
+            ev = pysubs2.SSAEvent(start=orig_i * 1000, end=orig_i * 1000 + 800, text=f"Source sentence {orig_i}.", name="Bohater_A")
+            untranslated.append((orig_i, ev, ev.text, ""))
+            p1_items.append({
+                "id": local_i,
+                "orig_idx": orig_i,
+                "event": ev,
+                "style": "Default",
+                "en": f"We might as well test line {orig_i} right now.",
+                "pl": f"Draft_b{b_idx}_id{local_i}",
+                "speaker": "Bohater_A",
+                "speaker_name": "Bohater_A",
+                "calque_score": 0.65 if local_i <= 14 else 0.0,
+                "notes": "",
+                "is_sign": False,
+                "is_song": False,
+            })
+        phase1_outputs[b_idx] = {
+            "b_idx": b_idx,
+            "pass1_items": p1_items,
+            "untranslated_in_batch": untranslated,
+            "scene_desc": f"Scena {b_idx}",
+            "batch_response": types.SimpleNamespace(scene_diagnosis=f"Diagnoza sceny {b_idx}"),
+            "lookback_history": [],
+            "lookahead_events": [],
+            "scoped_series_bible_str": "",
+            "user_feedback_str": "",
+            "glossary_str": "",
+            "episode_profile_str": "",
+            "manga_canon_str": "",
+            "batch_glossary_items": [],
+            "speakers_on_ty": set(),
+            "scene_has_first_name_vocative": False,
+            "is_ass": True,
+            "pbar": _DummyPbarF2(),
+            "combined_glossary": {},
+            "all_user_rules": [],
+            "episode_profile": None,
+            "total_batches": 8,
+        }
+
+    groups = tr._consolidate_phase2_batches(phase1_outputs, max_lines_per_f2_call=48)
+    assert 2 <= len(groups) <= 3
+    total_cons_lines = sum(len(g["verifier_items"]) for g in groups)
+    assert total_cons_lines == 112
+    assert all(len(g["verifier_items"]) <= 48 for g in groups)
+    assert any("--- ZMIANA SCENY ---" in (g.get("scene_diagnosis") or "") for g in groups)
+
+    mapped_all = {}
+    for g in groups:
+        res_map = tr._execute_consolidated_phase2_group(g)
+        for ob, rlist in res_map.items():
+            mapped_all.setdefault(ob, []).extend(rlist)
+
+    restored_count = 0
+    for b_idx in range(8):
+        b_out = tr._process_phase2_only(
+            phase1_outputs[b_idx],
+            preverified_refined_lines=mapped_all.get(b_idx, []),
+            skip_verifier_call=True,
+        )
+        res_dict = b_out[1]
+        assert len(res_dict) == 28
+        for local_i in range(1, 15):
+            orig_i = b_idx * 28 + (local_i - 1)
+            assert res_dict[orig_i].startswith("Szlif_cons_")
+            restored_count += 1
+    assert restored_count == 112
+
+
+@pytest.mark.unit
+def test_f1_consolidation_respects_rollback_env_flag_and_non_hydrogen_path(monkeypatch):
+    """
+    F-1: AVT_CONSOLIDATE_F2=0 wyłącza konsolidację F2 (bezstratny powrót do trybu 1:1),
+    a model spoza rodziny Hydrogen nie uruchamia konsolidacji.
+    """
+    dummy_outputs = {
+        i: {
+            "b_idx": i,
+            "pass1_items": [{"id": 1, "en": "Long test sentence here.", "pl": "Długie zdanie testowe.", "calque_score": 0.6}],
+        }
+        for i in range(4)
+    }
+
+    tr_h = MultimodalTranslator(api_key="mock_k0", model="gemini-4-hydrogen", enable_verifier=True)
+    monkeypatch.setenv("AVT_CONSOLIDATE_F2", "0")
+    assert tr_h._consolidate_phase2_batches(dummy_outputs) == []
+
+    monkeypatch.setenv("AVT_CONSOLIDATE_F2", "1")
+    tr_flash = MultimodalTranslator(api_key="mock_k0", model="gemini-3.8-flash", enable_verifier=True)
+    assert tr_flash._consolidate_phase2_batches(dummy_outputs) == []
+
+
+@pytest.mark.unit
+def test_h3_obs06_phase2_retry_observer_is_thread_safe_under_parallel_workers(tmp_path, monkeypatch):
+    """
+    H-3 (OBS-06): Równoległe wątki F2 korzystające ze wspólnej puli client_pool raportują błędy
+    przez dispatcher threading.local() bez wzajemnego nadpisywania batch_id i z czystym przywróceniem hooka.
+    """
+    monkeypatch.setattr("time.sleep", lambda s: None)
+    monkeypatch.setattr("client_factory.global_rate_limiter.acquire", lambda: None)
+    monkeypatch.setattr("context_cache.ContextCacheManager.get_or_create_cache", lambda *a, **kw: "__IMPLICIT_CACHE_95__")
+
+    barrier = threading.Barrier(2, timeout=5)
+    thread_attempts = {}
+    tlock = threading.Lock()
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        prompt_txt = request.content.decode("utf-8", errors="ignore")
+        b_tag = 1 if "Line from batch 1." in prompt_txt else 2
+        with tlock:
+            cnt = thread_attempts.get(b_tag, 0) + 1
+            thread_attempts[b_tag] = cnt
+        if cnt == 1:
+            barrier.wait()
+            return httpx.Response(
+                503,
+                json={"error": {"code": 503, "message": "Overloaded.", "status": "UNAVAILABLE"}},
+            )
+        return httpx.Response(
+            200,
+            json={
+                "candidates": [{"content": {"role": "model", "parts": [{"text": json.dumps({"lines": [{"id": 1, "refined_pl": f"Po szlifie {b_tag}.", "changes_made": "Styl"}]})}]}}],
+                "usageMetadata": {"promptTokenCount": 800, "cachedContentTokenCount": 0, "candidatesTokenCount": 80, "thoughtsTokenCount": 20},
+            },
+        )
+
+    tr = MultimodalTranslator(api_key="mock_k0", model="gemini-4-hydrogen", enable_verifier=True)
+    mock_c = _make_mock_genai_client(handler)
+    tr.verifier.client_pool.clients = [mock_c]
+    tr.verifier.client = mock_c
+    orig_report = tr.verifier.client_pool.report_error
+
+    rec = EpisodeFlightRecorder(anime_slug="obs06_series", filename="ep01", trace_dir=tmp_path, enabled=True)
+    tr.flight_recorder = rec
+
+    def _run_worker(b_idx: int):
+        ev = pysubs2.SSAEvent(start=1000, end=2500, text=f"Line from batch {b_idx}.", name="Bohater_A")
+        p1_data = {
+            "b_idx": b_idx,
+            "pass1_items": [{
+                "id": 1, "orig_idx": b_idx, "event": ev, "style": "Default",
+                "en": f"Line from batch {b_idx}.", "pl": f"Szkic {b_idx}.",
+                "speaker": "Bohater_A", "speaker_name": "Bohater_A",
+                "is_sign": False, "is_song": False, "calque_score": 0.5, "notes": "",
+            }],
+            "untranslated_in_batch": [(b_idx, ev, ev.text, "")],
+            "scene_desc": f"Scene {b_idx}", "batch_response": None,
+            "lookback_history": [], "lookahead_events": [],
+            "scoped_series_bible_str": "", "user_feedback_str": "", "glossary_str": "",
+            "episode_profile_str": "", "manga_canon_str": "", "batch_glossary_items": [],
+            "speakers_on_ty": set(), "scene_has_first_name_vocative": False,
+            "is_ass": True, "pbar": _DummyPbarF2(), "combined_glossary": {},
+            "all_user_rules": [], "episode_profile": None, "total_batches": 2,
+        }
+        return tr._process_phase2_only(p1_data)
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+        futs = [pool.submit(_run_worker, 1), pool.submit(_run_worker, 2)]
+        for f in concurrent.futures.as_completed(futs):
+            f.result()
+
+    assert tr.verifier.client_pool.report_error == orig_report
+    events = [json.loads(line) for line in rec.jsonl_path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    retry_batches = sorted(ev["batch_id"] for ev in events if ev.get("stage") == "retry")
+    assert retry_batches == [1, 2]

@@ -6249,9 +6249,259 @@ class MultimodalTranslator:
 
         return selected_copies
 
+    def _enter_f2_retry_observer(self, b_idx: int) -> Tuple[Any, Any]:
+        """Thread-safe reference-counted TLS retry observer for F2 client_pool (Standard 12.0.0 H-3 / OBS-06)."""
+        tls = getattr(self, "_f2_retry_observer_tls", None)
+        if tls is None:
+            tls = threading.local()
+            self._f2_retry_observer_tls = tls
+        _v_pool = getattr(getattr(self, "verifier", None), "client_pool", None)
+        if self.flight_recorder and _v_pool is not None and callable(getattr(_v_pool, "report_error", None)):
+            with self.lock:
+                active_cnt = int(getattr(_v_pool, "_avt_f2_active_count", 0) or 0)
+                if active_cnt == 0:
+                    _base_report = _v_pool.report_error
+                    _v_num_keys = len(getattr(_v_pool, "clients", []) or [1])
+
+                    def _tls_dispatched_f2_report_error(client_obj: Any, error_str: str) -> Any:
+                        obs_state = getattr(tls, "f2_state", None)
+                        if obs_state is not None:
+                            obs_state["attempt"] += 1
+                            _att = obs_state["attempt"]
+                            _err_t = self._classify_retry_error_type(
+                                error_str if str(error_str or "").strip() else TimeoutError()
+                            )
+                            _est_wait_ms = (
+                                1500
+                                if _err_t in ("503", "504", "TimeoutError")
+                                else (200 if _att % max(1, _v_num_keys) != 0 else 600)
+                            )
+                            self._log_retry_telemetry(
+                                batch_id=obs_state["batch_id"],
+                                phase="F2",
+                                error_type=_err_t,
+                                attempt_number=_att,
+                                wait_ms=_est_wait_ms,
+                                model=str(getattr(self.verifier, "model", "") or ""),
+                                error_detail=str(error_str or ""),
+                            )
+                        return _base_report(client_obj, error_str)
+
+                    _v_pool._avt_f2_orig_report_error = _base_report
+                    _v_pool.report_error = _tls_dispatched_f2_report_error
+                _v_pool._avt_f2_active_count = active_cnt + 1
+            tls.f2_state = {"batch_id": b_idx, "attempt": 0}
+            return _v_pool, tls
+        return None, None
+
+    def _exit_f2_retry_observer(self, _v_pool: Any, tls: Any) -> None:
+        """Detaches current thread's TLS state and restores original report_error when last F2 worker exits."""
+        if tls is not None:
+            tls.f2_state = None
+        if _v_pool is not None:
+            with self.lock:
+                remaining = max(0, int(getattr(_v_pool, "_avt_f2_active_count", 1) or 1) - 1)
+                _v_pool._avt_f2_active_count = remaining
+                if remaining == 0 and hasattr(_v_pool, "_avt_f2_orig_report_error"):
+                    _v_pool.report_error = _v_pool._avt_f2_orig_report_error
+
+    def _consolidate_phase2_batches(
+        self,
+        phase1_outputs: Dict[int, Dict[str, Any]],
+        max_lines_per_f2_call: int = 48,
+    ) -> List[Dict[str, Any]]:
+        """
+        Standard 12.0.0 (F-1): Merges Risk-Weighted F2 candidates across consecutive F1 batches
+        into <= 48-line consolidated calls for Hydrogen Zero-Cache Lean when AVT_CONSOLIDATE_F2=1
+        and len(phase1_outputs) >= 3. Preserves lossless mapping back to original batch_id / line id.
+        """
+        if (
+            not phase1_outputs
+            or len(phase1_outputs) < 3
+            or os.getenv("AVT_CONSOLIDATE_F2", "1") != "1"
+            or not (self.enable_verifier and hasattr(self, "verifier") and self.verifier)
+        ):
+            return []
+
+        from model_resolver import is_gemini_4_or_hydrogen_model
+
+        v_model_name = getattr(self.verifier, "model", getattr(self, "model_phase2", self.model))
+        v_prompt_len = len(getattr(self.verifier, "system_prompt", ""))
+        if not (is_gemini_4_or_hydrogen_model(v_model_name) and v_prompt_len < 60000):
+            return []
+
+        sorted_bidxs = sorted(phase1_outputs.keys())
+        total_batches_f2 = max(1, len(sorted_bidxs))
+        episode_remaining = 115
+        selected_stream: List[Tuple[int, Dict[str, Any], Dict[str, Any]]] = []
+
+        for b_idx in sorted_bidxs:
+            p1_data = phase1_outputs[b_idx]
+            p1_items = p1_data.get("pass1_items") or []
+            cands = self._select_hydrogen_phase2_candidates(
+                p1_items,
+                total_batches=total_batches_f2,
+                episode_line_cap=115,
+            )
+            if episode_remaining <= 0:
+                cands = []
+            elif len(cands) > episode_remaining:
+                cands = cands[:episode_remaining]
+            episode_remaining -= len(cands)
+            for it in cands:
+                selected_stream.append((b_idx, it, p1_data))
+
+        if not selected_stream:
+            return []
+
+        max_per_call = max(1, int(max_lines_per_f2_call))
+        consolidated_groups: List[Dict[str, Any]] = []
+        for start_i in range(0, len(selected_stream), max_per_call):
+            chunk = selected_stream[start_i : start_i + max_per_call]
+            chunk_items: List[Dict[str, Any]] = []
+            id_map: Dict[int, Tuple[int, int]] = {}
+            source_bidxs: List[int] = []
+            seen_diags: List[str] = []
+            scene_descs: List[str] = []
+
+            for c_pos, (orig_bidx, orig_item, p1_data) in enumerate(chunk, start=1):
+                item_copy = copy.deepcopy(orig_item)
+                orig_local_id = int(item_copy.get("id", c_pos))
+                item_copy["id"] = c_pos
+                id_map[c_pos] = (orig_bidx, orig_local_id)
+                chunk_items.append(item_copy)
+
+                if orig_bidx not in source_bidxs:
+                    source_bidxs.append(orig_bidx)
+                    s_desc = str(p1_data.get("scene_desc") or "").strip()
+                    if s_desc and s_desc not in scene_descs:
+                        scene_descs.append(s_desc)
+                    b_resp = p1_data.get("batch_response")
+                    s_diag = getattr(b_resp, "scene_diagnosis", None) if b_resp else None
+                    if s_diag:
+                        diag_text = (
+                            str(getattr(s_diag, "dramatic_context", "") or s_diag)
+                            if not isinstance(s_diag, dict)
+                            else str(s_diag.get("dramatic_context") or s_diag)
+                        ).strip()
+                        if diag_text and diag_text not in seen_diags:
+                            seen_diags.append(diag_text)
+
+            first_p1 = phase1_outputs[source_bidxs[0]]
+            consolidated_groups.append({
+                "consolidated_idx": len(consolidated_groups),
+                "verifier_items": chunk_items,
+                "id_map": id_map,
+                "source_bidxs": source_bidxs,
+                "scene_desc": "\n--- ZMIANA SCENY ---\n".join(scene_descs) if scene_descs else "",
+                "scene_diagnosis": ("\n--- ZMIANA SCENY ---\n".join(seen_diags) if seen_diags else None),
+                "episode_profile_str": first_p1.get("episode_profile_str", ""),
+                "user_feedback_str": first_p1.get("user_feedback_str", ""),
+                "glossary_str": first_p1.get("glossary_str", ""),
+                "scoped_series_bible_str": first_p1.get("scoped_series_bible_str", ""),
+                "manga_canon_str": first_p1.get("manga_canon_str", ""),
+                "episode_profile": first_p1.get("episode_profile"),
+                "lookback_history": first_p1.get("lookback_history", []),
+                "lookahead_events": first_p1.get("lookahead_events", []),
+                "pbar": first_p1.get("pbar"),
+            })
+
+        return consolidated_groups
+
+    def _execute_consolidated_phase2_group(self, cons_group: Dict[str, Any]) -> Dict[int, List[Any]]:
+        """
+        Executes one consolidated F2 verify_batch call (Standard 12.0.0 F-1) with H-3 TLS retry observer
+        and maps returned RefinedLine objects losslessly back to {orig_bidx: [RefinedLine_with_orig_id]}.
+        """
+        verifier_items = cons_group.get("verifier_items") or []
+        if not verifier_items or not (self.enable_verifier and hasattr(self, "verifier") and self.verifier):
+            return {}
+
+        c_idx = int(cons_group.get("consolidated_idx", 0))
+        pbar = cons_group.get("pbar")
+        budget_val = getattr(
+            self.verifier,
+            "calculate_effective_budget",
+            lambda items: getattr(self.verifier, "thinking_budget", 2048),
+        )(verifier_items)
+        model_tag = "Flash" if "flash" in getattr(self.verifier, "model", "").lower() else "Pro"
+        cot_info_str = f"Faza 2 Konsolidacja #{c_idx + 1} (Redakcja {model_tag} CoT: {budget_val}, {len(verifier_items)} linii)"
+        if pbar and hasattr(pbar, "write"):
+            pbar.write(f" ├─ [{cot_info_str}]")
+
+        t0_p2 = time.perf_counter()
+        focused_rules = get_focused_rules_for_batch(verifier_items, max_rules=5 if len(verifier_items) > 40 else 3)
+        focused_rules = _append_phase2_linebreak_hygiene_rule(focused_rules, verifier_items)
+        clean_f2_reg = _build_clean_f2_character_registry(
+            getattr(self, "character_registry", None),
+            episode_profile=cons_group.get("episode_profile"),
+            dedup_dossiers=bool(
+                bool(cons_group.get("episode_profile_str"))
+                or bool(getattr(self.verifier, "_episode_knowledge_cached", False))
+            ),
+        )
+        _v_pool, _f2_tls = self._enter_f2_retry_observer(c_idx)
+        try:
+            refined_lines = self.verifier.verify_batch(
+                batch_items=verifier_items,
+                scene_summary=cons_group.get("scene_desc") or "",
+                episode_profile_str=cons_group.get("episode_profile_str") or "",
+                user_feedback_str=cons_group.get("user_feedback_str") or "",
+                glossary_str=cons_group.get("glossary_str") or "",
+                focused_rules_str=focused_rules,
+                series_bible_str=cons_group.get("scoped_series_bible_str") or "",
+                manga_canon_str=cons_group.get("manga_canon_str") or "",
+                history_context=cons_group.get("lookback_history") or [],
+                lookahead_events=cons_group.get("lookahead_events") or [],
+                character_registry=clean_f2_reg,
+                scene_diagnosis=cons_group.get("scene_diagnosis"),
+                batch_idx=c_idx + 1,
+            )
+        finally:
+            self._exit_f2_retry_observer(_v_pool, _f2_tls)
+
+        elapsed_p2 = round(max(0.0, time.perf_counter() - t0_p2), 2)
+        _vtl = getattr(self.verifier, "_thread_local", None)
+        p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
+        p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
+        if self.flight_recorder:
+            try:
+                self.flight_recorder.log_phase2_verifier(
+                    batch_id=c_idx,
+                    cot_budget=budget_val,
+                    prompt_dump=getattr(self.verifier, "last_prompt", "") or "",
+                    raw_response=[
+                        r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r))
+                        for r in refined_lines
+                    ],
+                    response_time_sec=elapsed_p2,
+                    token_usage=p2_tok_usage,
+                )
+            except Exception:
+                logger.debug("Rejestracja skonsolidowanej weryfikacji F2 zakończona wyjątkiem", exc_info=True)
+
+        self._audit_batch_context_cache(b_idx=c_idx, cached_tokens=p2_cached, phase="phase2")
+
+        id_map = cons_group.get("id_map") or {}
+        mapped_by_bidx: Dict[int, List[Any]] = {}
+        for r in refined_lines:
+            c_id = int(getattr(r, "id", 0))
+            if c_id not in id_map:
+                continue
+            orig_bidx, orig_local_id = id_map[c_id]
+            r_copy = copy.copy(r)
+            try:
+                setattr(r_copy, "id", orig_local_id)
+            except Exception:
+                pass
+            mapped_by_bidx.setdefault(orig_bidx, []).append(r_copy)
+        return mapped_by_bidx
+
     def _process_phase2_only(
         self,
-        phase1_data: Dict[str, Any]
+        phase1_data: Dict[str, Any],
+        preverified_refined_lines: Optional[List[Any]] = None,
+        skip_verifier_call: bool = False,
     ) -> Tuple[int, Dict[int, str], Dict[int, str], List[Any], List[Dict[str, Any]], str, str]:
         """
         Executes Phase 2 Script Doctor / Verifier and morphological post-processing on Phase 1 output.
@@ -6292,167 +6542,146 @@ class MultimodalTranslator:
             is_h_lean_f2 = is_gemini_4_or_hydrogen_model(v_model_name) and v_prompt_len < 60000
             total_batches_f2 = max(1, int(phase1_data.get("total_batches", 6) or 6))
 
-            verifier_batch_items = (
-                self._select_hydrogen_phase2_candidates(pass1_items, total_batches=total_batches_f2)
-                if is_h_lean_f2
-                else pass1_items
-            )
-
-            if not verifier_batch_items:
-                if pbar and hasattr(pbar, "write"):
-                    pbar.write(f" ├─ [Faza 2 (Selektywna Redakcja)]: 0/{len(pass1_items)} linii wysokiego ryzyka — zachowano zweryfikowany szkic F1.")
+            refined_lines: List[RefinedLine] = []
+            if skip_verifier_call:
+                refined_lines = list(preverified_refined_lines or [])
+                verifier_batch_items = refined_lines
             else:
-                budget_val = getattr(self.verifier, "calculate_effective_budget", lambda items: getattr(self.verifier, "thinking_budget", 2048))(verifier_batch_items)
-                model_tag = "Flash" if "flash" in getattr(self.verifier, "model", "").lower() else "Pro"
-                sel_suffix = f", {len(verifier_batch_items)}/{len(pass1_items)} linii" if len(verifier_batch_items) < len(pass1_items) else ""
-                cot_info_str = f"Faza 2 (Redakcja {model_tag} CoT: {budget_val}{sel_suffix})"
-                if pbar and hasattr(pbar, "set_postfix_str"):
-                    with self.lock:
-                        pbar.set_postfix_str(f"{cot_info_str}...")
-                        pbar.refresh()
-                if pbar and hasattr(pbar, "write"):
-                    pbar.write(f" ├─ [{cot_info_str}]")
-                # Staggered entry (350ms per thread) to prevent simultaneous TPU burst collisions on 503
-                stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
-                if stagger_sec > 0:
-                    time.sleep(stagger_sec)
-
-                seen_p2_paradigms = set()
-                seen_p2_glossary = set()
-                seen_p2_speaker_voice = {}
-                seen_p2_speaker_prosody = {}
-                prev_speaker_name = None
-                for it in verifier_batch_items:
-                    paradigms = it.get("declension_paradigms")
-                    if paradigms:
-                        if isinstance(paradigms, list):
-                            new_pars = []
-                            for p in paradigms:
-                                p_key = str(p).strip()
-                                if p_key not in seen_p2_paradigms:
-                                    seen_p2_paradigms.add(p_key)
-                                    new_pars.append(p)
-                            it["declension_paradigms"] = new_pars
-                        else:
-                            p_key = str(paradigms).strip()
-                            if p_key in seen_p2_paradigms:
-                                it["declension_paradigms"] = []
-                            else:
-                                seen_p2_paradigms.add(p_key)
-
-                    gloss_term = it.get("canonical_glossary_term")
-                    if gloss_term:
-                        g_key = str(gloss_term).strip().lower()
-                        if g_key in seen_p2_glossary:
-                            it["canonical_glossary_term"] = None
-                        else:
-                            seen_p2_glossary.add(g_key)
-
-                    spk_name = (it.get("speaker_name") or it.get("speaker") or "").strip()
-                    spk_voice = it.get("speaker_voice", "")
-                    spk_prosody = it.get("prosody", "")
-                    if spk_name:
-                        if prev_speaker_name == spk_name:
-                            if spk_voice and seen_p2_speaker_voice.get(spk_name) == spk_voice:
-                                it["speaker_voice"] = ""
-                            if spk_prosody and seen_p2_speaker_prosody.get(spk_name) == spk_prosody:
-                                it["prosody"] = ""
-                        if spk_voice and not seen_p2_speaker_voice.get(spk_name):
-                            seen_p2_speaker_voice[spk_name] = spk_voice
-                        if spk_prosody and not seen_p2_speaker_prosody.get(spk_name):
-                            seen_p2_speaker_prosody[spk_name] = spk_prosody
-                    prev_speaker_name = spk_name
-
-                t0_phase2 = time.perf_counter()
-                phase2_focused_rules = get_focused_rules_for_batch(verifier_batch_items, max_rules=5 if len(verifier_batch_items) > 40 else 3)
-                phase2_focused_rules = _append_phase2_linebreak_hygiene_rule(phase2_focused_rules, verifier_batch_items)
-                # INC-AVT-060: Offset klucza dla Fazy 2 zapobiegający kolizji pamięci TPU z Fazą 1
-                f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx
-                # Standard 11.2.26 (OBS-04): Scoped obserwator ponowień F2 bez modyfikacji chronionego Z16 verifier.py
-                _v_pool = getattr(self.verifier, "client_pool", None)
-                _orig_v_report_error = getattr(_v_pool, "report_error", None) if _v_pool is not None else None
-                if self.flight_recorder and _v_pool is not None and callable(_orig_v_report_error):
-                    _f2_attempt_box = [0]
-                    _v_num_keys = len(getattr(_v_pool, "clients", []) or [1])
-
-                    def _observed_f2_report_error(client_obj: Any, error_str: str) -> Any:
-                        _f2_attempt_box[0] += 1
-                        _att = _f2_attempt_box[0]
-                        _err_t = self._classify_retry_error_type(error_str if str(error_str or "").strip() else TimeoutError())
-                        _est_wait_ms = 1500 if _err_t in ("503", "504", "TimeoutError") else (200 if _att % max(1, _v_num_keys) != 0 else 600)
-                        self._log_retry_telemetry(
-                            batch_id=b_idx,
-                            phase="F2",
-                            error_type=_err_t,
-                            attempt_number=_att,
-                            wait_ms=_est_wait_ms,
-                            model=str(getattr(self.verifier, "model", "") or ""),
-                            error_detail=str(error_str or "")
-                        )
-                        return _orig_v_report_error(client_obj, error_str)
-
-                    _v_pool.report_error = _observed_f2_report_error
-
-                f2_scene_summary = scene_desc or ""
-                if episode_profile and verifier_batch_items:
-                    try:
-                        _p2_starts = [int(it.get("start_ms", 0)) for it in verifier_batch_items if it.get("start_ms") is not None]
-                        _p2_ends = [int(it.get("end_ms", 0)) for it in verifier_batch_items if it.get("end_ms") is not None]
-                        if _p2_starts and _p2_ends:
-                            _p2_seq = _resolve_active_dramatic_sequence(episode_profile, min(_p2_starts), max(_p2_ends))
-                            if _p2_seq:
-                                f2_scene_summary = f"{f2_scene_summary}\n[AKTYWNA SEKWENCJA DRAMATURGICZNA]: {_p2_seq}".strip()
-                    except Exception:
-                        logger.debug("Rozwiązanie aktywnej sekwencji dramaturgicznej F2 nieudane", exc_info=True)
-
-                clean_f2_registry = _build_clean_f2_character_registry(
-                    getattr(self, "character_registry", None),
-                    episode_profile=episode_profile,
-                    dedup_dossiers=bool(
-                        is_h_lean_f2
-                        and (bool(episode_profile_str) or bool(getattr(self.verifier, "_episode_knowledge_cached", False)))
-                    ),
+                verifier_batch_items = (
+                    self._select_hydrogen_phase2_candidates(pass1_items, total_batches=total_batches_f2)
+                    if is_h_lean_f2
+                    else pass1_items
                 )
-                try:
-                    refined_lines: List[RefinedLine] = self.verifier.verify_batch(
-                        batch_items=verifier_batch_items,
-                        scene_summary=f2_scene_summary,
-                        episode_profile_str=episode_profile_str,
-                        user_feedback_str=user_feedback_str,
-                        glossary_str=glossary_str,
-                        focused_rules_str=phase2_focused_rules,
-                        series_bible_str=scoped_series_bible_str,
-                        manga_canon_str=manga_canon_str,
-                        history_context=lookback_history,
-                        lookahead_events=lookahead_events,
-                        character_registry=clean_f2_registry,
-                        scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
-                        batch_idx=f2_affinity_idx
+
+                if not verifier_batch_items:
+                    if pbar and hasattr(pbar, "write"):
+                        pbar.write(f" ├─ [Faza 2 (Selektywna Redakcja)]: 0/{len(pass1_items)} linii wysokiego ryzyka — zachowano zweryfikowany szkic F1.")
+                else:
+                    budget_val = getattr(self.verifier, "calculate_effective_budget", lambda items: getattr(self.verifier, "thinking_budget", 2048))(verifier_batch_items)
+                    model_tag = "Flash" if "flash" in getattr(self.verifier, "model", "").lower() else "Pro"
+                    sel_suffix = f", {len(verifier_batch_items)}/{len(pass1_items)} linii" if len(verifier_batch_items) < len(pass1_items) else ""
+                    cot_info_str = f"Faza 2 (Redakcja {model_tag} CoT: {budget_val}{sel_suffix})"
+                    if pbar and hasattr(pbar, "set_postfix_str"):
+                        with self.lock:
+                            pbar.set_postfix_str(f"{cot_info_str}...")
+                            pbar.refresh()
+                    if pbar and hasattr(pbar, "write"):
+                        pbar.write(f" ├─ [{cot_info_str}]")
+                    stagger_sec = (b_idx % max(1, self.concurrent_batches)) * 0.35
+                    if stagger_sec > 0:
+                        time.sleep(stagger_sec)
+
+                    seen_p2_paradigms = set()
+                    seen_p2_glossary = set()
+                    seen_p2_speaker_voice = {}
+                    seen_p2_speaker_prosody = {}
+                    prev_speaker_name = None
+                    for it in verifier_batch_items:
+                        paradigms = it.get("declension_paradigms")
+                        if paradigms:
+                            if isinstance(paradigms, list):
+                                new_pars = []
+                                for p in paradigms:
+                                    p_key = str(p).strip()
+                                    if p_key not in seen_p2_paradigms:
+                                        seen_p2_paradigms.add(p_key)
+                                        new_pars.append(p)
+                                it["declension_paradigms"] = new_pars
+                            else:
+                                p_key = str(paradigms).strip()
+                                if p_key in seen_p2_paradigms:
+                                    it["declension_paradigms"] = []
+                                else:
+                                    seen_p2_paradigms.add(p_key)
+
+                        gloss_term = it.get("canonical_glossary_term")
+                        if gloss_term:
+                            g_key = str(gloss_term).strip().lower()
+                            if g_key in seen_p2_glossary:
+                                it["canonical_glossary_term"] = None
+                            else:
+                                seen_p2_glossary.add(g_key)
+
+                        spk_name = (it.get("speaker_name") or it.get("speaker") or "").strip()
+                        spk_voice = it.get("speaker_voice", "")
+                        spk_prosody = it.get("prosody", "")
+                        if spk_name:
+                            if prev_speaker_name == spk_name:
+                                if spk_voice and seen_p2_speaker_voice.get(spk_name) == spk_voice:
+                                    it["speaker_voice"] = ""
+                                if spk_prosody and seen_p2_speaker_prosody.get(spk_name) == spk_prosody:
+                                    it["prosody"] = ""
+                            if spk_voice and not seen_p2_speaker_voice.get(spk_name):
+                                seen_p2_speaker_voice[spk_name] = spk_voice
+                            if spk_prosody and not seen_p2_speaker_prosody.get(spk_name):
+                                seen_p2_speaker_prosody[spk_name] = spk_prosody
+                        prev_speaker_name = spk_name
+
+                    t0_phase2 = time.perf_counter()
+                    phase2_focused_rules = get_focused_rules_for_batch(verifier_batch_items, max_rules=5 if len(verifier_batch_items) > 40 else 3)
+                    phase2_focused_rules = _append_phase2_linebreak_hygiene_rule(phase2_focused_rules, verifier_batch_items)
+                    f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx
+                    _v_pool, _f2_tls = self._enter_f2_retry_observer(b_idx)
+
+                    f2_scene_summary = scene_desc or ""
+                    if episode_profile and verifier_batch_items:
+                        try:
+                            _p2_starts = [int(it.get("start_ms", 0)) for it in verifier_batch_items if it.get("start_ms") is not None]
+                            _p2_ends = [int(it.get("end_ms", 0)) for it in verifier_batch_items if it.get("end_ms") is not None]
+                            if _p2_starts and _p2_ends:
+                                _p2_seq = _resolve_active_dramatic_sequence(episode_profile, min(_p2_starts), max(_p2_ends))
+                                if _p2_seq:
+                                    f2_scene_summary = f"{f2_scene_summary}\n[AKTYWNA SEKWENCJA DRAMATURGICZNA]: {_p2_seq}".strip()
+                        except Exception:
+                            logger.debug("Rozwiązanie aktywnej sekwencji dramaturgicznej F2 nieudane", exc_info=True)
+
+                    clean_f2_registry = _build_clean_f2_character_registry(
+                        getattr(self, "character_registry", None),
+                        episode_profile=episode_profile,
+                        dedup_dossiers=bool(
+                            is_h_lean_f2
+                            and (bool(episode_profile_str) or bool(getattr(self.verifier, "_episode_knowledge_cached", False)))
+                        ),
                     )
-                finally:
-                    if _v_pool is not None and _orig_v_report_error is not None:
-                        _v_pool.report_error = _orig_v_report_error
-                elapsed_phase2 = round(max(0.0, time.perf_counter() - t0_phase2), 2)
-                _vtl = getattr(self.verifier, "_thread_local", None)
-                p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
-                p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
-
-                # Standard 11.2.22 (Pre-HALT Telemetry Persistence): Utrwalenie rekordu F2 przed audytem budżetowym,
-                # aby pełna telemetria (prompt/cached/output/czas) zachowała się w events.jsonl również przy HALT.
-                if self.flight_recorder:
                     try:
-                        self.flight_recorder.log_phase2_verifier(
-                            batch_id=b_idx,
-                            cot_budget=budget_val if 'budget_val' in locals() else 0,
-                            prompt_dump=getattr(self.verifier, "last_prompt", "") or "",
-                            raw_response=[r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r)) for r in refined_lines],
-                            response_time_sec=elapsed_phase2,
-                            token_usage=p2_tok_usage
+                        refined_lines = self.verifier.verify_batch(
+                            batch_items=verifier_batch_items,
+                            scene_summary=f2_scene_summary,
+                            episode_profile_str=episode_profile_str,
+                            user_feedback_str=user_feedback_str,
+                            glossary_str=glossary_str,
+                            focused_rules_str=phase2_focused_rules,
+                            series_bible_str=scoped_series_bible_str,
+                            manga_canon_str=manga_canon_str,
+                            history_context=lookback_history,
+                            lookahead_events=lookahead_events,
+                            character_registry=clean_f2_registry,
+                            scene_diagnosis=getattr(batch_response, "scene_diagnosis", None) if batch_response else None,
+                            batch_idx=f2_affinity_idx
                         )
-                    except Exception:
-                        logger.debug("Rejestracja weryfikacji w locie zakończona wyjątkiem", exc_info=True)
+                    finally:
+                        self._exit_f2_retry_observer(_v_pool, _f2_tls)
+                    elapsed_phase2 = round(max(0.0, time.perf_counter() - t0_phase2), 2)
+                    _vtl = getattr(self.verifier, "_thread_local", None)
+                    p2_tok_usage = getattr(_vtl, "last_batch_token_usage", None) if _vtl else {}
+                    p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
 
-                self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=p2_cached, phase="phase2")
+                    if self.flight_recorder:
+                        try:
+                            self.flight_recorder.log_phase2_verifier(
+                                batch_id=b_idx,
+                                cot_budget=budget_val if 'budget_val' in locals() else 0,
+                                prompt_dump=getattr(self.verifier, "last_prompt", "") or "",
+                                raw_response=[r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r)) for r in refined_lines],
+                                response_time_sec=elapsed_phase2,
+                                token_usage=p2_tok_usage
+                            )
+                        except Exception:
+                            logger.debug("Rejestracja weryfikacji w locie zakończona wyjątkiem", exc_info=True)
+
+                    self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=p2_cached, phase="phase2")
+
+            if refined_lines:
                 for r in refined_lines:
                     orig_it = next((it for it in pass1_items if it.get("id") == r.id), None)
                     if orig_it:
@@ -7940,21 +8169,52 @@ class MultimodalTranslator:
                                 logger.warning(f"[RE-WARM WARN] Niepowodzenie re-warmu K2: {warm_err}")
                             time.sleep(0.5)
 
-                    # --- STANDARD 11.2.14: ETAP 2 - FAZA 2 REDAKCJA (F2 SEQUENTIAL CANARY GATE NA K2) ---
+                    # --- STANDARD 11.2.14 / 12.0.0 (F-1): ETAP 2 - FAZA 2 REDAKCJA ---
                     sorted_p1_keys = sorted(phase1_outputs.keys())
+                    _p2_method_overridden = (
+                        getattr(getattr(self, "_process_phase2_only", None), "__func__", None)
+                        is not MultimodalTranslator._process_phase2_only
+                    )
+                    cons_groups = (
+                        self._consolidate_phase2_batches(phase1_outputs)
+                        if (
+                            sorted_p1_keys
+                            and not _p2_method_overridden
+                            and self.enable_verifier
+                            and hasattr(self, "verifier")
+                            and self.verifier
+                        )
+                        else []
+                    )
 
-                    # 1. Sekwencyjny Pre-flight Fazy 2 (Paczka 0 jako F2 Canary Gate)
-                    if sorted_p1_keys:
-                        if cancel_check and cancel_check():
-                            print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
-                            remaining_f2_keys = []
-                        else:
-                            canary_f2_bidx = sorted_p1_keys[0]
-                            logger.info(f"[Canary Gate F2]: Uruchamianie sekwencyjnego ugruntowania K2 (Paczka {canary_f2_bidx} / F2 Canary Run)...")
-                            print(f"\n  [Canary Gate F2]: Uruchamianie sekwencyjnego ugruntowania K2 (Paczka {canary_f2_bidx} / F2 Canary Run)...")
-                            canary_f2_output = self._process_phase2_only(phase1_data=phase1_outputs[canary_f2_bidx])
+                    if cons_groups:
+                        logger.info(f"[F-1 Konsolidacja F2]: Scalono {len(sorted_p1_keys)} paczek F1 w {len(cons_groups)} wywołań F2 (<=48 linii każde).")
+                        print(f"\n  [F-1 Konsolidacja F2]: Scalono {len(sorted_p1_keys)} paczek F1 w {len(cons_groups)} zbiorczych wywołań F2...")
+                        f2_mapped_results: Dict[int, List[Any]] = {}
+                        if not (cancel_check and cancel_check()):
+                            canary_mapped = self._execute_consolidated_phase2_group(cons_groups[0])
+                            for k_b, v_list in canary_mapped.items():
+                                f2_mapped_results.setdefault(k_b, []).extend(v_list)
+                            time.sleep(1.0)
+                            for c_grp in cons_groups[1:]:
+                                if cancel_check and cancel_check():
+                                    print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
+                                    break
+                                time.sleep(0.25)
+                                grp_mapped = self._execute_consolidated_phase2_group(c_grp)
+                                for k_b, v_list in grp_mapped.items():
+                                    f2_mapped_results.setdefault(k_b, []).extend(v_list)
+
+                        for b_idx in sorted_p1_keys:
+                            if cancel_check and cancel_check():
+                                break
+                            batch_output = self._process_phase2_only(
+                                phase1_data=phase1_outputs[b_idx],
+                                preverified_refined_lines=f2_mapped_results.get(b_idx, []),
+                                skip_verifier_call=True,
+                            )
                             self._record_batch_results(
-                                batch_output=canary_f2_output,
+                                batch_output=batch_output,
                                 translated_results=translated_results,
                                 translated_regions=translated_regions,
                                 translated_typesetting=translated_typesetting,
@@ -7967,11 +8227,37 @@ class MultimodalTranslator:
                                 progress_callback=progress_callback,
                                 total_lines=total_lines
                             )
-                            # Pauza ugruntowująca snapshot TPU po realnym payloadzie F2
-                            time.sleep(1.0)
-                            remaining_f2_keys = sorted_p1_keys[1:]
-                    else:
                         remaining_f2_keys = []
+                    else:
+                        # 1. Sekwencyjny Pre-flight Fazy 2 (Paczka 0 jako F2 Canary Gate)
+                        if sorted_p1_keys:
+                            if cancel_check and cancel_check():
+                                print("\n[Tłumacz]: Otrzymano sygnał przerwania (⏹ Stop)...")
+                                remaining_f2_keys = []
+                            else:
+                                canary_f2_bidx = sorted_p1_keys[0]
+                                logger.info(f"[Canary Gate F2]: Uruchamianie sekwencyjnego ugruntowania K2 (Paczka {canary_f2_bidx} / F2 Canary Run)...")
+                                print(f"\n  [Canary Gate F2]: Uruchamianie sekwencyjnego ugruntowania K2 (Paczka {canary_f2_bidx} / F2 Canary Run)...")
+                                canary_f2_output = self._process_phase2_only(phase1_data=phase1_outputs[canary_f2_bidx])
+                                self._record_batch_results(
+                                    batch_output=canary_f2_output,
+                                    translated_results=translated_results,
+                                    translated_regions=translated_regions,
+                                    translated_typesetting=translated_typesetting,
+                                    translated_addressees=translated_addressees,
+                                    translated_speakers=translated_speakers,
+                                    episode_whisper_transcriptions=episode_whisper_transcriptions,
+                                    history=history,
+                                    checkpoint_path=checkpoint_path,
+                                    pbar=pbar,
+                                    progress_callback=progress_callback,
+                                    total_lines=total_lines
+                                )
+                                # Pauza ugruntowująca snapshot TPU po realnym payloadzie F2
+                                time.sleep(1.0)
+                                remaining_f2_keys = sorted_p1_keys[1:]
+                        else:
+                            remaining_f2_keys = []
 
                     # 2. Przetworzenie pozostałych paczek Fazy 2 (Standard 11.2.17: rygor 1:1 na kluczu K2 dla Hydrogen)
                     from model_resolver import is_gemini_4_or_hydrogen_model
