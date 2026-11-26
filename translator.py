@@ -1652,6 +1652,308 @@ def _guard_phase2_split_pair_integrity(
             refined_dict[id_i] = re.sub(r"\.(?=(?:\s|\{[^}]*\})*$)", "", ref_raw.rstrip()).strip()
 
 
+_GENERIC_TV_LABELS = frozenset({
+    "", "sign", "unknown", "unspecified", "grupa", "para", "polylogue",
+    "mężczyzna", "kobieta", "nieokreślony", "monolog", "postać", "narrator", "brak",
+})
+_TV_FORMAL_RE = re.compile(
+    r"\b(?:pan|pani|państwo|panie|panu|pana|proszę\s+pana|proszę\s+pani|"
+    r"mistrzu|mistrzyni|prezesie|kapitanie|profesorze|wasza\s+wysokość|"
+    r"wasza\s+miłość|baronie|hrabio)\b",
+    re.IGNORECASE,
+)
+_TV_INFORMAL_RE = re.compile(
+    r"\b(?:na\s+ty|per\s+ty|po\s+imieniu)\b|\bty\s*(?:\(|/)|\((?:\s*na\s+)?ty\s*\)",
+    re.IGNORECASE,
+)
+_ARISTOCRATIC_TITLE_MAP_EN_PL: Dict[str, str] = {
+    "lady": "lady",
+    "lord": "lord",
+    "sir": "sir",
+    "duke": "książę",
+    "duchess": "księżna",
+    "count": "hrabia",
+    "countess": "hrabina",
+    "viscount": "wicehrabia",
+    "viscountess": "wicehrabina",
+    "baron": "baron",
+    "baroness": "baronowa",
+    "marquis": "markiz",
+    "marchioness": "markiza",
+}
+_NON_NAME_TITLE_FOLLOWERS = frozenset({
+    "the", "of", "in", "and", "to", "from", "for", "with", "yes", "no",
+    "please", "wait", "stop", "here", "there", "who", "that", "this",
+    "what", "when", "where", "why", "how", "is", "was", "will", "you", "are",
+})
+_ARISTOCRATIC_TITLE_PAIR_RE = re.compile(
+    r"\b(Lady|Lord|Sir|Duke|Duchess|Count|Countess|Viscount|Viscountess|Baron|Baroness|Marquis|Marchioness)\s+([A-Z][a-zA-Z'-]{2,})\b"
+)
+_SPOKEN_NUMERIC_SCALE_FORMS: Dict[str, Tuple[str, str, str, str]] = {
+    "mln": ("milion", "miliony", "milionów", "miliona"),
+    "mld": ("miliard", "miliardy", "miliardów", "miliarda"),
+    "tys": ("tysiąc", "tysiące", "tysięcy", "tysiąca"),
+}
+_SPOKEN_NUMERIC_ABBR_RE = re.compile(
+    r"(\b\d+(?:[\s\u00a0]\d{3})*(?:[.,]\d+)?)\s+(mln|mld|tys)(\.?)(?=$|[\s,!?;:…\"”»)\]\-—.\\])",
+    re.IGNORECASE,
+)
+
+
+def _is_generic_tv_entity(raw_name: Optional[str]) -> bool:
+    if not raw_name or not str(raw_name).strip():
+        return True
+    if is_generic_actor_or_category(str(raw_name)):
+        return True
+    cleaned = extract_clean_speaker_name(str(raw_name)).strip().lower()
+    if not cleaned or cleaned in _GENERIC_TV_LABELS:
+        return True
+    if cleaned.startswith(("grupa ", "para ", "dwie ", "dwóch ", "polylogue", "unknown")):
+        return True
+    return False
+
+
+def _build_entity_alias_set(raw_name: str, series_bible: Any) -> set:
+    base_clean = extract_clean_speaker_name(str(raw_name)).strip().lower()
+    aliases = {str(raw_name).strip().lower(), base_clean}
+    aliases.discard("")
+    if not series_bible or not base_clean:
+        return aliases
+    chars_dict = getattr(series_bible, "characters", None)
+    if chars_dict is None and getattr(series_bible, "data", None):
+        chars_dict = series_bible.data.get("characters", {})
+    if not isinstance(chars_dict, dict):
+        return aliases
+    for c_key, c_rec in chars_dict.items():
+        c_key_str = str(c_key or "").strip()
+        c_key_low = c_key_str.lower()
+        c_key_clean = extract_clean_speaker_name(c_key_str).strip().lower()
+        rec_name = (
+            getattr(c_rec, "name", None)
+            if not isinstance(c_rec, dict)
+            else c_rec.get("name")
+        ) or c_key_str
+        rec_name_low = str(rec_name).strip().lower()
+        rec_aliases_raw = (
+            getattr(c_rec, "aliases", None)
+            if not isinstance(c_rec, dict)
+            else c_rec.get("aliases")
+        ) or []
+        cand_set = {c_key_low, c_key_clean, rec_name_low}
+        for al in rec_aliases_raw:
+            al_s = str(al or "").strip()
+            if al_s:
+                cand_set.add(al_s.lower())
+                cand_set.add(extract_clean_speaker_name(al_s).strip().lower())
+        cand_set.discard("")
+        if base_clean in cand_set:
+            aliases.update(cand_set)
+    return aliases
+
+
+def _extract_tv_directive_from_desc(rel_desc: str) -> Optional[str]:
+    if not rel_desc:
+        return None
+    # Strip appended telemetry brackets [KOBIETA (Adresat) - W 2. os. lp. 'ty' ...] before T-V analysis
+    base_desc = re.sub(r"\[[^\]]*\]", " ", str(rel_desc)).strip()
+    base_desc = re.sub(r"\\N", " ", base_desc).strip()
+    if not base_desc:
+        return None
+    m_q = re.search(r"Zwrot:\s*'([^']+)'", base_desc)
+    quoted_form = m_q.group(1).strip() if m_q else base_desc
+    clean_addr_form = re.sub(r"\s+", " ", quoted_form).strip()[:45]
+    if not clean_addr_form:
+        return None
+
+    is_pure_ty_quote = bool(re.fullmatch(r"(?:na\s+|per\s+)?ty(?:\s*\([^)]*\))?", quoted_form.strip(), re.IGNORECASE))
+    has_formal = bool(_TV_FORMAL_RE.search(quoted_form)) or (not is_pure_ty_quote and bool(_TV_FORMAL_RE.search(base_desc)))
+    has_informal = (
+        bool(_TV_INFORMAL_RE.search(quoted_form))
+        or bool(_TV_INFORMAL_RE.search(base_desc))
+        or bool(re.match(r"^(?:na\s+)?ty\b", quoted_form.strip(), re.IGNORECASE))
+    )
+    if has_formal and not is_pure_ty_quote:
+        return f"pan/pani ({clean_addr_form})"
+    if has_informal:
+        return f"na ty ({clean_addr_form})"
+    return None
+
+
+def _resolve_tv_address_form(
+    speaker_name: str,
+    target_name: str,
+    series_bible: Any,
+    episode_profile: Any = None,
+) -> Optional[str]:
+    """
+    Resolves directional T-V register strictly for (Speaker -> Addressee) using normalized character aliases.
+    Never uses reverse (B -> A) relations for lines spoken in direction (A -> B).
+    """
+    if _is_generic_tv_entity(speaker_name) or _is_generic_tv_entity(target_name):
+        return None
+    spk_aliases = _build_entity_alias_set(speaker_name, series_bible)
+    tgt_aliases = _build_entity_alias_set(target_name, series_bible)
+
+    if episode_profile is not None and getattr(episode_profile, "characters", None):
+        for rel in episode_profile.characters:
+            rel_s = str(getattr(rel, "speaker", None) or (rel.get("speaker") if isinstance(rel, dict) else "") or "").strip()
+            rel_t = str(getattr(rel, "listener", None) or (rel.get("listener") if isinstance(rel, dict) else "") or "").strip()
+            rel_f = str(getattr(rel, "address_form", None) or (rel.get("address_form") if isinstance(rel, dict) else "") or "").strip()
+            if not rel_s or not rel_t or not rel_f:
+                continue
+            s_low = extract_clean_speaker_name(rel_s).strip().lower()
+            t_low = extract_clean_speaker_name(rel_t).strip().lower()
+            if (rel_s.lower() in spk_aliases or s_low in spk_aliases) and (rel_t.lower() in tgt_aliases or t_low in tgt_aliases):
+                res_tv = _extract_tv_directive_from_desc(rel_f)
+                if res_tv:
+                    return res_tv
+
+    rel_map = None
+    if series_bible is not None:
+        if hasattr(series_bible, "get_relations_snapshot"):
+            rel_map = series_bible.get_relations_snapshot()
+        else:
+            rel_map = getattr(series_bible, "relations", None) or (getattr(series_bible, "data", None) or {}).get("relations")
+    if isinstance(rel_map, dict):
+        for rel_key, rel_desc in rel_map.items():
+            if "->" not in str(rel_key):
+                continue
+            lhs_raw, rhs_raw = str(rel_key).split("->", 1)
+            lhs = lhs_raw.strip()
+            rhs = rhs_raw.strip()
+            lhs_clean = extract_clean_speaker_name(lhs).strip().lower()
+            rhs_clean = extract_clean_speaker_name(rhs).strip().lower()
+            if (lhs.lower() in spk_aliases or lhs_clean in spk_aliases) and (rhs.lower() in tgt_aliases or rhs_clean in tgt_aliases):
+                res_tv = _extract_tv_directive_from_desc(str(rel_desc or ""))
+                if res_tv:
+                    return res_tv
+    return None
+
+
+def _extract_episode_honorific_title_locks(
+    events: List[Any],
+    existing_glossary: Optional[Dict[str, str]] = None,
+) -> Dict[str, str]:
+    """
+    Standard 12.1.0 (A-4): Scans episode EN dialogue/events for recurring Title + ProperName pairs
+    and builds RAM-only glossary locks preserving MangaCanon/Bible precedence.
+    """
+    if not events:
+        return {}
+    existing_lower = {
+        str(k).strip().lower(): str(v).strip()
+        for k, v in (existing_glossary or {}).items()
+        if k and str(k).strip()
+    }
+    known_name_tokens = set()
+    for k_low in existing_lower:
+        known_name_tokens.update(re.findall(r"[a-zA-Z'-]{3,}", k_low))
+
+    counts: Dict[Tuple[str, str], int] = {}
+    canonical_title_case: Dict[Tuple[str, str], str] = {}
+    canonical_name_case: Dict[Tuple[str, str], str] = {}
+
+    for ev in events:
+        if getattr(ev, "is_comment", False):
+            continue
+        style_low = str(getattr(ev, "style", "") or "").lower()
+        if any(s in style_low for s in ("credit", "staff")):
+            continue
+        raw_txt = getattr(ev, "plaintext", None) or getattr(ev, "text", "") or ""
+        if is_song_line(ev, str(raw_txt)):
+            continue
+        clean_en = _strip_ass_markup_for_pair(str(raw_txt))
+        if not clean_en:
+            continue
+        for m in _ARISTOCRATIC_TITLE_PAIR_RE.finditer(clean_en):
+            t_raw = m.group(1)
+            n_raw = m.group(2)
+            if n_raw.lower() in _NON_NAME_TITLE_FOLLOWERS:
+                continue
+            pair_key = (t_raw.lower(), n_raw.lower())
+            counts[pair_key] = counts.get(pair_key, 0) + 1
+            canonical_title_case.setdefault(pair_key, t_raw)
+            canonical_name_case.setdefault(pair_key, n_raw)
+
+    locks: Dict[str, str] = {}
+    for pair_key, cnt in counts.items():
+        t_low, n_low = pair_key
+        if cnt < 2 and n_low not in known_name_tokens:
+            continue
+        t_orig = canonical_title_case[pair_key]
+        n_orig = canonical_name_case[pair_key]
+        pair_en = f"{t_orig} {n_orig}"
+        if pair_en.lower() in existing_lower:
+            continue
+        mapped_pl = _ARISTOCRATIC_TITLE_MAP_EN_PL.get(t_low)
+        if mapped_pl:
+            locks[pair_en] = f"{mapped_pl} {n_orig}"
+    return locks
+
+
+def _polish_scale_form(num_str: str, scale_key: str) -> str:
+    forms = _SPOKEN_NUMERIC_SCALE_FORMS.get(scale_key.lower(), ("milion", "miliony", "milionów", "miliona"))
+    compact = num_str.replace(" ", "").replace("\u00a0", "")
+    if "," in compact or "." in compact:
+        return forms[3]
+    try:
+        n = abs(int(compact))
+    except ValueError:
+        return forms[2]
+    if n == 1:
+        return forms[0]
+    if (n % 10 in (2, 3, 4)) and (n % 100 not in (12, 13, 14)):
+        return forms[1]
+    return forms[2]
+
+
+def _expand_spoken_numeric_abbreviations(text: str, is_sign: bool = False) -> str:
+    """
+    Standard 12.1.0 (A-5): Expands bureaucratic numeric abbreviations (mln, mld, tys.) into inflected
+    spoken Polish forms outside ASS {...} override tags while leaving signs/overlays untouched.
+    """
+    if is_sign or not text:
+        return text
+    segments = re.split(r"(\{[^}]*\})", text)
+    out_segments: List[str] = []
+    for seg in segments:
+        if not seg or (seg.startswith("{") and seg.endswith("}")):
+            out_segments.append(seg)
+            continue
+
+        def _repl_num(match: re.Match) -> str:
+            num_part = match.group(1)
+            scale_part = match.group(2)
+            dot_part = match.group(3) or ""
+            word_pl = _polish_scale_form(num_part, scale_part)
+            rest = seg[match.end():]
+            keep_dot = ""
+            if dot_part == ".":
+                if not rest.startswith(".") and not re.match(r"^(?:\s|\\[Nnh])*[a-ząćęłńóśźż0-9,;:\-—!?]", rest):
+                    keep_dot = "."
+            return f"{num_part} {word_pl}{keep_dot}"
+
+        out_segments.append(_SPOKEN_NUMERIC_ABBR_RE.sub(_repl_num, seg))
+    return "".join(out_segments)
+
+
+def _append_phase2_numeric_hygiene_rule(
+    focused_rules_str: str,
+    batch_items: List[Dict[str, Any]],
+) -> str:
+    """Appends a compact 1-sentence F2 rule against bureaucratic numeric abbreviations in spoken dialogue."""
+    if not batch_items or not any(not it.get("is_sign") for it in batch_items):
+        return focused_rules_str or ""
+    base = (focused_rules_str or "").strip()
+    rule_note = (
+        "LICZEBNIKI W DIALOGU: Podczas kondensacji AVT w kwestiach mówionych "
+        "zapisuj pełne formy liczebników zamiast skrótów biurowych (mln, mld, tys.)."
+    )
+    if rule_note in base:
+        return base
+    return f"{base}\n{rule_note}" if base else rule_note
+
+
 def _filter_dialogue_audio_events(
     events_tuples: List[Any],
     style_report: Optional[Any] = None,
@@ -4606,6 +4908,17 @@ class MultimodalTranslator:
                 )
                 if dry_telemetry:
                     lines.append(f"  📡 TELEMETRIA: {dry_telemetry}")
+                if event.name and target_actor_name and not is_internal_monologue:
+                    tv_hint_f1 = _resolve_tv_address_form(
+                        event.name,
+                        target_actor_name,
+                        getattr(self, "series_bible", None),
+                        episode_profile=episode_profile,
+                    )
+                    if tv_hint_f1:
+                        spk_disp = extract_clean_speaker_name(str(event.name)).strip() or str(event.name).strip()
+                        tgt_disp = extract_clean_speaker_name(str(target_actor_name)).strip() or str(target_actor_name).strip()
+                        lines.append(f"  🤝 Rejestr T-V ({spk_disp} -> {tgt_disp}): {tv_hint_f1} (utrzymuj konsekwentnie w całej scenie)")
                 if paradigm_strs:
                     new_paradigm_strs = [p for p in paradigm_strs if p not in seen_paradigms_in_batch]
                     if new_paradigm_strs:
@@ -5830,6 +6143,15 @@ class MultimodalTranslator:
 
             if line_dry_telemetry:
                 notes = f"{notes} {line_dry_telemetry}".strip()
+            if resolved_spk_name and resolved_tgt_name and not vtype.get("is_sign") and not is_internal_monologue:
+                tv_hint_f2 = _resolve_tv_address_form(
+                    resolved_spk_name,
+                    resolved_tgt_name,
+                    getattr(self, "series_bible", None),
+                    episode_profile=episode_profile,
+                )
+                if tv_hint_f2:
+                    notes = f"{notes} [Zwrot T-V: {tv_hint_f2}]".strip()
 
             # Line-Level Pinning: Direct Profiler alerts for this specific line
             pinned_alerts = getattr(self, "profile_line_alerts", {}).get(orig_idx) or getattr(self, "profile_line_alerts", {}).get(idx)
@@ -6425,7 +6747,9 @@ class MultimodalTranslator:
             paired_positions = set()
             linked_pairs: List[Tuple[int, int]] = []
 
-            for anchor_pos in sorted(list(chosen_map.keys())):
+            for anchor_pos in sorted(list(chosen_map.keys()), key=lambda p: (-chosen_map[p][0], p)):
+                if anchor_pos not in chosen_map:
+                    continue
                 anchor_score = chosen_map[anchor_pos][0]
                 candidate_partners: List[Tuple[int, int, int]] = []
                 if anchor_pos + 1 < len(pass1_items) and (
@@ -6753,6 +7077,7 @@ class MultimodalTranslator:
         t0_p2 = time.perf_counter()
         focused_rules = get_focused_rules_for_batch(verifier_items, max_rules=5 if len(verifier_items) > 40 else 3)
         focused_rules = _append_phase2_linebreak_hygiene_rule(focused_rules, verifier_items)
+        focused_rules = _append_phase2_numeric_hygiene_rule(focused_rules, verifier_items)
         clean_f2_reg = _build_clean_f2_character_registry(
             getattr(self, "character_registry", None),
             episode_profile=cons_group.get("episode_profile"),
@@ -6941,6 +7266,7 @@ class MultimodalTranslator:
                     t0_phase2 = time.perf_counter()
                     phase2_focused_rules = get_focused_rules_for_batch(verifier_batch_items, max_rules=5 if len(verifier_batch_items) > 40 else 3)
                     phase2_focused_rules = _append_phase2_linebreak_hygiene_rule(phase2_focused_rules, verifier_batch_items)
+                    phase2_focused_rules = _append_phase2_numeric_hygiene_rule(phase2_focused_rules, verifier_batch_items)
                     f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx
                     _v_pool, _f2_tls = self._enter_f2_retry_observer(b_idx)
 
@@ -7033,12 +7359,22 @@ class MultimodalTranslator:
                             if not re.search(r"[.!?…\"”»\-\—]$", ref_strip) and not orig_it.get("is_sign"):
                                 r.refined_pl = ref_strip + "."
 
-                refined_dict.update({r.id: sanitize_sub_text(r.refined_pl) for r in refined_lines})
+                _refined_is_sign = {
+                    it.get("id"): bool(it.get("is_sign"))
+                    for it in pass1_items
+                }
+                refined_dict.update({
+                    r.id: _expand_spoken_numeric_abbreviations(
+                        sanitize_sub_text(r.refined_pl),
+                        is_sign=_refined_is_sign.get(r.id, False),
+                    )
+                    for r in refined_lines
+                })
                 refined_region_dict.update({r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)})
                 refined_typesetting_dict.update({r.id: r.visual_typesetting for r in refined_lines if getattr(r, 'visual_typesetting', None)})
 
                 # Hotfix 11.1.6 (Zadanie 1.1 / E-11): Strażnik zablokowanej terminologii po Fazie 2
-                active_gloss_entries = batch_glossary_items if 'batch_glossary_items' in locals() and batch_glossary_items else []
+                active_gloss_entries = list(batch_glossary_items) if 'batch_glossary_items' in locals() and batch_glossary_items else []
                 if not active_gloss_entries:
                     if episode_profile and getattr(episode_profile, "glossary", None):
                         active_gloss_entries = list(episode_profile.glossary)
@@ -7046,6 +7382,15 @@ class MultimodalTranslator:
                         g_dict = self.series_bible.data.get("glossary", {})
                         if isinstance(g_dict, dict):
                             active_gloss_entries = [{"term_en": k, "translation_pl": v} for k, v in g_dict.items()]
+                if combined_glossary:
+                    _existing_g_keys = {
+                        str(g.get("term_en") if isinstance(g, dict) else getattr(g, "term_en", "") or "").strip().lower()
+                        for g in active_gloss_entries
+                    }
+                    for _cg_k, _cg_v in combined_glossary.items():
+                        if _cg_k and str(_cg_k).strip().lower() not in _existing_g_keys:
+                            active_gloss_entries.append({"term_en": _cg_k, "translation_pl": _cg_v})
+                            _existing_g_keys.add(str(_cg_k).strip().lower())
 
                 for r_line in refined_lines:
                     orig_item = next((it for it in pass1_items if it["id"] == r_line.id), None)
@@ -8041,6 +8386,10 @@ class MultimodalTranslator:
             profiler_glossary=profiler_gloss_dict,
             keep_honorifics=self.keep_honorifics
         )
+        ep_title_locks = _extract_episode_honorific_title_locks(subs.events, combined_glossary)
+        if ep_title_locks:
+            for _tl_k, _tl_v in ep_title_locks.items():
+                combined_glossary.setdefault(_tl_k, _tl_v)
         self.combined_glossary = combined_glossary
         if combined_glossary:
             print(f"  [Słownik Deterministyczny]: Aktywnych {len(combined_glossary)} terminów (Hierarchia: Kanon Mangi > Biblia Serialu > Profiler > Słownik Użytkownika).")
@@ -8973,6 +9322,8 @@ class MultimodalTranslator:
 
             if is_sign_flag and (master_id in all_caps_sign_masters or orig_idx in all_caps_sign_masters):
                 clean_translated_text = _uppercase_preserving_ass_tags(clean_translated_text)
+            elif not is_sign_flag:
+                clean_translated_text = _expand_spoken_numeric_abbreviations(clean_translated_text, is_sign=False)
 
             # Reattach Typesetting tags to translated text
             full_event_text = f"{ts_prefix_applied}{clean_translated_text}" if ts_prefix_applied else clean_translated_text
