@@ -53,6 +53,22 @@ GOOGLE_API_RATES: Dict[str, Dict[str, float]] = {
 
 
 class PricingGuard:
+    DEFAULT_COST_GOVERNANCE_CEILING_PLN = 4.00
+    ZERO_CACHE_LEAN_CEILING_PLN = 6.00
+
+    @classmethod
+    def get_cost_governance_ceiling_pln(
+        cls,
+        f1_stats: Optional[Dict[str, Any]] = None,
+        f2_stats: Optional[Dict[str, Any]] = None,
+    ) -> float:
+        """Returns 6.00 PLN ceiling for Hydrogen Zero-Cache Lean, or 4.00 PLN for cached modes."""
+        m1 = str((f1_stats or {}).get("model") or "").lower()
+        m2 = str((f2_stats or {}).get("model") or "").lower()
+        if any(tag in m for m in (m1, m2) if m for tag in ("hydrogen", "gemini-4")):
+            return cls.ZERO_CACHE_LEAN_CEILING_PLN
+        return cls.DEFAULT_COST_GOVERNANCE_CEILING_PLN
+
     @staticmethod
     def estimate_episode_cost_pln(
         profile: str,
@@ -375,10 +391,11 @@ class PricingGuard:
         savings_pln = round(max(0.0, standard_net_pln - total_net_pln), 2)
         savings_ratio = round(savings_pln / max(0.01, standard_net_pln), 4)
 
-        if savings_ratio < 0.85 and total_net_pln > 4.00:
+        ceiling_pln = cls.get_cost_governance_ceiling_pln(f1_stats, f2_stats)
+        if savings_ratio < 0.85 and total_net_pln > ceiling_pln:
             logger.error(
                 f"[CostGovernance CRITICAL]: Realizacja rabatu Context Cache wyniosła zaledwie {savings_ratio * 100:.1f}% "
-                f"(< 85.0%). Koszt rzeczywisty {total_net_pln:.2f} PLN przekroczył sufit 4.00 PLN! "
+                f"(< 85.0%). Koszt rzeczywisty {total_net_pln:.2f} PLN przekroczył sufit {ceiling_pln:.2f} PLN! "
                 f"Wymagana weryfikacja stabilności prefiksu promptu i rozgrzewania kluczy w puli."
             )
 
@@ -391,6 +408,7 @@ class PricingGuard:
             "standard_gross_pln": standard_gross_pln,
             "savings_pln": savings_pln,
             "savings_ratio": savings_ratio,
+            "governance_ceiling_pln": ceiling_pln,
             "vat_rate": vat_rate
         }
 

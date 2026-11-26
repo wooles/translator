@@ -6338,14 +6338,14 @@ class MultimodalTranslator:
         max_lines_per_f2_call: int = 48,
     ) -> List[Dict[str, Any]]:
         """
-        Standard 12.0.0 (F-1): Merges Risk-Weighted F2 candidates across consecutive F1 batches
-        into <= 48-line consolidated calls for Hydrogen Zero-Cache Lean when AVT_CONSOLIDATE_F2=1
-        and len(phase1_outputs) >= 3. Preserves lossless mapping back to original batch_id / line id.
+        Standard 12.0.0b (F-1): Opt-in consolidation of Risk-Weighted F2 candidates across consecutive
+        F1 batches into <= 48-line calls for Hydrogen Zero-Cache Lean. Disabled by default ('0') after
+        A/B rollback; enable explicitly via AVT_CONSOLIDATE_F2=1 once A/B gates §4.1-§4.3 pass.
         """
         if (
             not phase1_outputs
             or len(phase1_outputs) < 3
-            or os.getenv("AVT_CONSOLIDATE_F2", "1") != "1"
+            or os.getenv("AVT_CONSOLIDATE_F2", "0") != "1"
             or not (self.enable_verifier and hasattr(self, "verifier") and self.verifier)
         ):
             return []
@@ -8903,9 +8903,22 @@ class MultimodalTranslator:
                 print(f"  ├─ Faza 2 (Reżyseria & Elastic CoT): {cost_f2_pln:.2f} PLN netto")
                 print(f"  │   └─ Wejście: {f2_stats.get('prompt',0):,} tok (Cached: {f2_stats.get('cached',0):,}) | Wyjście+CoT: {f2_stats.get('output',0):,} tok")
             savings_ratio = breakdown.get("savings_ratio", 0.0)
+            from model_resolver import is_gemini_4_or_hydrogen_model
+            _is_h_lean_cg = (
+                is_gemini_4_or_hydrogen_model(getattr(self, "model_phase1", getattr(self, "model", "")))
+                and len(getattr(self, "system_prompt", "")) < 60000
+            )
+            governance_ceiling_pln = (
+                PricingGuard.ZERO_CACHE_LEAN_CEILING_PLN
+                if _is_h_lean_cg
+                else PricingGuard.DEFAULT_COST_GOVERNANCE_CEILING_PLN
+            )
             print(f"  ├─ 🛡️ Rabat Context Cache: Zaoszczędzono ~{cache_savings_pln:.2f} PLN (Efektywność: {savings_ratio * 100:.1f}%) [Standardowo: ~{std_gross_pln:.2f} PLN brutto]")
-            if savings_ratio < 0.85 and actual_cost_pln > 4.00:
-                print(f"  ⚠️ [Cost Governance ALERT]: Efektywność rabatu Context Cache ({savings_ratio * 100:.1f}%) poniżej progu 85%! Sprawdź stabilność prefiksu promptu.")
+            if savings_ratio < 0.85 and actual_cost_pln > governance_ceiling_pln:
+                print(
+                    f"  ⚠️ [Cost Governance ALERT]: Efektywność rabatu Context Cache ({savings_ratio * 100:.1f}%) poniżej progu 85% "
+                    f"(koszt {actual_cost_pln:.2f} PLN > sufit {governance_ceiling_pln:.2f} PLN)! Sprawdź stabilność prefiksu promptu."
+                )
             print(f"  └─ ℹ️ Rozliczenia Google Cloud: Wyciągi bankowe zawierają 23% VAT i sumują wszystkie próby oraz testy z danego dnia.")
             print("═" * 72 + "\n")
 

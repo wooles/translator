@@ -1314,13 +1314,14 @@ def test_bug1_a1_filter_handles_production_2_tuples_without_index_error():
 
 
 @pytest.mark.unit
-def test_bug2_f1_consolidated_scene_diagnosis_renders_in_verifier_prompt():
+def test_bug2_f1_consolidated_scene_diagnosis_renders_in_verifier_prompt(monkeypatch):
     """
     BUG #2 (F-1): _consolidate_phase2_batches przekazuje scene_diagnosis jako strukturalny dict
     oraz dołącza aktywny ton sekwencji (B-2) tak, aby chroniony verifier.py wyrenderował zarówno
     sekcję DIAGNOZA DRAMATURGICZNA I KOGNITYWNA SCENY z separatorem '--- ZMIANA SCENY ---',
     jak i aktywny ton sekwencji z Profilera.
     """
+    monkeypatch.setenv("AVT_CONSOLIDATE_F2", "1")
     tr = MultimodalTranslator(api_key="mock_k0", model="gemini-4-hydrogen", enable_verifier=True)
     ep_profile = EpisodeProfile(
         episode_summary="Odcinek testowy o negocjacjach w gildii.",
@@ -1575,3 +1576,70 @@ def test_bug5_f3_uppercase_preserving_ass_tags_keeps_inline_italics_and_newlines
     raw = r"{\i1}Gildia{\i0}\N{\b1}światła zaćmienia: ąćęłńóśźż{\b0}\nNowy\hwiersz"
     expected = r"{\i1}GILDIA{\i0}\N{\b1}ŚWIATŁA ZAĆMIENIA: ĄĆĘŁŃÓŚŹŻ{\b0}\nNOWY\hWIERSZ"
     assert _uppercase_preserving_ass_tags(raw) == expected
+
+
+@pytest.mark.unit
+def test_f1_disabled_by_default_without_env_var(monkeypatch):
+    """
+    12.0.0b: Bez ustawionej zmiennej środowiskowej AVT_CONSOLIDATE_F2 konsolidacja F2
+    pozostaje domyślnie wyłączona ('0') i _consolidate_phase2_batches zwraca [].
+    """
+    monkeypatch.delenv("AVT_CONSOLIDATE_F2", raising=False)
+    tr_h = MultimodalTranslator(api_key="mock_k0", model="gemini-4-hydrogen", enable_verifier=True)
+    dummy_outputs = {
+        i: {
+            "b_idx": i,
+            "pass1_items": [
+                {
+                    "id": 1,
+                    "en": "Long test sentence that would otherwise qualify for consolidation.",
+                    "pl": "Długie zdanie testowe kwalifikujące się do konsolidacji.",
+                    "calque_score": 0.7,
+                }
+            ],
+        }
+        for i in range(4)
+    }
+    assert tr_h._consolidate_phase2_batches(dummy_outputs) == []
+
+
+@pytest.mark.unit
+def test_cost_governance_no_critical_at_4_22_pln_for_hydrogen_zero_cache_lean(caplog):
+    """
+    12.0.0b: Dla modelu gemini-4-hydrogen (tryb Zero-Cache Lean) sufit CostGovernance wynosi
+    PricingGuard.ZERO_CACHE_LEAN_CEILING_PLN (6.00 PLN): koszt 4.22 PLN przy savings_ratio=0.0
+    nie wyzwala [CostGovernance CRITICAL], natomiast 6.10 PLN loguje komunikat z '6.00 PLN'.
+    Dla modeli spoza Hydrogen utrzymany pozostaje próg 4.00 PLN.
+    """
+    import logging
+    from pricing_guard import PricingGuard
+
+    assert PricingGuard.ZERO_CACHE_LEAN_CEILING_PLN == 6.00
+
+    # 1. Hydrogen 4.22 PLN przy cached=0 -> brak CRITICAL
+    stats_422 = {"model": "gemini-4-hydrogen", "prompt": 700_000, "cached": 0, "output": 667}
+    caplog.clear()
+    with caplog.at_level(logging.ERROR):
+        res_ok = PricingGuard.calculate_actual_cost_breakdown(stats_422, usd_pln=4.00)
+    assert res_ok["net_pln"] == 4.22
+    assert res_ok["savings_ratio"] == 0.0
+    assert not any("[CostGovernance CRITICAL]" in r.message for r in caplog.records)
+
+    # 2. Hydrogen 6.10 PLN przy cached=0 -> CRITICAL zawierający '6.00 PLN'
+    stats_610 = {"model": "gemini-4-hydrogen", "prompt": 1_000_000, "cached": 0, "output": 3334}
+    caplog.clear()
+    with caplog.at_level(logging.ERROR):
+        res_high = PricingGuard.calculate_actual_cost_breakdown(stats_610, usd_pln=4.00)
+    assert res_high["net_pln"] == 6.10
+    assert res_high["savings_ratio"] == 0.0
+    crit_msgs = [r.message for r in caplog.records if "[CostGovernance CRITICAL]" in r.message]
+    assert crit_msgs and "6.00 PLN" in crit_msgs[0]
+
+    # 3. Standardowy model (Flash) 4.22 PLN przy cached=0 -> CRITICAL z progiem 4.00 PLN
+    stats_flash = {"model": "gemini-3.8-flash", "prompt": 1_400_000, "cached": 0, "output": 1334}
+    caplog.clear()
+    with caplog.at_level(logging.ERROR):
+        res_flash = PricingGuard.calculate_actual_cost_breakdown(stats_flash, usd_pln=4.00)
+    assert res_flash["net_pln"] == 4.22
+    crit_flash = [r.message for r in caplog.records if "[CostGovernance CRITICAL]" in r.message]
+    assert crit_flash and "4.00 PLN" in crit_flash[0]
