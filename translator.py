@@ -3760,7 +3760,7 @@ class MultimodalTranslator:
         if self.character_registry:
             dossier_names_f1: set = set()
             from model_resolver import is_gemini_4_or_hydrogen_model
-            is_h_lean_f1 = is_gemini_4_or_hydrogen_model(getattr(self, "model_phase1", self.model))
+            is_h_lean_f1 = is_gemini_4_or_hydrogen_model(getattr(self, "model_phase1", getattr(self, "model", "")))
             has_ep_brief_in_f1 = bool(episode_profile_str) or bool(getattr(self, "_episode_knowledge_cached", False))
             if is_h_lean_f1 and has_ep_brief_in_f1 and episode_profile is not None:
                 dossiers_f1 = (
@@ -6493,7 +6493,7 @@ class MultimodalTranslator:
             try:
                 setattr(r_copy, "id", orig_local_id)
             except Exception:
-                pass
+                logger.debug(f"Nie udało się zmapować atrybutu id={orig_local_id} w kopii obiektu F2", exc_info=True)
             mapped_by_bidx.setdefault(orig_bidx, []).append(r_copy)
         return mapped_by_bidx
 
@@ -7105,6 +7105,81 @@ class MultimodalTranslator:
             except Exception:
                 logger.debug("Wywołanie funkcji postępu zakończone wyjątkiem", exc_info=True)
 
+    def _auto_ingest_episode_to_tm(
+        self,
+        final_subs: "pysubs2.SSAFile",
+        qg_fixes: Optional[List[str]] = None,
+        video_path: Optional[str] = None,
+        subs_file: Optional[Path] = None,
+    ) -> int:
+        """
+        Standard 12.0.0 (G-1): Zapisuje zweryfikowane linie dialogowe (quality_tier=3)
+        do bazy TranslationMemory z odfiltrowaniem napisów ekranowych, piosenek, staffu i linii z błędami QG.
+        """
+        if getattr(self, "tm", None) is None or os.getenv("AVT_TM_AUTO_INGEST", "1") == "0":
+            return 0
+        try:
+            _tm_series_title = ""
+            if getattr(self, "series_bible", None) and getattr(self.series_bible, "series_title", None):
+                _tm_series_title = str(self.series_bible.series_title).strip()
+            elif video_path:
+                _tm_series_title = Path(video_path).stem
+            elif subs_file is not None:
+                _tm_series_title = subs_file.stem
+
+            _en_warnings_lower = {
+                str(_qf).lower()
+                for _qf in (qg_fixes or [])
+                if "nieprzetłumaczony angielski" in str(_qf)
+            }
+
+            _tm_pairs = []
+            for _ev in final_subs.events:
+                if getattr(_ev, "is_comment", False):
+                    continue
+                _src_en = str(getattr(_ev, "source_en", "") or "").strip()
+                _raw_ev_pl = str(getattr(_ev, "text", "") or "").strip()
+                if not _src_en or not _raw_ev_pl:
+                    continue
+                _is_staff_tm = False
+                if getattr(self, "style_report", None) is not None and hasattr(self.style_report, "classify_single_event"):
+                    try:
+                        from style_matrix import EventRole
+                        _st_tm, _ = self.style_report.classify_single_event(_ev)
+                        _is_staff_tm = (_st_tm == EventRole.STAFF_METADATA)
+                    except Exception:
+                        _is_staff_tm = False
+                _is_sign_tm = bool(detect_event_visual_type(_ev, "", style_report=getattr(self, "style_report", None)).get("is_sign", False))
+                _is_song_tm = bool(is_song_line(_ev, _raw_ev_pl) or is_song_line(_ev, _src_en))
+                _clean_pl_tm = re.sub(r"\{\\?i[01]?\}", "", _raw_ev_pl).replace("\\N", " ").replace("\\n", " ").strip()
+                _clean_en_tm = re.sub(r"\{\\?i[01]?\}", "", _src_en).replace("\\N", " ").replace("\\n", " ").strip()
+                _has_qg_err = False
+                if _en_warnings_lower:
+                    _en_probe = _clean_en_tm[:30].lower()
+                    if _en_probe and any(_en_probe in _w for _w in _en_warnings_lower):
+                        _has_qg_err = True
+                _tm_pairs.append({
+                    "en": _clean_en_tm,
+                    "pl": _clean_pl_tm,
+                    "is_sign": _is_sign_tm,
+                    "is_song": _is_song_tm,
+                    "is_staff": _is_staff_tm,
+                    "has_critical_qg_error": _has_qg_err,
+                })
+            if not _tm_pairs:
+                return 0
+            _ingested_cnt = self.tm.ingest_episode_pairs(
+                _tm_pairs,
+                series_title=_tm_series_title,
+                quality_tier=3,
+            )
+            if _ingested_cnt:
+                logger.info(f"[TranslationMemory G-1]: Automatycznie zapisano {_ingested_cnt} par dialogowych (tier=3) dla '{_tm_series_title}'.")
+            return _ingested_cnt
+        except Exception as _e_tm:
+            logger.debug(f"[TranslationMemory G-1]: Pomijanie auto-ingestu TM ({_e_tm})")
+            return 0
+
     def translate_file(
         self,
         subs_path: str,
@@ -7610,7 +7685,7 @@ class MultimodalTranslator:
                 )
 
         from model_resolver import is_gemini_4_or_hydrogen_model
-        _is_zero_cache_lean = is_gemini_4_or_hydrogen_model(getattr(self, "model_phase1", self.model))
+        _is_zero_cache_lean = is_gemini_4_or_hydrogen_model(getattr(self, "model_phase1", getattr(self, "model", "")))
         series_bible_str = (
             _build_ssot_lean_bible_str(self.series_bible, episode_profile=episode_profile)
             if _is_zero_cache_lean
@@ -8684,6 +8759,14 @@ class MultimodalTranslator:
         final_subs.events = split_oversized_ass_events(final_subs.events)
 
         final_subs.save(output_path, encoding="utf-8")
+
+        # Standard 12.0.0 (G-1): Auto-ingest czystych par dialogowych do pamięci tłumaczeniowej (quality_tier=3)
+        self._auto_ingest_episode_to_tm(
+            final_subs,
+            qg_fixes=qg_fixes if "qg_fixes" in locals() else None,
+            video_path=video_path,
+            subs_file=subs_file,
+        )
         
         # Remove checkpoint and temporary profile cache files only upon truly 100% complete dialogue translation
         missing_dialogue_at_end = [item for item in raw_entries if item[0] not in translated_results and not is_song_line(item[1], item[2])]

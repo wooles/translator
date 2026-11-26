@@ -1,12 +1,18 @@
 """
 Zestaw nienaruszalnych, nietautologicznych testów regresyjnych dla Standardu 12.0.0:
 - Commit 1 (5 testów): A-1, A-2, A-3, E-1, E-2
+- Commit 2 (4 testy): B-1, B-2, B-3, D-1
+- Commit 3 (4 testy): F-2/C-1, F-3, D-2
+- Commit 4 (3 testy): F-1, H-3 (OBS-06)
+- Commit 5 (3 testy): G-1, G-2
 """
 
 import concurrent.futures
 import json
+import sys
 import threading
 import types
+from pathlib import Path
 import httpx
 import pytest
 import pysubs2
@@ -1036,3 +1042,229 @@ def test_h3_obs06_phase2_retry_observer_is_thread_safe_under_parallel_workers(tm
     events = [json.loads(line) for line in rec.jsonl_path.read_text(encoding="utf-8").splitlines() if line.strip()]
     retry_batches = sorted(ev["batch_id"] for ev in events if ev.get("stage") == "retry")
     assert retry_batches == [1, 2]
+
+
+@pytest.mark.unit
+def test_g1_tm_quality_tier_migration_and_priority_ranking(tmp_path):
+    """
+    G-1: Idempotentna migracja starej tabeli translation_pairs do schematu z kolumną quality_tier
+    oraz hierarchia autorytetu: tier=1 (human edit) > tier=2 (legacy) > tier=3 (AI auto-ingest).
+    """
+    import sqlite3
+    from memory import TranslationMemory
+
+    db_path = tmp_path / "legacy_tm.db"
+    # Utwórz starszy schemat bez kolumny quality_tier
+    with sqlite3.connect(db_path) as conn:
+        conn.execute("""
+            CREATE TABLE translation_pairs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                en_text TEXT NOT NULL,
+                pl_text TEXT NOT NULL,
+                en_clean TEXT NOT NULL,
+                anime_title TEXT,
+                word_count INTEGER
+            )
+        """)
+        conn.execute(
+            "INSERT INTO translation_pairs (en_text, pl_text, en_clean, anime_title, word_count) VALUES (?, ?, ?, ?, ?)",
+            ("We must reach the northern fortress today.", "Musimy dziś dotrzeć do północnej twierdzy.", "we must reach the northern fortress today.", "LegacySeries", 7),
+        )
+        conn.commit()
+
+    tm = TranslationMemory(db_path=db_path)
+    with sqlite3.connect(db_path) as conn:
+        cols = {row[1] for row in conn.execute("PRAGMA table_info(translation_pairs)").fetchall()}
+        assert "quality_tier" in cols
+        legacy_tier = conn.execute("SELECT quality_tier FROM translation_pairs WHERE anime_title = 'LegacySeries'").fetchone()[0]
+        assert legacy_tier == 2
+
+    # Wpis AI (tier=3) nie może nadpisać starszego wpisu tier=2 ani nowego tier=1
+    changed_downgrade = tm.ingest_episode_pairs(
+        [{"en": "We must reach the northern fortress today.", "pl": "Słabszy automatyczny przekład twierdzy."}],
+        series_title="LegacySeries",
+        quality_tier=3,
+    )
+    assert changed_downgrade == 0
+
+    # Dodaj ten sam tekst EN w innej serii jako tier=3 i jako tier=1, aby porównać ranking
+    tm.ingest_episode_pairs(
+        [{"en": "Please guard the eastern gate tonight.", "pl": "Proszę pilnować wschodniej bramy dziś w nocy."}],
+        series_title="SeriesBeta",
+        quality_tier=3,
+    )
+    tm.ingest_episode_pairs(
+        [{"en": "Please guard the eastern gate tonight.", "pl": "Strzeż wschodniej bramy dzisiejszej nocy."}],
+        series_title="SeriesAlpha",
+        quality_tier=1,
+    )
+    results = tm.find_relevant_examples(["Please guard the eastern gate tonight."], max_examples=5)
+    assert len(results) >= 2
+    assert results[0]["anime"] == "SeriesAlpha"
+    assert results[0]["quality_tier"] == 1
+    assert results[0]["score"] > results[1]["score"]
+
+    # Korekta ludzka (tier=1) promuje i aktualizuje istniejący wpis tier=3
+    promoted = tm.ingest_episode_pairs(
+        [{"en": "Please guard the eastern gate tonight.", "pl": "Przypilnuj proszę wschodniej bramy tej nocy."}],
+        series_title="SeriesBeta",
+        quality_tier=1,
+    )
+    assert promoted == 1
+    with sqlite3.connect(db_path) as conn:
+        row = conn.execute(
+            "SELECT pl_text, quality_tier FROM translation_pairs WHERE anime_title = 'SeriesBeta'"
+        ).fetchone()
+        assert row[0] == "Przypilnuj proszę wschodniej bramy tej nocy."
+        assert row[1] == 1
+
+
+@pytest.mark.unit
+def test_g1_auto_ingest_skips_signs_songs_and_short_lines(tmp_path, monkeypatch):
+    """
+    G-1: ingest_episode_pairs oraz MultimodalTranslator._auto_ingest_episode_to_tm
+    odfiltrowują plansze (is_sign), piosenki (is_song), staff, surowe tagi ASS/HTML i krótkie kwestie (< 3 słowa),
+    a flaga AVT_TM_AUTO_INGEST=0 całkowicie wyłącza zapis automatyczny.
+    """
+    from memory import TranslationMemory
+
+    db_path = tmp_path / "auto_ingest.db"
+    tm = TranslationMemory(db_path=db_path)
+
+    tr = MultimodalTranslator(api_key="mock_k0", model="gemini-4-hydrogen", enable_verifier=False)
+    tr.tm = tm
+
+    subs = pysubs2.SSAFile()
+    subs.styles["Sign"] = pysubs2.SSAStyle()
+    subs.styles["Karaoke"] = pysubs2.SSAStyle()
+
+    ev_ok = pysubs2.SSAEvent(start=1000, end=3000, text=r"{\i1}Ten miecz pamięta dawne czasy.{\i0}", style="Default")
+    ev_ok.source_en = "This sword remembers old times."
+    ev_short = pysubs2.SSAEvent(start=3500, end=4500, text="Tak, rozumiem.", style="Default")
+    ev_short.source_en = "Yes, okay."
+    ev_sign = pysubs2.SSAEvent(start=5000, end=7000, text=r"{\an8}KRÓLEWSKA AKADEMIA MAGII", style="Sign")
+    ev_sign.source_en = "ROYAL ACADEMY OF MAGIC"
+    ev_song = pysubs2.SSAEvent(start=8000, end=10000, text="Singing under the silver moon tonight.", style="Karaoke")
+    ev_song.source_en = "Singing under the silver moon tonight."
+    ev_uncleaned = pysubs2.SSAEvent(start=11000, end=13000, text="<i>Uncleaned html remains inside line.</i>", style="Default")
+    ev_uncleaned.source_en = "Clean English source sentence here."
+    ev_qg_bad = pysubs2.SSAEvent(start=14000, end=16000, text="Tego problemu nie wykryto wcześniej tutaj.", style="Default")
+    ev_qg_bad.source_en = "Unresolved English sentence warning marker."
+
+    subs.events = [ev_ok, ev_short, ev_sign, ev_song, ev_uncleaned, ev_qg_bad]
+
+    # Najpierw z AVT_TM_AUTO_INGEST=0 -> 0 zapisanych par
+    monkeypatch.setenv("AVT_TM_AUTO_INGEST", "0")
+    assert tr._auto_ingest_episode_to_tm(subs, qg_fixes=["Linia: nieprzetłumaczony angielski: Unresolved English sentence"], subs_file=Path("SyntheticEp01.ass")) == 0
+
+    # Teraz z włączonym auto-ingestem -> wyłącznie czysta linia dialogowa ev_ok
+    monkeypatch.setenv("AVT_TM_AUTO_INGEST", "1")
+    ingested = tr._auto_ingest_episode_to_tm(
+        subs,
+        qg_fixes=["Linia: nieprzetłumaczony angielski: Unresolved English sentence warning marker."],
+        subs_file=Path("SyntheticEp01.ass"),
+    )
+    assert ingested == 1
+
+    import sqlite3
+    with sqlite3.connect(db_path) as conn:
+        rows = conn.execute("SELECT en_text, pl_text, quality_tier FROM translation_pairs").fetchall()
+        assert len(rows) == 1
+        assert rows[0][0] == "This sword remembers old times."
+        assert rows[0][1] == "Ten miecz pamięta dawne czasy."
+        assert rows[0][2] == 3
+
+
+@pytest.mark.unit
+def test_g2_learn_from_edits_cli_ingests_user_diff_to_feedback_and_tm_tier1(tmp_path):
+    """
+    G-2: Samodzielne narzędzie CLI tools/learn_from_edits.py wyciąga różnice między --raw i --edited
+    do UserFeedbackManager oraz promuje poprawione pary do TranslationMemory z quality_tier=1.
+    """
+    import sqlite3
+    import subprocess
+    from memory import TranslationMemory
+
+    en_path = tmp_path / "ep01.en.ass"
+    raw_path = tmp_path / "ep01_raw.ass"
+    edited_path = tmp_path / "ep01_edited.ass"
+    fb_path = tmp_path / "feedback.json"
+    tm_path = tmp_path / "tm_cli.db"
+
+    subs_en = pysubs2.SSAFile()
+    subs_raw = pysubs2.SSAFile()
+    subs_edited = pysubs2.SSAFile()
+
+    for subs_obj, lines in (
+        (
+            subs_en,
+            [
+                (1000, 3000, "That idea makes total sense to me."),
+                (4000, 6000, "We will depart at dawn tomorrow."),
+            ],
+        ),
+        (
+            subs_raw,
+            [
+                (1000, 3000, "Ten pomysł robi kompletny sens dla mnie."),
+                (4000, 6000, "Wyruszymy jutro o samym świcie."),
+            ],
+        ),
+        (
+            subs_edited,
+            [
+                (1000, 3000, "Ten pomysł ma dla mnie całkowity sens."),
+                (4000, 6000, "Wyruszymy jutro o samym świcie."),
+            ],
+        ),
+    ):
+        for s_ms, e_ms, txt in lines:
+            subs_obj.events.append(pysubs2.SSAEvent(start=s_ms, end=e_ms, text=txt, style="Default"))
+
+    subs_en.save(str(en_path), encoding="utf-8")
+    subs_raw.save(str(raw_path), encoding="utf-8")
+    subs_edited.save(str(edited_path), encoding="utf-8")
+
+    # Pre-seed TM wpisami tier=3
+    tm = TranslationMemory(db_path=tm_path)
+    tm.ingest_episode_pairs(
+        [
+            {"en": "That idea makes total sense to me.", "pl": "Ten pomysł robi kompletny sens dla mnie."},
+            {"en": "We will depart at dawn tomorrow.", "pl": "Wyruszymy jutro o samym świcie."},
+        ],
+        series_title="Synthetic Chronicle",
+        quality_tier=3,
+    )
+
+    cmd = [
+        sys.executable,
+        str(Path(__file__).resolve().parent.parent / "tools" / "learn_from_edits.py"),
+        "--raw", str(raw_path),
+        "--edited", str(edited_path),
+        "--en", str(en_path),
+        "--series", "Synthetic Chronicle",
+        "--scope", "series",
+        "--feedback-file", str(fb_path),
+        "--tm-db", str(tm_path),
+    ]
+    proc = subprocess.run(cmd, capture_output=True, text=True, check=False)
+    assert proc.returncode == 0, f"CLI failed: {proc.stderr}\n{proc.stdout}"
+    assert "quality_tier=1" in proc.stdout
+
+    fb_data = json.loads(fb_path.read_text(encoding="utf-8"))
+    matched_fb = [e for e in fb_data if e.get("bad_pl") == "Ten pomysł robi kompletny sens dla mnie."]
+    assert len(matched_fb) == 1
+    assert matched_fb[0]["good_pl"] == "Ten pomysł ma dla mnie całkowity sens."
+    assert matched_fb[0]["scope"] == "series"
+
+    with sqlite3.connect(tm_path) as conn:
+        row_edited = conn.execute(
+            "SELECT pl_text, quality_tier FROM translation_pairs WHERE en_clean = ?",
+            ("that idea makes total sense to me.",),
+        ).fetchone()
+        row_unchanged = conn.execute(
+            "SELECT pl_text, quality_tier FROM translation_pairs WHERE en_clean = ?",
+            ("we will depart at dawn tomorrow.",),
+        ).fetchone()
+        assert row_edited == ("Ten pomysł ma dla mnie całkowity sens.", 1)
+        assert row_unchanged == ("Wyruszymy jutro o samym świcie.", 3)

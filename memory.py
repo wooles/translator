@@ -50,9 +50,13 @@ class TranslationMemory:
                     pl_text TEXT NOT NULL,
                     en_clean TEXT NOT NULL,
                     anime_title TEXT,
-                    word_count INTEGER
+                    word_count INTEGER,
+                    quality_tier INTEGER NOT NULL DEFAULT 2
                 )
             """)
+            cols = {row[1] for row in conn.execute("PRAGMA table_info(translation_pairs)").fetchall()}
+            if "quality_tier" not in cols:
+                conn.execute("ALTER TABLE translation_pairs ADD COLUMN quality_tier INTEGER NOT NULL DEFAULT 2")
             conn.execute("CREATE INDEX IF NOT EXISTS idx_en_clean ON translation_pairs(en_clean)")
             try:
                 conn.execute("""
@@ -194,6 +198,132 @@ class TranslationMemory:
         print(f"[Translation Memory] Successfully indexed {len(pairs_to_insert)} authentic dialogue pairs!")
         return len(pairs_to_insert)
 
+    @staticmethod
+    def _has_uncleaned_markup(text: str) -> bool:
+        """Reject raw ASS override blocks ({...}) or uncleaned HTML markup (<i>, <b>)."""
+        if not text:
+            return False
+        return bool(re.search(r"\{[^\}]*\}|</?[ib](?:\s+[^>]*)?>", text, re.IGNORECASE))
+
+    @staticmethod
+    def _tier_boost(quality_tier: int) -> int:
+        if quality_tier == 1:
+            return 30
+        if quality_tier == 2:
+            return 15
+        return 0
+
+    def ingest_episode_pairs(
+        self,
+        pairs: List[Dict[str, Any]],
+        series_title: str,
+        quality_tier: int = 3
+    ) -> int:
+        """
+        Standard 12.0.0 (G-1): Idempotent ingestion of verified dialogue pairs with quality_tier precedence.
+        Tier hierarchy: 1 = human manual correction, 2 = curated/legacy fansub, 3 = AI episode output.
+        Higher-authority tiers (lower number) are never overwritten by lower-authority tiers.
+        """
+        if not pairs:
+            return 0
+
+        default_tier = max(1, min(3, int(quality_tier)))
+        anime_name = (series_title or "").strip()
+        anime_key = anime_name.lower()
+
+        filtered: Dict[str, tuple] = {}
+        for item in pairs:
+            if not isinstance(item, dict):
+                continue
+            if (
+                item.get("is_sign")
+                or item.get("is_song")
+                or item.get("is_staff")
+                or item.get("has_critical_qg_error")
+            ):
+                continue
+
+            en_raw = str(item.get("en") or item.get("en_text") or "").strip()
+            pl_raw = str(item.get("pl") or item.get("pl_text") or "").strip()
+            if not en_raw or not pl_raw:
+                continue
+            if self._has_uncleaned_markup(en_raw) or self._has_uncleaned_markup(pl_raw):
+                continue
+
+            clean_en = clean_text_for_memory(en_raw)
+            clean_pl = clean_text_for_memory(pl_raw)
+            if not clean_en or not clean_pl:
+                continue
+            if len(clean_en) < 3 or len(clean_en) > 250 or len(clean_pl) < 3 or len(clean_pl) > 300:
+                continue
+            if clean_en.lower() == clean_pl.lower():
+                continue
+            if len(clean_en.split()) < 3 or len(clean_pl.split()) < 3:
+                continue
+
+            item_tier = max(1, min(3, int(item.get("quality_tier", item.get("tier", default_tier)))))
+            en_clean = clean_en.lower()
+            prev = filtered.get(en_clean)
+            if prev is None or item_tier <= prev[3]:
+                filtered[en_clean] = (clean_en, clean_pl, len(clean_en.split()), item_tier)
+
+        if not filtered:
+            return 0
+
+        self._init_db()
+        applied = 0
+        with sqlite3.connect(self.db_path) as conn:
+            cur = conn.cursor()
+            for en_clean, (clean_en, clean_pl, word_cnt, item_tier) in filtered.items():
+                cur.execute(
+                    "SELECT id, pl_text, coalesce(quality_tier, 2) FROM translation_pairs "
+                    "WHERE en_clean = ? AND lower(coalesce(anime_title, '')) = ? "
+                    "ORDER BY coalesce(quality_tier, 2) ASC LIMIT 1",
+                    (en_clean, anime_key),
+                )
+                existing = cur.fetchone()
+                if existing is None:
+                    cur.execute(
+                        "INSERT INTO translation_pairs (en_text, pl_text, en_clean, anime_title, word_count, quality_tier) "
+                        "VALUES (?, ?, ?, ?, ?, ?)",
+                        (clean_en, clean_pl, en_clean, anime_name, word_cnt, item_tier),
+                    )
+                    try:
+                        cur.execute(
+                            "INSERT INTO translation_pairs_fts (en_clean, pl_text, anime_title, en_text) VALUES (?, ?, ?, ?)",
+                            (en_clean, clean_pl, anime_name, clean_en),
+                        )
+                    except Exception:
+                        pass
+                    applied += 1
+                    continue
+
+                ex_id, ex_pl, ex_tier = existing[0], existing[1] or "", int(existing[2] if existing[2] is not None else 2)
+                if item_tier > ex_tier:
+                    # Never overwrite higher-authority entry (e.g., tier=3 cannot replace tier=1 or tier=2)
+                    continue
+                if item_tier == ex_tier and (item_tier != 1 or ex_pl.strip() == clean_pl.strip()):
+                    continue
+
+                cur.execute(
+                    "UPDATE translation_pairs SET en_text = ?, pl_text = ?, anime_title = ?, word_count = ?, quality_tier = ? WHERE id = ?",
+                    (clean_en, clean_pl, anime_name, word_cnt, item_tier, ex_id),
+                )
+                try:
+                    cur.execute(
+                        "DELETE FROM translation_pairs_fts WHERE en_clean = ? AND lower(coalesce(anime_title, '')) = ?",
+                        (en_clean, anime_key),
+                    )
+                    cur.execute(
+                        "INSERT INTO translation_pairs_fts (en_clean, pl_text, anime_title, en_text) VALUES (?, ?, ?, ?)",
+                        (en_clean, clean_pl, anime_name, clean_en),
+                    )
+                except Exception:
+                    pass
+                applied += 1
+            conn.commit()
+        return applied
+
     def find_relevant_examples(
         self,
         query_texts: List[str],
@@ -203,7 +333,7 @@ class TranslationMemory:
     ) -> List[Dict[str, str]]:
         """
         Searches database for the most relevant authentic translation examples
-        using SQLite FTS5 (BM25 ranking) and exact phrase matching.
+        using SQLite FTS5 (BM25 ranking), exact phrase matching, and quality_tier weighting.
         Optionally restricts or boosts examples from the same series (Domain-Locked TM).
         """
         if not os.path.exists(self.db_path):
@@ -211,6 +341,16 @@ class TranslationMemory:
 
         candidates: Dict[str, Dict[str, Any]] = {}
         target_series_norm = series_title.strip().lower() if series_title else ""
+
+        def _lookup_tier(cursor, en_val: str, pl_val: str, anime_val: str) -> int:
+            cursor.execute(
+                "SELECT coalesce(quality_tier, 2) FROM translation_pairs "
+                "WHERE en_text = ? AND pl_text = ? AND lower(coalesce(anime_title, '')) = ? "
+                "ORDER BY coalesce(quality_tier, 2) ASC LIMIT 1",
+                (en_val, pl_val, anime_val.lower()),
+            )
+            r = cursor.fetchone()
+            return int(r[0]) if r and r[0] is not None else 2
 
         with sqlite3.connect(self.db_path) as conn:
             cursor = conn.cursor()
@@ -220,21 +360,24 @@ class TranslationMemory:
                 if len(clean_q) < 3:
                     continue
 
-                # 1. Exact phrase match (Priority 100)
+                # 1. Exact phrase match (Priority 100 + tier boost)
                 cursor.execute(
-                    "SELECT en_text, pl_text, anime_title FROM translation_pairs WHERE en_clean = ? LIMIT 4",
+                    "SELECT en_text, pl_text, anime_title, coalesce(quality_tier, 2) "
+                    "FROM translation_pairs WHERE en_clean = ? "
+                    "ORDER BY coalesce(quality_tier, 2) ASC LIMIT 8",
                     (clean_q,)
                 )
                 for row in cursor.fetchall():
-                    key = row[0]
                     anime_name = (row[2] or "").strip()
                     anime_lower = anime_name.lower()
                     is_same_series = bool(target_series_norm and (target_series_norm in anime_lower or anime_lower in target_series_norm))
                     if require_same_series and target_series_norm and not is_same_series:
                         continue
-                    score = 100 + (50 if is_same_series else 0)
+                    tier = int(row[3] if row[3] is not None else 2)
+                    score = 100 + (50 if is_same_series else 0) + self._tier_boost(tier)
+                    key = f"{row[0]}||{anime_lower}"
                     if key not in candidates or candidates[key]["score"] < score:
-                        candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "score": score}
+                        candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "quality_tier": tier, "score": score}
 
                 # 2. SQLite FTS5 BM25 Match (High-Speed Full-Text Search)
                 try:
@@ -243,57 +386,62 @@ class TranslationMemory:
                         # 2a. Phrase match via FTS5
                         phrase_q = '"' + " ".join(sanitized_tokens[:8]) + '"'
                         cursor.execute(
-                            "SELECT coalesce(en_text, en_clean), pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 4",
+                            "SELECT coalesce(en_text, en_clean), pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 8",
                             (phrase_q,)
                         )
                         for row in cursor.fetchall():
-                            key = row[0]
                             anime_name = (row[2] or "").strip()
                             anime_lower = anime_name.lower()
                             is_same_series = bool(target_series_norm and (target_series_norm in anime_lower or anime_lower in target_series_norm))
                             if require_same_series and target_series_norm and not is_same_series:
                                 continue
-                            score = 85 + (50 if is_same_series else 0)
+                            tier = _lookup_tier(cursor, row[0], row[1], anime_name)
+                            score = 85 + (50 if is_same_series else 0) + self._tier_boost(tier)
+                            key = f"{row[0]}||{anime_lower}"
                             if key not in candidates or candidates[key]["score"] < score:
-                                candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "score": score}
+                                candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "quality_tier": tier, "score": score}
 
                         # 2b. Multi-term AND match on key words (len >= 4)
                         key_tokens = [t for t in sanitized_tokens if len(t) >= 4]
                         if len(key_tokens) >= 2:
                             and_q = " AND ".join(key_tokens[:4])
                             cursor.execute(
-                                "SELECT coalesce(en_text, en_clean), pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 4",
+                                "SELECT coalesce(en_text, en_clean), pl_text, anime_title, bm25(translation_pairs_fts) FROM translation_pairs_fts WHERE translation_pairs_fts MATCH ? ORDER BY bm25(translation_pairs_fts) LIMIT 8",
                                 (and_q,)
                             )
                             for row in cursor.fetchall():
-                                key = row[0]
                                 anime_name = (row[2] or "").strip()
                                 anime_lower = anime_name.lower()
                                 is_same_series = bool(target_series_norm and (target_series_norm in anime_lower or anime_lower in target_series_norm))
                                 if require_same_series and target_series_norm and not is_same_series:
                                     continue
-                                score = 70 + (50 if is_same_series else 0)
+                                tier = _lookup_tier(cursor, row[0], row[1], anime_name)
+                                score = 70 + (50 if is_same_series else 0) + self._tier_boost(tier)
+                                key = f"{row[0]}||{anime_lower}"
                                 if key not in candidates or candidates[key]["score"] < score:
-                                    candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "score": score}
+                                    candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "quality_tier": tier, "score": score}
                 except Exception:
                     # Fallback to sub-phrase LIKE matching if FTS fails
                     words = tokenize(clean_q)
                     if len(words) >= 2:
                         bigram_query = f"%{words[0]} {words[1]}%"
                         cursor.execute(
-                            "SELECT en_text, pl_text, anime_title FROM translation_pairs WHERE en_clean LIKE ? AND word_count <= 14 LIMIT 4",
+                            "SELECT en_text, pl_text, anime_title, coalesce(quality_tier, 2) "
+                            "FROM translation_pairs WHERE en_clean LIKE ? AND word_count <= 14 "
+                            "ORDER BY coalesce(quality_tier, 2) ASC LIMIT 8",
                             (bigram_query,)
                         )
                         for row in cursor.fetchall():
-                            key = row[0]
                             anime_name = (row[2] or "").strip()
                             anime_lower = anime_name.lower()
                             is_same_series = bool(target_series_norm and (target_series_norm in anime_lower or anime_lower in target_series_norm))
                             if require_same_series and target_series_norm and not is_same_series:
                                 continue
-                            score = 60 + (50 if is_same_series else 0)
+                            tier = int(row[3] if row[3] is not None else 2)
+                            score = 60 + (50 if is_same_series else 0) + self._tier_boost(tier)
+                            key = f"{row[0]}||{anime_lower}"
                             if key not in candidates or candidates[key]["score"] < score:
-                                candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "score": score}
+                                candidates[key] = {"en": row[0], "pl": row[1], "anime": anime_name, "quality_tier": tier, "score": score}
 
         # Sort by relevance score
         sorted_results = sorted(candidates.values(), key=lambda x: x["score"], reverse=True)
