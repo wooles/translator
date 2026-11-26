@@ -120,6 +120,7 @@ def format_dry_telemetry_tag(
     speaker_name: Optional[str] = None,
     target_name: Optional[str] = None,
     register: Optional[str] = None,
+    target_min_confidence: float = 0.80,
     **kwargs: Any
 ) -> str:
     """
@@ -199,7 +200,7 @@ def format_dry_telemetry_tag(
 
     tgt_name_clean = str(tgt_n or "").strip()
     is_generic_tgt = tgt_name_clean.lower() in {"mężczyzna", "kobieta", "mężczyźni", "kobiety", "brak", "none", "unspecified"}
-    if _is_valid_telemetry_val(tgt) and tgt_c >= 0.80 and not is_generic_tgt:
+    if _is_valid_telemetry_val(tgt) and tgt_c >= float(target_min_confidence) and not is_generic_tgt:
         if _is_valid_telemetry_val(tgt_n):
             segments.append(f"Adresat: {tgt_n} ({tgt})")
         else:
@@ -1959,6 +1960,8 @@ def _analyze_local_polylogue_window(
     lookback_history: Optional[List[Dict[str, Any]]] = None,
     cuts_ms: Optional[List[int]] = None,
     window_size: int = 6,
+    curr_clean_text: str = "",
+    curr_end_ms: Optional[int] = None,
 ) -> Dict[str, Any]:
     """
     Standard 12.2.0 (OBS-13a): Scans up to `window_size` preceding dialogue turns within DEF-02
@@ -2114,6 +2117,34 @@ def _analyze_local_polylogue_window(
                 is_third_party_interjection = True
                 is_confirmed_ping_pong = False
 
+    is_direct_2p_qa_dyad = False
+    if is_local_polylogue and (not is_confirmed_ping_pong or is_third_party_interjection):
+        clean_q = re.sub(r"[\s\"'”»)\]]+$", "", re.sub(r"\{[^}]*\}", "", str(curr_clean_text or ""))).strip()
+        has_2p_q = clean_q.endswith("?") and bool(
+            re.search(r"\b(?:you|your|you're|you've|you'd|you'll)\b", clean_q, re.IGNORECASE)
+        )
+        if has_2p_q and not is_third_party_interjection and immediate_other and batch_events and event_idx + 1 < len(batch_events):
+            curr_end_val = int(curr_end_ms if curr_end_ms is not None else curr_start_ms or 0)
+            for q_off in range(1, min(4, len(batch_events) - event_idx)):
+                q_item = batch_events[event_idx + q_off]
+                q_ev = q_item[1] if len(q_item) > 1 else None
+                if q_ev is None:
+                    continue
+                q_style = str(getattr(q_ev, "style", "") or "").lower()
+                q_spk = str(getattr(q_ev, "name", None) or getattr(q_ev, "actor", None) or "").strip()
+                q_clean = extract_clean_speaker_name(q_spk).strip().lower()
+                if (not q_clean or q_clean in _non_dlg
+                        or any(k in q_style for k in ("sign", "title", "caption", "italic", "thought", "internal"))
+                        or getattr(q_ev, "is_internal_monologue", False)):
+                    continue
+                q_start = int(getattr(q_ev, "start", 0) or 0)
+                if _is_cut(curr_end_val, q_start) or max(0, q_start - curr_end_val) > 1500:
+                    break
+                if q_clean != curr_clean:
+                    if q_clean == immediate_other:
+                        is_direct_2p_qa_dyad = True
+                    break
+
     return {
         "local_speakers": local_speakers,
         "is_local_polylogue": is_local_polylogue,
@@ -2121,7 +2152,182 @@ def _analyze_local_polylogue_window(
         "immediate_other_word_count": immediate_other_word_count,
         "is_confirmed_ping_pong": is_confirmed_ping_pong,
         "is_third_party_interjection": is_third_party_interjection,
+        "is_direct_2p_qa_dyad": is_direct_2p_qa_dyad,
     }
+
+
+def _is_explicit_vocative_for_label(
+    event: Any,
+    clean_text: str,
+    line_addr_lbl: Optional[str],
+) -> bool:
+    if getattr(event, "vocative_lock", False):
+        return True
+    lbl_actor = re.sub(r"\s*\([^)]*\)\s*", "", str(line_addr_lbl or "")).strip()
+    if len(lbl_actor) < 3:
+        return False
+    stripped = re.sub(r"\{[^}]*\}", "", str(clean_text or ""))
+    return bool(re.search(rf"(?<!\w){re.escape(lbl_actor)}(?:[,!?]|\.\.\.|…)", stripped, re.IGNORECASE))
+
+
+def _compute_effective_target_confidence(
+    event: Any,
+    line_addr_cat: Optional[str],
+    line_addr_lbl: Optional[str],
+    poly_ctx: Optional[Dict[str, Any]] = None,
+    is_internal_monologue: bool = False,
+    line_has_explicit_vocative: bool = False,
+) -> float:
+    """
+    Standard 12.2.0 (OBS-13c): Propagates real event.target_confidence from SceneDiscourseGraph
+    and local polylogue certainty instead of hardcoding 1.0, supporting Z2 target_min_confidence=0.90.
+    """
+    if is_internal_monologue or not line_addr_cat:
+        return 0.0
+    cat_s = str(line_addr_cat).strip()
+    if not cat_s or cat_s.upper() == "UNSPECIFIED" or cat_s.lower() in ("none", "unknown", "brak"):
+        return 0.0
+
+    if getattr(event, "vocative_lock", False) or line_has_explicit_vocative:
+        return 0.98
+
+    lbl_s = str(line_addr_lbl or "").strip()
+    if "hipoteza faza 1" in lbl_s.lower():
+        return 0.70
+
+    if cat_s in (
+        "grupa_kobiet", "grupa_mężczyzn", "grupa_mieszana",
+        "kobieta_dual", "mężczyzna_dual", "para_mieszana_dual",
+    ):
+        return 0.95
+
+    ev_tgt_conf: Optional[float] = None
+    ev_tgt_conf_raw = getattr(event, "target_confidence", None)
+    if ev_tgt_conf_raw is not None:
+        try:
+            v = float(ev_tgt_conf_raw)
+            if v > 0.0:
+                ev_tgt_conf = v
+        except (TypeError, ValueError):
+            ev_tgt_conf = None
+
+    ev_tgt_spk = str(getattr(event, "target_speaker", None) or getattr(event, "target_actor", None) or "").strip()
+    lbl_actor = re.sub(r"\s*\([^)]*\)\s*", "", lbl_s).strip()
+    same_target_actor = bool(
+        not ev_tgt_spk
+        or ev_tgt_spk.upper() == "UNSPECIFIED"
+        or (lbl_actor and ev_tgt_spk.lower() == lbl_actor.lower())
+    )
+
+    if ev_tgt_conf is not None and same_target_actor:
+        if (
+            poly_ctx
+            and poly_ctx.get("is_local_polylogue")
+            and not poly_ctx.get("is_confirmed_ping_pong")
+            and not poly_ctx.get("is_direct_2p_qa_dyad")
+        ):
+            return min(ev_tgt_conf, 0.85)
+        return ev_tgt_conf
+
+    if poly_ctx is not None:
+        if (
+            poly_ctx.get("is_local_polylogue")
+            and not poly_ctx.get("is_confirmed_ping_pong")
+            and not poly_ctx.get("is_direct_2p_qa_dyad")
+        ):
+            return 0.85
+        return 0.95
+
+    return ev_tgt_conf if ev_tgt_conf is not None else 0.95
+
+
+def _attach_phase2_readonly_neighbor_context(
+    pass1_items: List[Dict[str, Any]],
+    selected_copies: List[Dict[str, Any]],
+    cuts_ms: Optional[List[int]] = None,
+    max_chars: int = 90,
+) -> List[Dict[str, Any]]:
+    """
+    Standard 12.2.0 (C-1): Attaches read-only preceding/following skipped neighbors within
+    DEF-02 scene boundaries to selected Phase 2 candidates' `notes` (CoT remains 2048 LOW).
+    """
+    if not pass1_items or not selected_copies or len(selected_copies) >= len(pass1_items):
+        return selected_copies
+
+    from series_memory import extract_clean_speaker_name
+
+    pos_by_id: Dict[Any, int] = {}
+    for idx_p, it_p in enumerate(pass1_items):
+        it_id = it_p.get("id")
+        if it_id is not None and it_id not in pos_by_id:
+            pos_by_id[it_id] = idx_p
+
+    selected_ids = {it.get("id") for it in selected_copies if it.get("id") is not None}
+
+    def _is_cut(t_prev_end: int, t_next_start: int) -> bool:
+        gap_v = max(0, int(t_next_start) - int(t_prev_end))
+        if gap_v >= 3500:
+            return True
+        if gap_v >= 2500 and cuts_ms:
+            for b_cut in cuts_ms:
+                if t_prev_end < b_cut < t_next_start:
+                    return True
+        return False
+
+    def _clean_trunc(raw_pl: Any) -> str:
+        txt = re.sub(r"\{[^}]*\}", "", str(raw_pl or ""))
+        txt = txt.replace(r"\N", " ").replace(r"\n", " ").replace("\n", " ")
+        txt = re.sub(r"\s+", " ", txt).strip()
+        if len(txt) > max_chars:
+            txt = txt[: max(1, max_chars - 1)].rstrip() + "…"
+        return txt
+
+    for it_copy in selected_copies:
+        if it_copy.get("is_sign"):
+            continue
+        cur_id = it_copy.get("id")
+        if cur_id not in pos_by_id:
+            continue
+        pos = pos_by_id[cur_id]
+        cur_start = int(it_copy.get("start_ms") or getattr(it_copy.get("event"), "start", 0) or 0)
+        cur_end = int(it_copy.get("end_ms") or getattr(it_copy.get("event"), "end", 0) or 0)
+        extra_notes: List[str] = []
+
+        if pos > 0:
+            prev_it = pass1_items[pos - 1]
+            prev_id = prev_it.get("id")
+            if prev_id is not None and prev_id not in selected_ids and not prev_it.get("is_sign"):
+                prev_end = int(prev_it.get("end_ms") or getattr(prev_it.get("event"), "end", 0) or 0)
+                if not _is_cut(prev_end, cur_start):
+                    prev_spk = extract_clean_speaker_name(
+                        str(prev_it.get("speaker_name") or getattr(prev_it.get("event"), "name", "") or "Postać")
+                    ).strip() or "Postać"
+                    prev_pl_t = _clean_trunc(prev_it.get("pl"))
+                    if prev_pl_t:
+                        tag_p = f'[Poprzednia #{prev_id} (read-only, NIE zwracaj w JSON) {prev_spk}: "{prev_pl_t}"]'
+                        if tag_p not in str(it_copy.get("notes") or ""):
+                            extra_notes.append(tag_p)
+
+        if pos + 1 < len(pass1_items):
+            nxt_it = pass1_items[pos + 1]
+            nxt_id = nxt_it.get("id")
+            if nxt_id is not None and nxt_id not in selected_ids and not nxt_it.get("is_sign"):
+                nxt_start = int(nxt_it.get("start_ms") or getattr(nxt_it.get("event"), "start", 0) or 0)
+                if not _is_cut(cur_end, nxt_start):
+                    nxt_spk = extract_clean_speaker_name(
+                        str(nxt_it.get("speaker_name") or getattr(nxt_it.get("event"), "name", "") or "Postać")
+                    ).strip() or "Postać"
+                    nxt_pl_t = _clean_trunc(nxt_it.get("pl"))
+                    if nxt_pl_t:
+                        tag_n = f'[Następna #{nxt_id} (read-only, NIE zwracaj w JSON) {nxt_spk}: "{nxt_pl_t}"]'
+                        if tag_n not in str(it_copy.get("notes") or ""):
+                            extra_notes.append(tag_n)
+
+        if extra_notes:
+            existing_n = str(it_copy.get("notes") or "").strip()
+            it_copy["notes"] = f"{existing_n} {' '.join(extra_notes)}".strip()
+
+    return selected_copies
 
 
 _TECHNICAL_ACTOR_SUFFIXES = frozenset({
@@ -4262,6 +4468,7 @@ class MultimodalTranslator:
 
         # Standard 12.2.0 (OBS-13a): Local polylogue Z2 guard before prev_interlocutor / forward lookahead
         curr_start_ms_val = int(getattr(event, "start", 0) or 0)
+        curr_end_ms_val = int(getattr(event, "end", curr_start_ms_val) or curr_start_ms_val or 0)
         poly_ctx = _analyze_local_polylogue_window(
             batch_events=batch_events,
             event_idx=event_idx,
@@ -4270,38 +4477,13 @@ class MultimodalTranslator:
             lookback_history=lookback_history,
             cuts_ms=cuts_ms,
             window_size=6,
+            curr_clean_text=clean_text,
+            curr_end_ms=curr_end_ms_val,
         )
         if poly_ctx["is_local_polylogue"] and (
             not poly_ctx["is_confirmed_ping_pong"] or poly_ctx["is_third_party_interjection"]
         ):
-            is_direct_2p_qa_dyad = False
-            clean_q = re.sub(r"[\s\"'”»)\]]+$", "", re.sub(r"\{[^}]*\}", "", str(clean_text or ""))).strip()
-            has_2p_q = clean_q.endswith("?") and bool(
-                re.search(r"\b(?:you|your|you're|you've|you'd|you'll)\b", clean_q, re.IGNORECASE)
-            )
-            if has_2p_q and not poly_ctx["is_third_party_interjection"] and poly_ctx["immediate_other"] and batch_events and event_idx + 1 < len(batch_events):
-                curr_end_ms_val = int(getattr(event, "end", curr_start_ms_val) or curr_start_ms_val or 0)
-                curr_clean_q = extract_clean_speaker_name(curr_spk).strip().lower()
-                for q_off in range(1, min(4, len(batch_events) - event_idx)):
-                    q_item = batch_events[event_idx + q_off]
-                    q_ev = q_item[1] if len(q_item) > 1 else None
-                    if q_ev is None:
-                        continue
-                    q_style = str(getattr(q_ev, "style", "") or "").lower()
-                    q_spk = str(getattr(q_ev, "name", None) or getattr(q_ev, "actor", None) or "").strip()
-                    q_clean = extract_clean_speaker_name(q_spk).strip().lower()
-                    if (not q_clean or q_clean in _NON_DIALOGUE_ACTORS
-                            or any(k in q_style for k in ("sign", "title", "caption", "italic", "thought", "internal"))
-                            or getattr(q_ev, "is_internal_monologue", False)):
-                        continue
-                    q_start = int(getattr(q_ev, "start", 0) or 0)
-                    if _is_scene_cut_boundary(curr_end_ms_val, q_start) or max(0, q_start - curr_end_ms_val) > 1500:
-                        break
-                    if q_clean != curr_clean_q:
-                        if q_clean == poly_ctx["immediate_other"]:
-                            is_direct_2p_qa_dyad = True
-                        break
-            if not is_direct_2p_qa_dyad:
+            if not poly_ctx["is_direct_2p_qa_dyad"]:
                 return None, None
 
         # 1. Multi-Step Backward Interlocutor Search (up to 4 events, rygor cięć scen z DEF-02)
@@ -5232,6 +5414,26 @@ class MultimodalTranslator:
                         pl_grp_val = "VIRILE"
                     you_grp_val = "VIRILE" if (has_male_addressee_in_line or line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if line_addr_cat in ["grupa_kobiet", "kobieta_dual"] else None)
 
+                poly_ctx_f1 = _analyze_local_polylogue_window(
+                    batch_events=batch_events,
+                    event_idx=idx,
+                    curr_spk=str(getattr(event, "name", None) or getattr(event, "actor", None) or "").strip(),
+                    curr_start_ms=int(getattr(event, "start", 0) or 0),
+                    lookback_history=history_context,
+                    cuts_ms=getattr(self, "scene_cuts_ms", None),
+                    curr_clean_text=clean_text,
+                    curr_end_ms=int(getattr(event, "end", 0) or 0),
+                )
+                is_voc_f1 = _is_explicit_vocative_for_label(event, clean_text, line_addr_lbl)
+                eff_tgt_conf_f1 = _compute_effective_target_confidence(
+                    event=event,
+                    line_addr_cat=line_addr_cat,
+                    line_addr_lbl=line_addr_lbl,
+                    poly_ctx=poly_ctx_f1,
+                    is_internal_monologue=is_internal_monologue,
+                    line_has_explicit_vocative=is_voc_f1,
+                )
+
                 batch_actors = {getattr(b_ev, "name", "") for _, b_ev, _, _ in batch_events if getattr(b_ev, "name", "") and not is_generic_actor_or_category(getattr(b_ev, "name", ""))}
                 poly_val = getattr(self, "episode_scene_polylogues", {}).get(original_idx)
                 if not poly_val and len(batch_actors) >= 3:
@@ -5240,20 +5442,21 @@ class MultimodalTranslator:
                 dry_telemetry = format_dry_telemetry_tag(
                     speaker_gender=contract_spk_gender,
                     speaker_confidence=1.0 if str(contract_spk_gender).lower() in ("masculine", "feminine") else 0.0,
-                    target_gender=contract_target_gender,
-                    target_confidence=1.0 if str(contract_target_gender).lower() in ("masculine", "feminine") else 0.0,
+                    target_gender=contract_target_gender if eff_tgt_conf_f1 >= 0.90 else "UNKNOWN",
+                    target_confidence=eff_tgt_conf_f1,
                     plural_group_gender=pl_grp_val,
                     plural_confidence=1.0 if pl_grp_val else 0.0,
-                    you_group_gender=you_grp_val,
-                    you_group_confidence=1.0 if you_grp_val else 0.0,
+                    you_group_gender=you_grp_val if (eff_tgt_conf_f1 >= 0.90 or contract_addr_number == "PLURAL") else None,
+                    you_group_confidence=1.0 if (you_grp_val and (eff_tgt_conf_f1 >= 0.90 or contract_addr_number == "PLURAL")) else 0.0,
                     speaker_name=disc_telem.get("speaker_name") or event.name or "UNKNOWN",
-                    target_name=target_actor_name if target_actor_name else None,
+                    target_name=(target_actor_name if (target_actor_name and eff_tgt_conf_f1 >= 0.90) else None),
                     register=reg_name if reg_name else None,
-                    polylogue=poly_val
+                    polylogue=poly_val,
+                    target_min_confidence=0.90,
                 )
                 if dry_telemetry:
                     lines.append(f"  📡 TELEMETRIA: {dry_telemetry}")
-                if event.name and target_actor_name and not is_internal_monologue:
+                if event.name and target_actor_name and not is_internal_monologue and eff_tgt_conf_f1 >= 0.90:
                     tv_hint_f1 = _resolve_tv_address_form(
                         event.name,
                         target_actor_name,
@@ -6403,14 +6606,40 @@ class MultimodalTranslator:
                     has_male_addressee_in_line = True
                     addressee_cat = "para_mieszana_dual"
 
+            poly_ctx_f2 = _analyze_local_polylogue_window(
+                batch_events=untranslated_in_batch,
+                event_idx=idx,
+                curr_spk=str(getattr(event, "name", None) or getattr(event, "actor", None) or "").strip(),
+                curr_start_ms=int(getattr(event, "start", 0) or 0),
+                lookback_history=lookback_history,
+                cuts_ms=getattr(self, "scene_cuts_ms", None),
+                curr_clean_text=clean_en,
+                curr_end_ms=int(getattr(event, "end", 0) or 0),
+            )
+            is_voc_f2 = _is_explicit_vocative_for_label(event, clean_en, addressee_label)
+            tgt_conf = _compute_effective_target_confidence(
+                event=event,
+                line_addr_cat=addressee_cat,
+                line_addr_lbl=addressee_label,
+                poly_ctx=poly_ctx_f2,
+                is_internal_monologue=is_internal_monologue,
+                line_has_explicit_vocative=is_voc_f2,
+            )
+            is_plural_or_dual_addr = addressee_cat in [
+                "grupa_kobiet", "grupa_mężczyzn", "grupa_mieszana",
+                "kobieta_dual", "mężczyzna_dual", "para_mieszana_dual",
+            ]
+
             has_male_speaker_in_line = (
                 spk_gram_tag == "MASCULINE"
                 or speaker_gender == "mężczyzna"
             )
             has_male_addressee_in_line = (
                 (has_dual_2p and addressee_cat == "para_mieszana_dual")
-                or tgt_gram_tag == "MASCULINE"
-                or addressee_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn", "para_mieszana_dual"]
+                or ((tgt_conf >= 0.90 or is_plural_or_dual_addr) and (
+                    tgt_gram_tag == "MASCULINE"
+                    or addressee_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn", "para_mieszana_dual"]
+                ))
             )
             if has_male_speaker_in_line:
                 is_fem_scene = False
@@ -6418,13 +6647,13 @@ class MultimodalTranslator:
             if collective_virility_f2 in ("VIRILE", "NON_VIRILE"):
                 is_fem_scene = (collective_virility_f2 == "NON_VIRILE")
                 line_pl_grp = collective_virility_f2
-                line_you_grp = "VIRILE" if (has_male_addressee_in_line or addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
+                line_you_grp = "VIRILE" if (has_male_addressee_in_line or addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if (addressee_cat in ["grupa_kobiet", "kobieta_dual"] and (tgt_conf >= 0.90 or is_plural_or_dual_addr)) else "AMBIGUOUS")
             elif is_fem_scene:
                 line_pl_grp = "NON_VIRILE"
-                line_you_grp = "VIRILE" if (has_male_addressee_in_line or addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
+                line_you_grp = "VIRILE" if (has_male_addressee_in_line or addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if (addressee_cat in ["grupa_kobiet", "kobieta_dual"] and (tgt_conf >= 0.90 or is_plural_or_dual_addr)) else "AMBIGUOUS")
             else:
                 line_pl_grp = "VIRILE" if (has_male_speaker_in_line or addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"] or getattr(self, "scene_has_male", False)) else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
-                line_you_grp = "VIRILE" if (has_male_addressee_in_line or addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
+                line_you_grp = "VIRILE" if (has_male_addressee_in_line or addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if (addressee_cat in ["grupa_kobiet", "kobieta_dual"] and (tgt_conf >= 0.90 or is_plural_or_dual_addr)) else "AMBIGUOUS")
 
             if has_male_speaker_in_line and line_pl_grp == "NON_VIRILE":
                 line_pl_grp = "VIRILE"
@@ -6438,7 +6667,7 @@ class MultimodalTranslator:
                 poly_val_f2 = f"POLYLOGUE (n={len(batch_actors_f2)})"
             resolved_spk_name = disc_telem.get("speaker_name") or raw_speaker_name or event.name or "UNKNOWN"
             resolved_tgt_name = disc_telem.get("target_actor") or (addressee_label if addressee_label else None)
-            if is_internal_monologue:
+            if is_internal_monologue or tgt_conf < 0.90:
                 resolved_tgt_name = None
                 tgt_gram_tag = None
 
@@ -6484,7 +6713,7 @@ class MultimodalTranslator:
                 speaker_gender=spk_gram_tag,
                 speaker_confidence=spk_conf,
                 target_gender=tgt_gram_tag,
-                target_confidence=1.0 if p0_tgt_gram in ("MASCULINE", "FEMININE") else tgt_conf,
+                target_confidence=tgt_conf,
                 plural_group_gender=line_pl_grp if line_pl_grp != "AMBIGUOUS" else None,
                 plural_confidence=1.0 if line_pl_grp != "AMBIGUOUS" else 0.0,
                 you_group_gender=line_you_grp if line_you_grp != "AMBIGUOUS" else None,
@@ -6492,7 +6721,8 @@ class MultimodalTranslator:
                 speaker_name=resolved_spk_name,
                 target_name=resolved_tgt_name,
                 register=short_reg,
-                polylogue=poly_val_f2
+                polylogue=poly_val_f2,
+                target_min_confidence=0.90,
             )
             if short_reg and line_dry_telemetry and "Rejestr:" not in line_dry_telemetry:
                 if line_dry_telemetry.endswith("]"):
@@ -6796,11 +7026,11 @@ class MultimodalTranslator:
                 "speaker_gender": speaker_gender if spk_conf >= 0.95 else None,
                 "speaker_confidence": spk_conf,
                 "raw_speaker_gender_hypothesis": speaker_gender if spk_conf < 0.95 else None,
-                "addressee": addressee_cat if tgt_conf >= 0.95 else None,
-                "target_gender": addressee_cat if tgt_conf >= 0.95 else None,
+                "addressee": addressee_cat if tgt_conf >= 0.90 else None,
+                "target_gender": addressee_cat if tgt_conf >= 0.90 else None,
                 "target_confidence": tgt_conf,
-                "raw_addressee_hypothesis": addressee_cat if tgt_conf < 0.95 else None,
-                "addressee_label": addressee_label,
+                "raw_addressee_hypothesis": addressee_cat if tgt_conf < 0.90 else None,
+                "addressee_label": addressee_label if tgt_conf >= 0.90 else "",
                 "telemetry_tag": line_dry_telemetry,
                 "declension_paradigms": p2_paradigms,
                 "semiotic_layer": semiotic_layer,
@@ -7194,6 +7424,11 @@ class MultimodalTranslator:
                     it_copy["notes"] = f"{existing_notes} {' '.join(extra_hints)}".strip()
             selected_copies.append(it_copy)
 
+        selected_copies = _attach_phase2_readonly_neighbor_context(
+            pass1_items=pass1_items,
+            selected_copies=selected_copies,
+            cuts_ms=getattr(self, "scene_cuts_ms", None),
+        )
         return selected_copies
 
     def _enter_f2_retry_observer(self, b_idx: int) -> Tuple[Any, Any]:
