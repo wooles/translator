@@ -1,10 +1,11 @@
 """
-Zestaw nienaruszalnych, nietautologicznych testów regresyjnych dla Standardu 12.0.0:
+Zestaw nienaruszalnych, nietautologicznych testów regresyjnych dla Standardu 12.0.0 + Hotfixu 12.0.0a:
 - Commit 1 (5 testów): A-1, A-2, A-3, E-1, E-2
 - Commit 2 (4 testy): B-1, B-2, B-3, D-1
 - Commit 3 (4 testy): F-2/C-1, F-3, D-2
 - Commit 4 (3 testy): F-1, H-3 (OBS-06)
 - Commit 5 (3 testy): G-1, G-2
+- Hotfix 12.0.0a (5 testów): BUG #1..#5
 """
 
 import concurrent.futures
@@ -29,6 +30,7 @@ from translator import (
     _build_ssot_lean_bible_str,
     _deduplicate_episode_signs,
     _build_clean_f2_character_registry,
+    _uppercase_preserving_ass_tags,
     extract_typesetting_tags,
     sanitize_ts_prefix_for_translation,
 )
@@ -922,7 +924,12 @@ def test_f1_phase2_consolidation_merges_batches_and_maps_results_back_losslessly
     total_cons_lines = sum(len(g["verifier_items"]) for g in groups)
     assert total_cons_lines == 112
     assert all(len(g["verifier_items"]) <= 48 for g in groups)
-    assert any("--- ZMIANA SCENY ---" in (g.get("scene_diagnosis") or "") for g in groups)
+    assert all(g.get("scene_diagnosis") is None or isinstance(g.get("scene_diagnosis"), dict) for g in groups)
+    assert any(
+        isinstance(g.get("scene_diagnosis"), dict)
+        and "--- ZMIANA SCENY ---" in (g["scene_diagnosis"].get("dramatic_context") or "")
+        for g in groups
+    )
 
     mapped_all = {}
     for g in groups:
@@ -1268,3 +1275,276 @@ def test_g2_learn_from_edits_cli_ingests_user_diff_to_feedback_and_tm_tier1(tmp_
         ).fetchone()
         assert row_edited == ("Ten pomysł ma dla mnie całkowity sens.", 1)
         assert row_unchanged == ("Wyruszymy jutro o samym świcie.", 3)
+
+
+# =====================================================================
+# HOTFIX 12.0.0a: Testy regresyjne BUG #1 .. BUG #5
+# =====================================================================
+
+@pytest.mark.unit
+def test_bug1_a1_filter_handles_production_2_tuples_without_index_error():
+    """
+    BUG #1 (A-1): Produkcyjny translator.py:4990 przekazuje listę 2-krotek (b_id, SSAEvent)
+    do _filter_dialogue_audio_events. Filtr nie może rzucać IndexError, zwraca 2-krotki
+    i zachowuje wyłącznie DIALOGUE_BOTTOM oraz DIALOGUE_TOP.
+    """
+    subs = pysubs2.SSAFile()
+    subs.styles["Default"] = pysubs2.SSAStyle()
+    subs.styles["Main"] = pysubs2.SSAStyle(alignment=8)
+    subs.styles["Sign"] = pysubs2.SSAStyle()
+    subs.styles["OP"] = pysubs2.SSAStyle()
+
+    ev_diag = pysubs2.SSAEvent(start=1000, end=2500, style="Default", name="Bohater_A", text="Idziemy na północ.")
+    ev_top = pysubs2.SSAEvent(start=2600, end=4000, style="Main", name="Dialogue", text="{\\an8}Uwaga na patrol.")
+    ev_sign = pysubs2.SSAEvent(start=4100, end=5000, style="Sign", name="Sign", text="WEJŚCIE")
+    ev_song = pysubs2.SSAEvent(start=5100, end=7000, style="OP", name="Singer", text="Running into the bright horizon")
+    ev_staff = pysubs2.SSAEvent(start=7100, end=8500, style="Sign", name="Sign", text="TYPESETTING: Zespół_Y")
+
+    subs.events.extend([ev_diag, ev_top, ev_sign, ev_song, ev_staff])
+    report = StyleMatrixReport(subs)
+
+    prod_2_tuples = [(1, ev_diag), (2, ev_top), (3, ev_sign), (4, ev_song), (5, ev_staff)]
+    filtered = _filter_dialogue_audio_events(prod_2_tuples, style_report=report)
+
+    assert len(filtered) == 2
+    assert all(isinstance(x, tuple) and len(x) == 2 for x in filtered)
+    assert [x[0] for x in filtered] == [1, 2]
+    assert filtered[0][1] is ev_diag
+    assert filtered[1][1] is ev_top
+
+
+@pytest.mark.unit
+def test_bug2_f1_consolidated_scene_diagnosis_renders_in_verifier_prompt():
+    """
+    BUG #2 (F-1): _consolidate_phase2_batches przekazuje scene_diagnosis jako strukturalny dict
+    oraz dołącza aktywny ton sekwencji (B-2) tak, aby chroniony verifier.py wyrenderował zarówno
+    sekcję DIAGNOZA DRAMATURGICZNA I KOGNITYWNA SCENY z separatorem '--- ZMIANA SCENY ---',
+    jak i aktywny ton sekwencji z Profilera.
+    """
+    tr = MultimodalTranslator(api_key="mock_k0", model="gemini-4-hydrogen", enable_verifier=True)
+    ep_profile = EpisodeProfile(
+        episode_summary="Odcinek testowy o negocjacjach w gildii.",
+        dramatic_sequences=[
+            DramaticSequence(
+                sequence_name="Konfrontacja w Sali Rady",
+                time_range="00:00 - 00:25",
+                dramatic_summary="Bohater_A i Bohater_B ścierają się słownie przy stole obrad.",
+                dominant_tone="chłodne napięcie dworskie",
+            ),
+        ],
+    )
+
+    phase1_outputs = {}
+    for b_idx in range(3):
+        start_base = b_idx * 4000 + 1000
+        ev = pysubs2.SSAEvent(start=start_base, end=start_base + 2000, text=f"Proposal sentence {b_idx} must be reviewed.", name="Bohater_A")
+        p1_items = [{
+            "id": 1,
+            "orig_idx": b_idx,
+            "event": ev,
+            "start_ms": ev.start,
+            "end_ms": ev.end,
+            "style": "Default",
+            "en": ev.text,
+            "pl": f"Propozycja {b_idx} wymaga rozważenia.",
+            "speaker": "Bohater_A",
+            "speaker_name": "Bohater_A",
+            "calque_score": 0.70,
+            "notes": "",
+            "is_sign": False,
+            "is_song": False,
+        }]
+        diag_obj = types.SimpleNamespace(
+            dramatic_context=f"Rozmowa przy stole nr {b_idx}",
+            dominant_tone="stanowczy i powściągliwy" if b_idx == 0 else "narastający sprzeciw",
+            dialogue_flow=f"Replika {b_idx} prowadzi do impasu.",
+            power_dynamic="Bohater_A dominuje",
+        )
+        phase1_outputs[b_idx] = {
+            "b_idx": b_idx,
+            "pass1_items": p1_items,
+            "untranslated_in_batch": [(b_idx, ev, ev.text, "")],
+            "scene_desc": f"Scena obrad {b_idx}",
+            "batch_response": types.SimpleNamespace(scene_diagnosis=diag_obj),
+            "episode_profile_str": "Brief odcinka.",
+            "user_feedback_str": "",
+            "glossary_str": "",
+            "scoped_series_bible_str": "",
+            "manga_canon_str": "",
+            "episode_profile": ep_profile,
+            "lookback_history": [],
+            "lookahead_events": [],
+            "pbar": _DummyPbarF2(),
+        }
+
+    groups = tr._consolidate_phase2_batches(phase1_outputs, max_lines_per_f2_call=48)
+    assert len(groups) == 1
+    cons_group = groups[0]
+    assert isinstance(cons_group["scene_diagnosis"], dict)
+
+    rendered_prompt = tr.verifier.verify_batch(
+        batch_items=cons_group["verifier_items"],
+        scene_summary=cons_group["scene_desc"],
+        scene_diagnosis=cons_group["scene_diagnosis"],
+        episode_profile_str=cons_group["episode_profile_str"],
+        return_prompt=True,
+    )
+    assert "DIAGNOZA DRAMATURGICZNA I KOGNITYWNA SCENY" in rendered_prompt
+    assert "--- ZMIANA SCENY ---" in rendered_prompt
+    assert "chłodne napięcie dworskie" in rendered_prompt
+
+
+@pytest.mark.unit
+def test_bug3_ab_harness_reconstructs_full_events_jsonl_and_accumulates_live_tokens(tmp_path, monkeypatch, capsys):
+    """
+    BUG #3 (verify_f2_consolidation_ab.py): Rekonstrukcja pełnych paczek F1 z rzeczywistego schematu
+    events.jsonl (scene_discourse + line_evolution + phase1_batch + phase2_verifier) bez placeholderów
+    oraz poprawne sumowanie tokenów i dodatniej różnicy PLN w trybie --live.
+    """
+    import re as _re
+    from tools.verify_f2_consolidation_ab import load_phase2_items_from_events, run_ab_comparison
+
+    events_path = tmp_path / "synthetic_ep07_events.jsonl"
+    records = []
+    batches_summary = []
+    for b_idx in range(4):
+        first_id = b_idx * 20
+        last_id = first_id + 19
+        batches_summary.append({
+            "batch_id": b_idx,
+            "line_count": 20,
+            "first_id": first_id,
+            "last_id": last_id,
+            "start_ms": first_id * 2000,
+            "end_ms": (last_id + 1) * 2000,
+        })
+    records.append({"stage": "scene_discourse", "batch_id": None, "line_id": None, "payload": {"batches_summary": batches_summary}})
+
+    for b_idx in range(4):
+        records.append({
+            "stage": "phase1_batch",
+            "batch_id": b_idx,
+            "line_id": None,
+            "payload": {
+                "batch_id": b_idx,
+                "raw_response": {
+                    "scene_diagnosis": {
+                        "dramatic_context": f"Kontekst dramatyczny paczki {b_idx}",
+                        "dominant_tone": "napięcie taktyczne",
+                    }
+                },
+            },
+        })
+        p2_resp = []
+        for local_i in range(1, 21):
+            lid = b_idx * 20 + (local_i - 1)
+            records.append({
+                "stage": "line_evolution",
+                "batch_id": None,
+                "line_id": lid,
+                "payload": {
+                    "line_id": lid,
+                    "start_ms": lid * 2000,
+                    "end_ms": lid * 2000 + 1800,
+                    "actor": "Bohater_A",
+                    "en_text": f"We really might as well check gate sector {lid} carefully now.",
+                    "jp_audio": f"JP audio {lid}",
+                    "telemetry_tag": "[Mówca: Bohater_A (M)]",
+                    "phase1_pl": f"Naprawdę możemy teraz uważnie sprawdzić sektor {lid}.",
+                    "phase2_pl": f"PO_F2_REFINED_{lid}",
+                },
+            })
+            if local_i <= 6:
+                p2_resp.append({"id": local_i, "refined_pl": f"PO_F2_REFINED_{lid}", "changes_made": "Styl"})
+        records.append({
+            "stage": "phase2_verifier",
+            "batch_id": b_idx,
+            "line_id": None,
+            "payload": {"batch_id": b_idx, "raw_response": p2_resp},
+        })
+
+    events_path.write_text("\n".join(json.dumps(r, ensure_ascii=False) for r in records), encoding="utf-8")
+
+    p1_outputs = load_phase2_items_from_events(events_path)
+    assert len(p1_outputs) == 4
+    reconstructed_lines = [it for b in sorted(p1_outputs) for it in p1_outputs[b]["pass1_items"]]
+    assert len(reconstructed_lines) == 80
+    assert all("placeholder text" not in it["en"].lower() for it in reconstructed_lines)
+    assert all(not it["pl"].startswith("PO_F2_REFINED_") for it in reconstructed_lines)
+    assert all(it["pl"].startswith("Naprawdę możemy teraz uważnie sprawdzić sektor") for it in reconstructed_lines)
+
+    monkeypatch.setenv("AVT_CONSOLIDATE_F2", "1")
+    monkeypatch.setenv("GEMINI_API_KEY", "mock_live_key")
+    monkeypatch.setattr("time.sleep", lambda s: None)
+    monkeypatch.setattr("client_factory.global_rate_limiter.acquire", lambda: None)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        prompt_txt = str(json.loads(request.content.decode("utf-8")))
+        ids_found = sorted({int(m) for m in _re.findall(r"\[KWESTIA #(\d+)\]", prompt_txt)})
+        if not ids_found:
+            ids_found = [1]
+        lines_out = [{"id": lid, "refined_pl": f"Szlif_{lid}.", "changes_made": "Styl"} for lid in ids_found]
+        return httpx.Response(
+            200,
+            json={
+                "candidates": [{"content": {"role": "model", "parts": [{"text": json.dumps({"lines": lines_out})}]}}],
+                "usageMetadata": {"promptTokenCount": 14500, "cachedContentTokenCount": 0, "candidatesTokenCount": 420, "thoughtsTokenCount": 50},
+            },
+        )
+
+    tr = MultimodalTranslator(api_key="mock_live_key", model="gemini-4-hydrogen", enable_verifier=True)
+    mock_c = _make_mock_genai_client(handler)
+    tr.verifier.client_pool.clients = [mock_c]
+    tr.verifier.client = mock_c
+
+    rc = run_ab_comparison(events_path, live=True, translator_obj=tr)
+    assert rc == 0
+    out = capsys.readouterr().out
+    m_cost = _re.search(r"Koszt F2 PLN netto: A=([0-9.]+) vs B=([0-9.]+) \(różnica=([0-9.-]+) PLN\)", out)
+    assert m_cost is not None, f"Unexpected A/B output:\n{out}"
+    cost_a = float(m_cost.group(1))
+    cost_b = float(m_cost.group(2))
+    assert cost_a > cost_b > 0.0
+
+
+@pytest.mark.unit
+def test_bug4_g1_auto_ingest_uses_series_bible_anime_title_for_same_series_lookup(tmp_path):
+    """
+    BUG #4 (G-1): _auto_ingest_episode_to_tm pobiera self.series_bible.anime_title zamiast nazwy pliku wideo,
+    dzięki czemu odczyt w kolejnym odcinku z require_same_series=True zwraca trafienia.
+    """
+    from memory import TranslationMemory
+
+    sb = SeriesBible(anime_title="Kronika Gwiazd S2", storage_dir=tmp_path)
+    tm = TranslationMemory(db_path=tmp_path / "tm_bug4.db")
+
+    tr = MultimodalTranslator(api_key="mock_k0", model="gemini-4-hydrogen", enable_verifier=False)
+    tr.series_bible = sb
+    tr.tm = tm
+
+    subs = pysubs2.SSAFile()
+    ev = pysubs2.SSAEvent(start=1000, end=3500, text="Musimy dziś w nocy strzec północnej bramy.", style="Default")
+    ev.source_en = "We must protect the northern gate tonight."
+    subs.events.append(ev)
+
+    ingested = tr._auto_ingest_episode_to_tm(subs, video_path="[GROUP] Kodowy_Plik_07.mkv")
+    assert ingested == 1
+
+    hits = tm.find_relevant_examples(
+        ["We must protect the northern gate tonight."],
+        series_title=tr.series_bible.anime_title,
+        require_same_series=True,
+    )
+    assert len(hits) >= 1
+    assert hits[0]["anime"] == "Kronika Gwiazd S2"
+
+
+@pytest.mark.unit
+def test_bug5_f3_uppercase_preserving_ass_tags_keeps_inline_italics_and_newlines():
+    """
+    BUG #5 (F-3): _uppercase_preserving_ass_tags zamienia na wielkie litery wyłącznie widoczny tekst
+    (w tym polskie znaki diakrytyczne), nie naruszając bloków {...} ani sekwencji \\N, \\n, \\h.
+    """
+    raw = r"{\i1}Gildia{\i0}\N{\b1}światła zaćmienia: ąćęłńóśźż{\b0}\nNowy\hwiersz"
+    expected = r"{\i1}GILDIA{\i0}\N{\b1}ŚWIATŁA ZAĆMIENIA: ĄĆĘŁŃÓŚŹŻ{\b0}\nNOWY\hWIERSZ"
+    assert _uppercase_preserving_ass_tags(raw) == expected
