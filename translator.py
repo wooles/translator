@@ -1476,18 +1476,45 @@ def _append_phase2_linebreak_hygiene_rule(
     return f"{base}\n{rule_note}" if base else rule_note
 
 
+def _uppercase_preserving_ass_tags(text: str) -> str:
+    """Uppercases visible subtitle text while leaving ASS override blocks {...} and \\N/\\n/\\h intact."""
+    if not text:
+        return text
+    return re.sub(
+        r"(\{[^}]*\}|\\[Nnh])|([^{}\\]+)",
+        lambda m: m.group(1) if m.group(1) else m.group(2).upper(),
+        text,
+    )
+
+
 def _filter_dialogue_audio_events(
     events_tuples: List[Any],
     style_report: Optional[Any] = None,
 ) -> List[Any]:
     """
     Filters scene events for AudioProsodyEngine / SpeakerVoiceClassifier (Standard 12.0.0 A-1).
+    Accepts production 2-tuples (b_id, SSAEvent), 3-tuples, or 4-tuples (orig_idx, ev, clean, ts_prefix).
     Excludes only SIGN_OVERLAY, SIGN_LOCATIONAL, SONG_LYRICS, and STAFF_METADATA.
-    Never excludes DIALOGUE_TOP or DIALOGUE_BOTTOM.
+    Never excludes DIALOGUE_TOP or DIALOGUE_BOTTOM. Returns items in their original tuple shape.
     """
     dialogue_audio_tuples: List[Any] = []
     for item_ev in events_tuples:
-        ev_a, clean_a, ts_a = item_ev[1], item_ev[2], item_ev[3]
+        if not isinstance(item_ev, (tuple, list)) or len(item_ev) < 2:
+            continue
+        if len(item_ev) >= 4:
+            ev_a, clean_a, ts_a = item_ev[1], item_ev[2], item_ev[3]
+        elif len(item_ev) == 3:
+            ev_a = item_ev[1]
+            raw_text_a = getattr(ev_a, "text", "") or ""
+            ts_a, clean_a_ext = extract_typesetting_tags(raw_text_a)
+            clean_a = item_ev[2] or clean_a_ext or getattr(ev_a, "plaintext", None) or raw_text_a
+        else:
+            ev_a = item_ev[1]
+            raw_text_a = getattr(ev_a, "text", "") or ""
+            ts_a, clean_a = extract_typesetting_tags(raw_text_a)
+            if not clean_a:
+                clean_a = getattr(ev_a, "plaintext", None) or raw_text_a
+
         if style_report is not None and hasattr(style_report, "classify_single_event"):
             from style_matrix import EventRole
             ev_role, _ = style_report.classify_single_event(ev_a)
@@ -6354,6 +6381,15 @@ class MultimodalTranslator:
         if not selected_stream:
             return []
 
+        _diag_fields = (
+            "dramatic_context",
+            "dialogue_flow",
+            "audio_intent_check",
+            "dominant_tone",
+            "power_dynamic",
+            "epistemic_asymmetry",
+            "table_read_mouth_feel",
+        )
         max_per_call = max(1, int(max_lines_per_f2_call))
         consolidated_groups: List[Dict[str, Any]] = []
         for start_i in range(0, len(selected_stream), max_per_call):
@@ -6361,8 +6397,10 @@ class MultimodalTranslator:
             chunk_items: List[Dict[str, Any]] = []
             id_map: Dict[int, Tuple[int, int]] = {}
             source_bidxs: List[int] = []
-            seen_diags: List[str] = []
+            seen_field_vals: Dict[str, List[str]] = {f: [] for f in _diag_fields}
             scene_descs: List[str] = []
+            seen_b2_seqs: List[str] = []
+            bidx_times: Dict[int, Tuple[List[int], List[int]]] = {}
 
             for c_pos, (orig_bidx, orig_item, p1_data) in enumerate(chunk, start=1):
                 item_copy = copy.deepcopy(orig_item)
@@ -6371,21 +6409,69 @@ class MultimodalTranslator:
                 id_map[c_pos] = (orig_bidx, orig_local_id)
                 chunk_items.append(item_copy)
 
+                ev_obj = orig_item.get("event")
+                st_ms = orig_item.get("start_ms")
+                en_ms = orig_item.get("end_ms")
+                if st_ms is None and ev_obj is not None:
+                    st_ms = getattr(ev_obj, "start", None)
+                if en_ms is None and ev_obj is not None:
+                    en_ms = getattr(ev_obj, "end", None)
+                if st_ms is not None and en_ms is not None:
+                    s_list, e_list = bidx_times.setdefault(orig_bidx, ([], []))
+                    s_list.append(int(st_ms))
+                    e_list.append(int(en_ms))
+
                 if orig_bidx not in source_bidxs:
                     source_bidxs.append(orig_bidx)
                     s_desc = str(p1_data.get("scene_desc") or "").strip()
                     if s_desc and s_desc not in scene_descs:
                         scene_descs.append(s_desc)
                     b_resp = p1_data.get("batch_response")
-                    s_diag = getattr(b_resp, "scene_diagnosis", None) if b_resp else None
+                    s_diag = p1_data.get("scene_diagnosis") or (getattr(b_resp, "scene_diagnosis", None) if b_resp else None)
                     if s_diag:
-                        diag_text = (
-                            str(getattr(s_diag, "dramatic_context", "") or s_diag)
-                            if not isinstance(s_diag, dict)
-                            else str(s_diag.get("dramatic_context") or s_diag)
-                        ).strip()
-                        if diag_text and diag_text not in seen_diags:
-                            seen_diags.append(diag_text)
+                        if isinstance(s_diag, str):
+                            s_val = s_diag.strip()
+                            if s_val and s_val not in seen_field_vals["dramatic_context"]:
+                                seen_field_vals["dramatic_context"].append(s_val)
+                        else:
+                            diag_src = s_diag if isinstance(s_diag, dict) else (s_diag.dict() if hasattr(s_diag, "dict") else {})
+                            for fname in _diag_fields:
+                                raw_fv = diag_src.get(fname) if isinstance(diag_src, dict) else None
+                                if not raw_fv and not isinstance(s_diag, dict):
+                                    raw_fv = getattr(s_diag, fname, None)
+                                fval = str(raw_fv or "").strip()
+                                if fval and fval not in seen_field_vals[fname]:
+                                    seen_field_vals[fname].append(fval)
+
+            for b_src in source_bidxs:
+                ep_prof_b = phase1_outputs[b_src].get("episode_profile")
+                starts_b, ends_b = bidx_times.get(b_src, ([], []))
+                if ep_prof_b and starts_b and ends_b:
+                    seq_b = _resolve_active_dramatic_sequence(ep_prof_b, min(starts_b), max(ends_b))
+                    if seq_b and seq_b not in seen_b2_seqs:
+                        seen_b2_seqs.append(seq_b)
+
+            merged_scene_desc = "\n--- ZMIANA SCENY ---\n".join(scene_descs) if scene_descs else ""
+            if seen_b2_seqs:
+                seq_block = " || ".join(seen_b2_seqs)
+                if seq_block not in merged_scene_desc:
+                    merged_scene_desc = f"{merged_scene_desc}\n[AKTYWNA SEKWENCJA DRAMATURGICZNA]: {seq_block}".strip()
+
+            consolidated_diag: Optional[Dict[str, str]] = {}
+            for fname in _diag_fields:
+                vals = seen_field_vals[fname]
+                if vals:
+                    sep = " | " if fname in ("dominant_tone", "power_dynamic") else "\n--- ZMIANA SCENY ---\n"
+                    consolidated_diag[fname] = sep.join(vals)
+            if not consolidated_diag:
+                consolidated_diag = None
+            elif seen_b2_seqs:
+                seq_block = " || ".join(seen_b2_seqs)
+                existing_tone = consolidated_diag.get("dominant_tone", "")
+                if seq_block not in existing_tone:
+                    consolidated_diag["dominant_tone"] = (
+                        f"{existing_tone} | {seq_block}" if existing_tone else seq_block
+                    )
 
             first_p1 = phase1_outputs[source_bidxs[0]]
             consolidated_groups.append({
@@ -6393,8 +6479,8 @@ class MultimodalTranslator:
                 "verifier_items": chunk_items,
                 "id_map": id_map,
                 "source_bidxs": source_bidxs,
-                "scene_desc": "\n--- ZMIANA SCENY ---\n".join(scene_descs) if scene_descs else "",
-                "scene_diagnosis": ("\n--- ZMIANA SCENY ---\n".join(seen_diags) if seen_diags else None),
+                "scene_desc": merged_scene_desc,
+                "scene_diagnosis": consolidated_diag,
                 "episode_profile_str": first_p1.get("episode_profile_str", ""),
                 "user_feedback_str": first_p1.get("user_feedback_str", ""),
                 "glossary_str": first_p1.get("glossary_str", ""),
@@ -7119,13 +7205,22 @@ class MultimodalTranslator:
         if getattr(self, "tm", None) is None or os.getenv("AVT_TM_AUTO_INGEST", "1") == "0":
             return 0
         try:
-            _tm_series_title = ""
-            if getattr(self, "series_bible", None) and getattr(self.series_bible, "series_title", None):
-                _tm_series_title = str(self.series_bible.series_title).strip()
+            _sb_title = (
+                getattr(self.series_bible, "anime_title", None)
+                or getattr(self.series_bible, "series_title", None)
+                or ""
+            ) if getattr(self, "series_bible", None) else ""
+            _sb_title = str(_sb_title).strip()
+            if _sb_title and _sb_title != "Nieznana Seria":
+                _tm_series_title = _sb_title
+            elif getattr(self, "series_title", None):
+                _tm_series_title = str(self.series_title).strip()
             elif video_path:
                 _tm_series_title = Path(video_path).stem
             elif subs_file is not None:
                 _tm_series_title = subs_file.stem
+            else:
+                _tm_series_title = ""
 
             _en_warnings_lower = {
                 str(_qf).lower()
@@ -8636,7 +8731,7 @@ class MultimodalTranslator:
                     ts_prefix_applied = TypesettingColorMatcher.ensure_sign_contrast(ts_prefix_applied, style=target_style)
 
             if is_sign_flag and (master_id in all_caps_sign_masters or orig_idx in all_caps_sign_masters):
-                clean_translated_text = clean_translated_text.upper()
+                clean_translated_text = _uppercase_preserving_ass_tags(clean_translated_text)
 
             # Reattach Typesetting tags to translated text
             full_event_text = f"{ts_prefix_applied}{clean_translated_text}" if ts_prefix_applied else clean_translated_text
