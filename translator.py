@@ -1487,6 +1487,171 @@ def _uppercase_preserving_ass_tags(text: str) -> str:
     )
 
 
+_PAIR_CONTINUATION_CONJUNCTION_RE = re.compile(
+    r"^(?:and|or|but|so|because|that|which|to|i|a|ale|lub|ani|oraz|że|żeby|by|bo)\b",
+    re.IGNORECASE,
+)
+_PAIR_ECHO_STOPWORDS = frozenset({
+    "about", "after", "again", "could", "going", "have", "here", "just", "maybe", "might",
+    "never", "other", "really", "right", "should", "since", "still", "their", "there",
+    "these", "thing", "think", "those", "through", "under", "until", "where", "which",
+    "while", "would", "będzie", "będą", "będę", "czego", "czegoś", "dlaczego", "gdzie",
+    "jakby", "jakiś", "jestem", "jesteś", "jeszcze", "jeśli", "kiedy", "który", "która",
+    "które", "może", "można", "musimy", "nawet", "nigdy", "nikogo", "przed", "przez",
+    "sobą", "sobie", "teraz", "tutaj", "tylko", "właśnie", "wszystko", "zawsze", "żeby",
+})
+_MODAL_GOVERNOR_RE = re.compile(
+    r"\b(?:macie|musimy|musisz|musicie|chcę|chce|chcemy|chcecie|możemy|możesz|możecie|mamy|masz|trzeba|należy|warto|proszę|kazano|polecono)\b",
+    re.IGNORECASE,
+)
+_CONJ_INFINITIVE_START_RE = re.compile(
+    r"^(?:i|oraz|a|lub|ani|aby|żeby|by)\s+[a-ząćęłńóśźż]{2,}(?:ć|c)\b",
+    re.IGNORECASE,
+)
+
+
+def _strip_ass_markup_for_pair(text: str) -> str:
+    cleaned = re.sub(r"\{[^}]*\}", "", str(text or ""))
+    cleaned = cleaned.replace("\\N", " ").replace("\\n", " ").replace("\\h", " ")
+    return re.sub(r"\s+", " ", cleaned).strip()
+
+
+def _normalized_pair_speaker(item: Dict[str, Any]) -> str:
+    raw_s = str(
+        item.get("speaker_name")
+        or item.get("speaker")
+        or item.get("actor")
+        or getattr(item.get("event"), "name", "")
+        or ""
+    ).strip()
+    if not raw_s:
+        return ""
+    cleaned = extract_clean_speaker_name(raw_s).strip().lower()
+    if not cleaned or cleaned in ("unknown", "sign", "narrator"):
+        return ""
+    return cleaned
+
+
+def _pair_time_gap_ms(item_a: Dict[str, Any], item_b: Dict[str, Any]) -> Optional[int]:
+    end_a = item_a.get("end_ms") if item_a.get("end_ms") is not None else getattr(item_a.get("event"), "end", None)
+    start_b = item_b.get("start_ms") if item_b.get("start_ms") is not None else getattr(item_b.get("event"), "start", None)
+    if end_a is None or start_b is None:
+        return None
+    return int(start_b) - int(end_a)
+
+
+def _is_split_sentence_pair(item_a: Dict[str, Any], item_b: Dict[str, Any]) -> bool:
+    """
+    Returns True when item_a and item_b form a single speaker's sentence split across two adjacent events
+    within <= 1500 ms where item_a lacks sentence-ending punctuation and item_b continues syntactically.
+    """
+    if not isinstance(item_a, dict) or not isinstance(item_b, dict):
+        return False
+    if item_a.get("is_sign") or item_a.get("is_song") or item_b.get("is_sign") or item_b.get("is_song"):
+        return False
+    spk_a = _normalized_pair_speaker(item_a)
+    spk_b = _normalized_pair_speaker(item_b)
+    if not spk_a or spk_a != spk_b:
+        return False
+    gap_ms = _pair_time_gap_ms(item_a, item_b)
+    if gap_ms is not None and gap_ms > 1500:
+        return False
+
+    en_a = _strip_ass_markup_for_pair(item_a.get("en", ""))
+    if not en_a or re.search(r"[.!?…\"”»]$", en_a):
+        return False
+
+    en_b = _strip_ass_markup_for_pair(item_b.get("en", ""))
+    pl_b = _strip_ass_markup_for_pair(item_b.get("pl", ""))
+    for cand_b in (en_b, pl_b):
+        if not cand_b:
+            continue
+        if cand_b[0].islower() or _PAIR_CONTINUATION_CONJUNCTION_RE.match(cand_b):
+            return True
+    return False
+
+
+def _is_lexical_echo_pair(item_a: Dict[str, Any], item_b: Dict[str, Any]) -> bool:
+    """
+    Returns True when item_b is a short (1..4 word) cross-speaker echo within <= 1500 ms
+    sharing a >= 5-char non-stopword stem with item_a (e.g. case-governed noun echoes).
+    """
+    if not isinstance(item_a, dict) or not isinstance(item_b, dict):
+        return False
+    if item_a.get("is_sign") or item_a.get("is_song") or item_b.get("is_sign") or item_b.get("is_song"):
+        return False
+    spk_a = _normalized_pair_speaker(item_a)
+    spk_b = _normalized_pair_speaker(item_b)
+    if not spk_a or not spk_b or spk_a == spk_b:
+        return False
+    gap_ms = _pair_time_gap_ms(item_a, item_b)
+    if gap_ms is not None and gap_ms > 1500:
+        return False
+
+    en_a = _strip_ass_markup_for_pair(item_a.get("en", "")).lower()
+    pl_a = _strip_ass_markup_for_pair(item_a.get("pl", "")).lower()
+    en_b = _strip_ass_markup_for_pair(item_b.get("en", "")).lower()
+    pl_b = _strip_ass_markup_for_pair(item_b.get("pl", "")).lower()
+
+    en_tokens_b = re.findall(r"[^\W\d_]+", en_b)
+    pl_tokens_b = re.findall(r"[^\W\d_]+", pl_b)
+    if not ((1 <= len(en_tokens_b) <= 4) or (1 <= len(pl_tokens_b) <= 4)):
+        return False
+
+    for toks_a_src, toks_b in ((en_a, en_tokens_b), (pl_a, pl_tokens_b)):
+        if not (1 <= len(toks_b) <= 4):
+            continue
+        toks_a = [w for w in re.findall(r"[^\W\d_]+", toks_a_src) if len(w) >= 5 and w not in _PAIR_ECHO_STOPWORDS]
+        cand_b = [w for w in toks_b if len(w) >= 5 and w not in _PAIR_ECHO_STOPWORDS]
+        for wb in cand_b:
+            pref_b = wb[:5]
+            if any(wa.startswith(pref_b) for wa in toks_a):
+                return True
+    return False
+
+
+def _guard_phase2_split_pair_integrity(
+    pass1_items: List[Dict[str, Any]],
+    refined_dict: Dict[int, str],
+    verified_ids: set,
+) -> None:
+    """
+    Post-F2 deterministic guard (Standard 12.1.0 A-1 Layer 2): protects unverified split-sentence
+    continuations from orphaned periods or broken modal-infinitive links introduced on the head line.
+    """
+    if not pass1_items or not verified_ids:
+        return
+    for pos in range(len(pass1_items) - 1):
+        item_i = pass1_items[pos]
+        item_next = pass1_items[pos + 1]
+        id_i = item_i.get("id")
+        id_next = item_next.get("id")
+        if id_i not in verified_ids or id_next in verified_ids:
+            continue
+        if id_i not in refined_dict:
+            continue
+        if not _is_split_sentence_pair(item_i, item_next):
+            continue
+
+        en_i = _strip_ass_markup_for_pair(item_i.get("en", ""))
+        p1_i_raw = str(item_i.get("pl") or "")
+        p1_i = _strip_ass_markup_for_pair(p1_i_raw)
+        if en_i.endswith(".") or p1_i.endswith("."):
+            continue
+
+        ref_raw = str(refined_dict[id_i] or "")
+        ref_clean = _strip_ass_markup_for_pair(ref_raw)
+        if not (ref_clean.endswith(".") and not ref_clean.endswith("...")):
+            continue
+
+        next_pl_clean = _strip_ass_markup_for_pair(item_next.get("pl", ""))
+        has_conj_inf = bool(_CONJ_INFINITIVE_START_RE.match(next_pl_clean))
+        if has_conj_inf and _MODAL_GOVERNOR_RE.search(p1_i) and not _MODAL_GOVERNOR_RE.search(ref_clean):
+            refined_dict[id_i] = sanitize_sub_text(p1_i_raw)
+        else:
+            refined_dict[id_i] = re.sub(r"\.(?=(?:\s|\{[^}]*\})*$)", "", ref_raw.rstrip()).strip()
+
+
 def _filter_dialogue_audio_events(
     events_tuples: List[Any],
     style_report: Optional[Any] = None,
@@ -6253,14 +6418,84 @@ class MultimodalTranslator:
             scored_entries.sort(key=lambda x: (-x[0], x[1]))
             chosen = sorted(scored_entries[:batch_cap], key=lambda x: x[1])
 
+            # Standard 12.1.0 (A-1 Layer 1): Partner pairing for split sentences and short lexical echoes
+            score_by_pos = {pos_s: sc_s for sc_s, pos_s, _, _, _ in scored_entries}
+            hard_half_cap = int(len(pass1_items) * 0.50)
+            chosen_map = {pos_c: entry_c for entry_c in chosen for pos_c in (entry_c[1],)}
+            paired_positions = set()
+            linked_pairs: List[Tuple[int, int]] = []
+
+            for anchor_pos in sorted(list(chosen_map.keys())):
+                anchor_score = chosen_map[anchor_pos][0]
+                candidate_partners: List[Tuple[int, int, int]] = []
+                if anchor_pos + 1 < len(pass1_items) and (
+                    _is_split_sentence_pair(pass1_items[anchor_pos], pass1_items[anchor_pos + 1])
+                    or _is_lexical_echo_pair(pass1_items[anchor_pos], pass1_items[anchor_pos + 1])
+                ):
+                    candidate_partners.append((anchor_pos, anchor_pos + 1, anchor_pos + 1))
+                if anchor_pos > 0 and _is_split_sentence_pair(pass1_items[anchor_pos - 1], pass1_items[anchor_pos]):
+                    candidate_partners.append((anchor_pos - 1, anchor_pos, anchor_pos - 1))
+
+                for a_p, b_p, partner_pos in candidate_partners:
+                    if partner_pos in chosen_map:
+                        paired_positions.add(a_p)
+                        paired_positions.add(b_p)
+                        if (a_p, b_p) not in linked_pairs:
+                            linked_pairs.append((a_p, b_p))
+                        continue
+                    if len(chosen_map) < hard_half_cap and len(chosen_map) < min(hard_half_cap, batch_cap + 2):
+                        p_it = pass1_items[partner_pos]
+                        chosen_map[partner_pos] = (score_by_pos.get(partner_pos, 0), partner_pos, False, p_it, False)
+                        paired_positions.add(a_p)
+                        paired_positions.add(b_p)
+                        linked_pairs.append((a_p, b_p))
+                    else:
+                        evict_cands = [
+                            (entry[0], entry_pos)
+                            for entry_pos, entry in chosen_map.items()
+                            if entry_pos != anchor_pos
+                            and entry_pos not in paired_positions
+                            and not entry[2]
+                            and entry[0] <= anchor_score
+                        ]
+                        if evict_cands:
+                            evict_cands.sort(key=lambda x: (x[0], -x[1]))
+                            _, evict_pos = evict_cands[0]
+                            del chosen_map[evict_pos]
+                            p_it = pass1_items[partner_pos]
+                            chosen_map[partner_pos] = (score_by_pos.get(partner_pos, 0), partner_pos, False, p_it, False)
+                            paired_positions.add(a_p)
+                            paired_positions.add(b_p)
+                            linked_pairs.append((a_p, b_p))
+
+            chosen = [chosen_map[k] for k in sorted(chosen_map.keys())]
+
+        pair_notes_by_pos: Dict[int, List[str]] = {}
+        if len(pass1_items) > 10:
+            for a_p, b_p in linked_pairs:
+                if a_p in chosen_map and b_p in chosen_map:
+                    id_a = pass1_items[a_p].get("id")
+                    id_b = pass1_items[b_p].get("id")
+                    if id_a is not None and id_b is not None:
+                        pair_notes_by_pos.setdefault(a_p, []).append(
+                            f"[Para spójności z #{id_b}: zachowaj ciągłość składni, braku kropki i przypadka]"
+                        )
+                        pair_notes_by_pos.setdefault(b_p, []).append(
+                            f"[Para spójności z #{id_a}: kontynuacja/echo — zachowaj spójność składni i przypadka]"
+                        )
+
         selected_copies: List[Dict[str, Any]] = []
-        for _, _, is_crit, orig_it, is_spk_ch in chosen:
+        for _, pos_sel, is_crit, orig_it, is_spk_ch in chosen:
             it_copy = dict(orig_it)
             if is_spk_ch:
                 hint_spk = "[Korekta wielkiej litery na wejściu nowego mówcy]"
                 existing_notes = str(it_copy.get("notes") or "").strip()
                 if hint_spk not in existing_notes:
                     it_copy["notes"] = f"{existing_notes} {hint_spk}".strip()
+            for p_note in pair_notes_by_pos.get(pos_sel, []):
+                existing_notes = str(it_copy.get("notes") or "").strip()
+                if p_note not in existing_notes:
+                    it_copy["notes"] = f"{existing_notes} {p_note}".strip()
             if not is_crit:
                 extra_hints: List[str] = []
                 if it_copy.get("audio_alert"):
@@ -6825,6 +7060,12 @@ class MultimodalTranslator:
                         glossary_entries=active_gloss_entries,
                         phase1_pl=p1_pl
                     )
+
+                _guard_phase2_split_pair_integrity(
+                    pass1_items=pass1_items,
+                    refined_dict=refined_dict,
+                    verified_ids={r.id for r in refined_lines},
+                )
 
 
                 any_redaction_printed = False
