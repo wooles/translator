@@ -1418,6 +1418,12 @@ def test_bug3_ab_harness_reconstructs_full_events_jsonl_and_accumulates_live_tok
             "start_ms": first_id * 2000,
             "end_ms": (last_id + 1) * 2000,
         })
+    records.append({
+        "stage": "profile_prepass",
+        "batch_id": None,
+        "line_id": None,
+        "payload": {"profile_brief": "Brief testowy: Bohater_A (mężczyzna)."},
+    })
     records.append({"stage": "scene_discourse", "batch_id": None, "line_id": None, "payload": {"batches_summary": batches_summary}})
 
     for b_idx in range(4):
@@ -1438,6 +1444,7 @@ def test_bug3_ab_harness_reconstructs_full_events_jsonl_and_accumulates_live_tok
         p2_resp = []
         for local_i in range(1, 21):
             lid = b_idx * 20 + (local_i - 1)
+            is_sign_row = (local_i == 1 and b_idx in (0, 1))
             records.append({
                 "stage": "line_evolution",
                 "batch_id": None,
@@ -1446,11 +1453,19 @@ def test_bug3_ab_harness_reconstructs_full_events_jsonl_and_accumulates_live_tok
                     "line_id": lid,
                     "start_ms": lid * 2000,
                     "end_ms": lid * 2000 + 1800,
-                    "actor": "Bohater_A",
-                    "en_text": f"We really might as well check gate sector {lid} carefully now.",
-                    "jp_audio": f"JP audio {lid}",
-                    "telemetry_tag": "[Mówca: Bohater_A (M)]",
-                    "phase1_pl": f"Naprawdę możemy teraz uważnie sprawdzić sektor {lid}.",
+                    "actor": "sign" if is_sign_row else "Bohater_A",
+                    "en_text": (
+                        f"Northern academy grand hall ancient arcane emblem royal charter inscription banner archive board {lid}"
+                        if is_sign_row
+                        else f"We really might as well check gate sector {lid} carefully now."
+                    ),
+                    "jp_audio": "" if is_sign_row else f"JP audio {lid}",
+                    "telemetry_tag": "[Mówca: sign (NEUTRAL)]" if is_sign_row else "[Mówca: Bohater_A (M)]",
+                    "phase1_pl": (
+                        f"[WIELKA SALA PÓŁNOCNEJ AKADEMII ARCHIWUM {lid}]"
+                        if is_sign_row
+                        else f"Naprawdę możemy teraz uważnie sprawdzić sektor {lid}."
+                    ),
                     "phase2_pl": f"PO_F2_REFINED_{lid}",
                 },
             })
@@ -1467,19 +1482,29 @@ def test_bug3_ab_harness_reconstructs_full_events_jsonl_and_accumulates_live_tok
 
     p1_outputs = load_phase2_items_from_events(events_path)
     assert len(p1_outputs) == 4
+    assert "Brief testowy" in p1_outputs[0]["episode_profile_str"]
     reconstructed_lines = [it for b in sorted(p1_outputs) for it in p1_outputs[b]["pass1_items"]]
     assert len(reconstructed_lines) == 80
     assert all("placeholder text" not in it["en"].lower() for it in reconstructed_lines)
     assert all(not it["pl"].startswith("PO_F2_REFINED_") for it in reconstructed_lines)
-    assert all(it["pl"].startswith("Naprawdę możemy teraz uważnie sprawdzić sektor") for it in reconstructed_lines)
+    sign_lines = [it for it in reconstructed_lines if it.get("is_sign")]
+    assert len(sign_lines) == 2
+    assert all(it.get("visual_type") == "Napis ekranowy" for it in sign_lines)
+    assert all(it.get("visual_type") == "Dialog" for it in reconstructed_lines if not it.get("is_sign"))
 
     monkeypatch.setenv("AVT_CONSOLIDATE_F2", "1")
     monkeypatch.setenv("GEMINI_API_KEY", "mock_live_key")
     monkeypatch.setattr("time.sleep", lambda s: None)
     monkeypatch.setattr("client_factory.global_rate_limiter.acquire", lambda: None)
 
+    seen_prompt_markers = {"brief": False, "sign_tag": False}
+
     def handler(request: httpx.Request) -> httpx.Response:
         prompt_txt = str(json.loads(request.content.decode("utf-8")))
+        if "Brief testowy: Bohater_A" in prompt_txt:
+            seen_prompt_markers["brief"] = True
+        if "[[Napis] Napis ekranowy]" in prompt_txt:
+            seen_prompt_markers["sign_tag"] = True
         ids_found = sorted({int(m) for m in _re.findall(r"\[KWESTIA #(\d+)\]", prompt_txt)})
         if not ids_found:
             ids_found = [1]
@@ -1499,6 +1524,8 @@ def test_bug3_ab_harness_reconstructs_full_events_jsonl_and_accumulates_live_tok
 
     rc = run_ab_comparison(events_path, live=True, translator_obj=tr)
     assert rc == 0
+    assert seen_prompt_markers["brief"] is True
+    assert seen_prompt_markers["sign_tag"] is True
     out = capsys.readouterr().out
     m_cost = _re.search(r"Koszt F2 PLN netto: A=([0-9.]+) vs B=([0-9.]+) \(różnica=([0-9.-]+) PLN\)", out)
     assert m_cost is not None, f"Unexpected A/B output:\n{out}"

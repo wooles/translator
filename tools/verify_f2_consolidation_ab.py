@@ -9,6 +9,7 @@ Użycie:
 
 import argparse
 import json
+import logging
 import os
 import sys
 import types
@@ -19,6 +20,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from pricing_guard import PricingGuard
 from translator import MultimodalTranslator
+
+
+def _extract_api_keys_from_env() -> List[str]:
+    """Extracts sanitized GEMINI_API_KEY entries supporting comma/semicolon-separated key pools."""
+    raw_val = os.getenv("GEMINI_API_KEY") or ""
+    return [k.strip() for k in raw_val.replace(";", ",").split(",") if k.strip()]
 
 
 def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]]:
@@ -35,6 +42,7 @@ def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]
     by_line_id: Dict[int, Dict[str, Any]] = {}
     p1_by_batch: Dict[int, Dict[str, Any]] = {}
     p2_by_batch: Dict[int, Dict[str, Any]] = {}
+    profile_brief: str = ""
 
     raw_lines = events_path.read_text(encoding="utf-8").splitlines()
     for line in raw_lines:
@@ -43,7 +51,11 @@ def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]
         ev = json.loads(line)
         stage = ev.get("stage")
         payload = ev.get("payload") or {}
-        if stage == "scene_discourse":
+        if stage == "profile_prepass":
+            pb = str(payload.get("profile_brief") or "").strip()
+            if pb:
+                profile_brief = pb
+        elif stage == "scene_discourse":
             bs = payload.get("batches_summary") or []
             if isinstance(bs, list) and bs:
                 batches_summary = bs
@@ -87,6 +99,7 @@ def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]
                     "start_ms": start_ms,
                     "end_ms": end_ms,
                     "is_sign": is_sign,
+                    "visual_type": "Napis ekranowy" if is_sign else "Dialog",
                     "is_song": False,
                     "calque_score": 0.5,
                     "notes": "",
@@ -114,7 +127,7 @@ def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]
                 "scene_desc": scene_desc,
                 "scene_diagnosis": s_diag,
                 "batch_response": types.SimpleNamespace(scene_diagnosis=s_diag) if s_diag else None,
-                "episode_profile_str": "",
+                "episode_profile_str": profile_brief,
                 "user_feedback_str": "",
                 "glossary_str": "",
                 "scoped_series_bible_str": "",
@@ -135,6 +148,9 @@ def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]
         items = payload.get("items") or payload.get("pass1_items") or []
         if not items:
             continue
+        for it in items:
+            if isinstance(it, dict) and "visual_type" not in it:
+                it["visual_type"] = "Napis ekranowy" if it.get("is_sign") else "Dialog"
         raw_resp = payload.get("raw_response") or {}
         s_diag = raw_resp.get("scene_diagnosis") if isinstance(raw_resp, dict) else None
         p1_outputs[b_idx] = {
@@ -143,7 +159,7 @@ def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]
             "scene_desc": str(payload.get("scene_desc") or f"Paczka {b_idx}"),
             "scene_diagnosis": s_diag,
             "batch_response": types.SimpleNamespace(scene_diagnosis=s_diag) if s_diag else None,
-            "episode_profile_str": "",
+            "episode_profile_str": profile_brief,
             "user_feedback_str": "",
             "glossary_str": "",
             "scoped_series_bible_str": "",
@@ -169,6 +185,8 @@ def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]
                         "id": int(r.get("id", idx_r)),
                         "en": str(r.get("en") or f"Line {idx_r} source."),
                         "pl": str(r.get("pl") or r.get("refined_pl") or ""),
+                        "is_sign": False,
+                        "visual_type": "Dialog",
                         "notes": str(r.get("changes_made") or ""),
                         "calque_score": 0.35,
                     })
@@ -179,7 +197,7 @@ def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]
                     "scene_desc": f"Paczka {b_idx}",
                     "scene_diagnosis": None,
                     "batch_response": None,
-                    "episode_profile_str": "",
+                    "episode_profile_str": profile_brief,
                     "user_feedback_str": "",
                     "glossary_str": "",
                     "scoped_series_bible_str": "",
@@ -217,8 +235,9 @@ def run_ab_comparison(events_path: Path, live: bool = False, translator_obj: Any
         print(f"[AB Harness]: Brak danych F1/F2 w pliku {events_path}")
         return 1
 
+    env_keys = _extract_api_keys_from_env()
     tr = translator_obj or MultimodalTranslator(
-        api_key=os.getenv("GEMINI_API_KEY") or "mock_k0",
+        api_key=",".join(env_keys) if env_keys else "mock_k0",
         model="gemini-4-hydrogen",
         enable_verifier=True,
     )
@@ -258,6 +277,11 @@ def run_ab_comparison(events_path: Path, live: bool = False, translator_obj: Any
                 "source_bidxs": source_bidxs,
                 "scene_desc": "\n--- ZMIANA SCENY ---\n".join(scene_descs),
                 "scene_diagnosis": None,
+                "episode_profile_str": (
+                    p1_outputs[source_bidxs[0]].get("episode_profile_str", "")
+                    if source_bidxs
+                    else ""
+                ),
             })
     else:
         episode_remaining = 115
@@ -285,7 +309,7 @@ def run_ab_comparison(events_path: Path, live: bool = False, translator_obj: Any
     print(f"Wariant A (1:1 mikropaczki):   {calls_a} wywołań F2, {lines_a} linii")
     print(f"Wariant B (konsolidacja <=48): {calls_b} wywołań F2, {lines_b} linii")
 
-    if not live or (translator_obj is None and not os.getenv("GEMINI_API_KEY")):
+    if not live or (translator_obj is None and not env_keys):
         est_prompt_tokens_saved = max(0, calls_a - calls_b) * 14200
         zero_f1 = {"model": "gemini-4-hydrogen", "prompt": 0, "cached": 0, "output": 0, "thinking": 0}
         est_pln_saved = round(
@@ -312,6 +336,7 @@ def run_ab_comparison(events_path: Path, live: bool = False, translator_obj: Any
         refined = tr.verifier.verify_batch(
             batch_items=cands,
             scene_summary=p1_d.get("scene_desc", ""),
+            episode_profile_str=p1_d.get("episode_profile_str", ""),
             scene_diagnosis=p1_d.get("scene_diagnosis"),
             batch_idx=b_idx,
         )
@@ -324,6 +349,7 @@ def run_ab_comparison(events_path: Path, live: bool = False, translator_obj: Any
         refined = tr.verifier.verify_batch(
             batch_items=grp["verifier_items"],
             scene_summary=grp.get("scene_desc", ""),
+            episode_profile_str=grp.get("episode_profile_str", ""),
             scene_diagnosis=grp.get("scene_diagnosis"),
             batch_idx=grp["consolidated_idx"],
         )
@@ -351,6 +377,12 @@ def run_ab_comparison(events_path: Path, live: bool = False, translator_obj: Any
 
 
 def main() -> int:
+    try:
+        from dotenv import load_dotenv
+        load_dotenv()
+    except Exception as exc_dotenv:
+        logging.getLogger(__name__).debug("load_dotenv pominięte: %s", exc_dotenv)
+
     parser = argparse.ArgumentParser(description="A/B harness dla konsolidacji paczek F2 (Standard 12.0.0 F-1)")
     parser.add_argument("--events", required=True, help="Ścieżka do pliku *_events.jsonl")
     parser.add_argument("--live", action="store_true", help="Uruchamia realne wywołania API (wymaga GEMINI_API_KEY)")
