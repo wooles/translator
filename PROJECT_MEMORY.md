@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-25 — Hotfix 11.2.28a Certyfikowany Baseline)
-- **Aktualny certyfikowany standard produkcyjny:** `Hotfix 11.2.28a (Mikro-Hotfix na bazie Standardu 11.2.28 — BUG #1 Ochrona apostrofów, BUG #2 Bogate opisy postaci, ev.name SIGN/EPTITLE, test negatywny OBS-09 oraz synchronizacja rejestru OBS-03..OBS-15 & KNOWN GAP)`
-- **Commit certyfikacji kodu:** `818f1ec` (`818f1ec5c4620b444bdcffd066fcf9a7a867ae50`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-26 — Standard 12.0.0 Etap 1 wdrożony na gałęzi `main`)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 12.0.0 — Architektura Jakości Stylistycznej, Zero-Cache SSOT, Konsolidacja F2 i Pętla Uczenia (Etap 1: A-1/2/3, B-1/2/3, D-1/2, E-1/2, F-1/2/3, G-1/2, H-3)`
+- **Commit certyfikacji kodu:** `bc5c5f2` (Commit 5/6 Standardu `12.0.0`, baza startowa: `365e260`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -52,18 +52,25 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Mikro-Hotfixu 11.2.28a:**
   * Commit 1 (`56cebbf`): `fix(pipeline): Hotfix 11.2.28a — BUG #1 (OBS-15c quotes), BUG #2 (OBS-15b rich desc), scene_snapper ev.name (0 B diff Z16)`
   * Commit 2 (`818f1ec`): `test(pipeline): Hotfix 11.2.28a — regression tests for BUG #1, BUG #2, OBS-09 negative (LUKA #4) & ev.name` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): Hotfix 11.2.28a — sync OBS-03..OBS-15 & KNOWN GAP registry in PROJECT_MEMORY & Raport_wdrozenia_11.2.28`
-- **Status 11.2.28a:** `CERTIFIED / READY FOR PROD VERIFICATION (2026-11-25)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a`; **bezwzględne 0 B diffu** na wszystkich 29 plikach chronionych Z16 oraz `scene_discourse.py` względem `6f1b310`)
-- **Stan metryk:** `472 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `542 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 11/11, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: CERTYFIKOWANY PRODUKCYJNIE (472/472 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-11.2:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Hotfix 11.2.28a` i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Hotfix 11.2.28a na bazie `11.2.28`: `BUG #1` ochrona poprawnych apostrofów w `_strip_hierarchical_relation_leaks` i `_reconcile_registry_gender_in_memory`, `BUG #2` ochrona bogatych opisów zaczynających się od `mężczyzna (postać), ...` w `_is_generic_character_desc`, obsługa `ev.name` `SIGN`/`EPTITLE` w `SceneShotSnapper._is_top_or_sign_event`, test negatywny `OBS-09` oraz zsynchronizowany rejestr `OBS-03..OBS-15` & `KNOWN GAP`).
+  * Commit 3 (`365e260`): `docs(release): Hotfix 11.2.28a — sync OBS-03..OBS-15 & KNOWN GAP registry in PROJECT_MEMORY & Raport_wdrozenia_11.2.28`
+- **Commity Standardu 12.0.0 (Etap 1):**
+  * Commit 1 (`8979eb3`): `fix(ingestion): 12.0.0 [1/6] — clean prosody/Whisper/StyleMatrix signals & RAM hygiene (A-1, A-2, A-3, E-1, E-2)`
+  * Commit 2 (`0de71c0`): `feat(profiler): 12.0.0 [2/6] — stylistic data bridge, sequence tone & Bible glossary feed (B-1, B-2, B-3, D-1)`
+  * Commit 3 (`93b1f5c`): `perf(prompts): 12.0.0 [3/6] — Zero-Cache SSOT dedup, episode SIGN dedup & stylistic F2 scoring (F-2/C-1, F-3, D-2)`
+  * Commit 4 (`8f0c0bc`): `perf(phase2): 12.0.0 [4/6] — consolidated F2 batches, thread-safe retry observer (OBS-06) & A/B harness (F-1, H-3)`
+  * Commit 5 (`bc5c5f2`): `feat(learning): 12.0.0 [5/6] — TM quality_tier auto-ingestion & user-edit diff CLI (G-1, G-2)` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 6 (`HEAD`): `docs(release): Standard 12.0.0 — PROJECT_MEMORY (ARB-081), Raport_wdrozenia_12.0.0 & link hygiene`
+- **Status 12.0.0:** `CERTIFIED IN TESTS / AWAITING LIVE PROD & F-1 API A/B BENCHMARK (2026-11-26)`
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a`; **bezwzględne 0 B diffu** na wszystkich 29 plikach chronionych Z16 oraz `scene_discourse.py` względem `365e260` i `6f1b310`)
+- **Stan metryk:** `491 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `561 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: ETAP 1 STANDARD 12.0.0 ZWERYFIKOWANY (491/491 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-12.0.0:** Wszelkie przyszłe prace rozwojowe startują z baseline'u `Standard 12.0.0` (`365e260..HEAD`) i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard `12.0.0`: czyste sygnały akustyczne i Whisper/StyleMatrix `A-1/2/3`, RAM strip honoryfikatywów i homoglify 1–4 znaków `E-1/2`, most stylistyczny Profilera i ton sekwencji `B-1/2/3 + D-1`, Zero-Cache SSOT dedup `F-2/C-1`, episode SIGN dedup `F-3`, scoring stylistyczny F2 `D-2`, skonsolidowane grupy F2 `F-1` z bezpiecznym przełącznikiem `AVT_CONSOLIDATE_F2=0`, thread-safe observer F2 `H-3 / OBS-06`, TM `quality_tier` `G-1` oraz CLI `tools/learn_from_edits.py` `G-2`).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (472 passed w tests/)
-  * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -ForbiddenTerms "<lista>"`
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (`491 passed` w `tests/`)
+  * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -BaseRef "365e260" -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
 ---
@@ -914,7 +921,23 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   - **`OBS-14` (`NISKI`):** `OPEN (non-blocking)` — nakładki po wydłużeniu krótkich replik do `700 ms` — mechanizm wdrożony w `11.2.28` + `ev.name` w `11.2.28a`; replay potwierdził `0 ms` nakładek, ale wymagany przebieg produkcyjny (nie zamykać bez produkcji).
   - **`OBS-15a/b/c` (`NISKI`):** `OPEN (non-blocking)` — dryf terminologii, generyczne duplikaty płci i osierocony ogon `SeriesBible` — mechanizmy wdrożone w `11.2.28` + `BUG #1/#2` w `11.2.28a`; wymagany przebieg produkcyjny (nie zamykać bez produkcji).
   - **`KNOWN GAP` (pełna lista):** **`DEF-04`, `OBS-01`, `OBS-04`, `DEF-05`** — pokryte jednostkowo, wymagają dedykowanych wyzwalaczy w przebiegu produkcyjnym.
-- **Testy regresyjne:** `tests/test_standard_11_2_28.py` (**20 / 20 PASSED**: `14` z `11.2.28` + `6` z `11.2.28a`) oraz dokumentacja [Raport_wdrozenia_11.2.28.md](file:///c:/Users/Piotrek/Desktop/translator/Artefakty/Raport_wdrozenia_11.2.28.md).
+- **Testy regresyjne:** `tests/test_standard_11_2_28.py` (**20 / 20 PASSED**: `14` z `11.2.28` + `6` z `11.2.28a`) oraz dokumentacja [Raport_wdrozenia_11.2.28.md](Artefakty/Raport_wdrozenia_11.2.28.md).
+
+---
+
+### 🔹 ARB-081 / INC-AVT-079 — Standard 12.0.0: Architektura Jakości Stylistycznej, Zero-Cache SSOT, Konsolidacja F2 i Pętla Uczenia (Etap 1: 16 usprawnień)
+- **Data wdrożenia:** `2026-11-26` (baza startowa: `365e260`; `6` atomowych commitów `8979eb3 .. HEAD`)
+- **Zakres kodu poza Z16 (`0 B` diffu na wszystkich 29 plikach Z16, `scene_discourse.py` oraz `_resolve_line_addressee`):**
+  1. **Higiena wejścia & RAM (`A-1`, `A-2`, `A-3`, `E-1`, `E-2`):** filtr zdarzeń audio `_filter_dialogue_audio_events` + 1:1 bypass `STAFF_METADATA` (`translator.py`), filtr halucynacji `no_speech_prob` / `avg_logprob` (`whisper_engine.py`), priorytet kluczy napisów końcowych przed `ALL CAPS` (`style_matrix.py`), obcinanie sufików honoryfikatywnych w RAM bez dotykania JSON na dysku (`series_memory.py`) oraz pełna normalizacja 1–4 znakowych słów złożonych z homoglifów cyrylickich (`translator.py`).
+  2. **Most stylistyczny & ton sceny (`B-1`, `B-2`, `B-3`, `D-1`):** przekazanie `episode_summary`, `dialogue_stylization`, `domain_expertise`, `key_conventions`, `yojijukugo_and_idioms`, `rels[:20]`, dyrektywy rejestru gatunkowego `D-1` oraz rozwiązanych `relationship_pivots` (`±20000 ms`) w `format_lean_episode_brief` (`profiler.py`), wstrzyknięcie aktywnego tonu sekwencji dramatycznej `_resolve_active_dramatic_sequence` w F1 i F2 (`translator.py`) oraz zasilenie Profilera istniejącym glosariuszem `SeriesBible` przed analizą (`translator.py` + `profiler.py`).
+  3. **Zero-Cache SSOT, deduplikacja `SIGN` & scoring F2 (`F-2/C-1`, `F-3`, `D-2`):** kompaktowy widok SSOT `_build_ssot_lean_bible_str`, eliminacja podwójnych bloków w promptach Lean `F1/F2`, odkładanie powtórzonych napisów ekranowych do słownika z zachowaniem indywidualnego timingu i wymuszeniem `ALL CAPS` (`_deduplicate_episode_signs`), oraz scoring ryzyka stylistycznego F2 z priorytetem pivotów dramatycznych/stylistycznych nad trywialnymi replikami `<= 3` słów.
+  4. **Konsolidacja F2 & współbieżny obserwator `H-3` (`F-1`, `H-3 / OBS-06`):** bezpieczne łączenie niskonakładowych paczek F2 do docelowo ~2 skonsolidowanych wywołań na odcinek przy zachowaniu bariery spójności (`AVT_CONSOLIDATE_F2=0` jako natychmiastowy rollback), harness offline/live [verify_f2_consolidation_ab.py](tools/verify_f2_consolidation_ab.py) (`Wariant A: 8 wywołań F2, 64 linii` vs `Wariant B: 2 wywołania F2, 64 linii`, szacunek `~0.5100 PLN`; test `--live` oczekuje na uruchomienie Operatora z aktywnym kluczem API) oraz ref-countowany dispatcher `threading.local()` w `_enter_f2_retry_observer` / `_exit_f2_retry_observer`.
+  5. **Pętla uczenia (`G-1`, `G-2`):** idempotentna migracja `quality_tier` (`1` = edycja ludzka, `2` = baza legacy, `3` = auto-ingest odcinka AI) w `memory.py`, automatyczny zapis czystych par dialogowych po `final_subs.save` (`_auto_ingest_episode_to_tm` z flagą `AVT_TM_AUTO_INGEST=0`), oraz samodzielne narzędzie CLI [learn_from_edits.py](tools/learn_from_edits.py).
+- **Zaktualizowany status rejestru po wdrożeniu 12.0.0:**
+  - **`OBS-06` (`NISKI`):** `RESOLVED IN CODE (12.0.0, H-3 threading.local() ref-counted dispatcher)` — wymaga potwierdzenia w równoległym przebiegu produkcyjnym (`max_workers_f2 >= 2`).
+  - **`OBS-13a/b/c` (`ŚREDNI`):** `DEFERRED → 12.1.0` — płeć/liczba adresata i chóru celowo zamrożona (`0 B` diffu w `scene_discourse.py` oraz `_resolve_line_addressee`).
+  - **`KNOWN GAP` (pełna lista):** **`DEF-04`, `OBS-01`, `OBS-04`, `DEF-05`**, otwarte obserwacje **`OBS-09`, `OBS-11`, `OBS-12`, `OBS-14`, `OBS-15`** oraz nowe mechanizmy **`12.0.0` (`A-1..H-3`)** i benchmark **`F-1 --live`** mają status **`OPEN (non-blocking — awaiting prod benchmark)`**.
+- **Testy regresyjne:** `tests/test_standard_12_0_0.py` (**19 / 19 PASSED**), łącznie `tests/` **491 / 491 PASSED**, `test_system.py` **70 passed, 154 deselected**, `4/4` bramki PASS oraz dokumentacja [Raport_wdrozenia_12.0.0.md](Artefakty/Raport_wdrozenia_12.0.0.md).
 
 
 
