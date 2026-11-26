@@ -8,6 +8,7 @@ Equipped with 3 strict anti-collision safety guards to prevent duplicate subtitl
 """
 
 import os
+import re
 import json
 import logging
 import tempfile
@@ -142,11 +143,93 @@ class VisualSignDetector:
         return gaps[:max_gaps_to_scan]
 
     @staticmethod
+    def is_near_existing_sign(
+        event_start_ms: int,
+        event_end_ms: int,
+        existing_events: Optional[List[Any]],
+        proximity_ms: int = 3000,
+    ) -> bool:
+        """
+        Deterministyczny filtr bliskości plansz (Standard 12.2.1 OBS-22):
+        Zwraca True, jeśli okno [event_start_ms - proximity_ms, event_end_ms + proximity_ms]
+        przecina się z istniejącą planszą / napisem ekranowym w existing_events.
+        """
+        if not existing_events:
+            return False
+
+        for ev in existing_events:
+            if ev is None:
+                continue
+            if isinstance(ev, dict):
+                ev_start = int(ev.get("start", 0) or 0)
+                ev_end = int(ev.get("end", 0) or 0)
+                style_low = str(ev.get("style") or "").strip().lower()
+                raw_text = str(ev.get("text") or "")
+                is_s = bool(ev.get("is_sign"))
+            else:
+                ev_start = int(getattr(ev, "start", 0) or 0)
+                ev_end = int(getattr(ev, "end", 0) or 0)
+                style_low = str(getattr(ev, "style", "") or "").strip().lower()
+                raw_text = str(getattr(ev, "text", "") or "")
+                is_s = bool(getattr(ev, "is_sign", False))
+
+            if not raw_text.strip() and not is_s:
+                continue
+
+            raw_low = raw_text.lower()
+            vis_text = re.sub(r"\{[^}]*\}", "", raw_text)
+            vis_text = vis_text.replace(r"\N", " ").replace(r"\n", " ")
+            alpha_letters = re.sub(r"[^A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]", "", vis_text)
+            is_all_caps_sign = len(alpha_letters) >= 6 and alpha_letters.isupper()
+
+            ev_is_sign = (
+                is_s
+                or VisualSignDetector.detect_signs(ev)
+                or any(tok in style_low for tok in ("sign", "title", "top"))
+                or any(tag in raw_low for tag in (r"\an8", r"\an5", r"\pos(", r"\move("))
+                or is_all_caps_sign
+            )
+            if not ev_is_sign:
+                continue
+
+            if (event_start_ms - proximity_ms) <= ev_end and (event_end_ms + proximity_ms) >= ev_start:
+                return True
+
+        return False
+
+    @staticmethod
+    def _normalize_glossary_entries(custom_glossary: Any) -> List[Dict[str, str]]:
+        """Normalizes dict or list glossary inputs into unified canonical entries."""
+        entries: List[Dict[str, str]] = []
+        if not custom_glossary:
+            return entries
+        if isinstance(custom_glossary, dict):
+            for k, v in custom_glossary.items():
+                t_en = str(k or "").strip()
+                t_pl = str(v or "").strip()
+                if t_en and t_pl:
+                    entries.append({"term_en": t_en, "translation_pl": t_pl})
+        elif isinstance(custom_glossary, (list, tuple)):
+            for item in custom_glossary:
+                if isinstance(item, dict):
+                    t_en = str(item.get("term_en") or "").strip()
+                    t_pl = str(item.get("translation_pl") or "").strip()
+                else:
+                    t_en = str(getattr(item, "term_en", "") or "").strip()
+                    t_pl = str(getattr(item, "translation_pl", "") or "").strip()
+                if t_en and t_pl:
+                    entries.append({"term_en": t_en, "translation_pl": t_pl})
+        return entries
+
+    @staticmethod
     def detect_signs_in_gaps(
         video_path: str,
         gaps: List[Tuple[int, int]],
         client: genai.Client,
-        model: str = "gemini-2.5-flash"
+        model: str = "gemini-2.5-flash",
+        custom_glossary: Optional[Any] = None,
+        existing_events: Optional[List[Any]] = None,
+        sign_proximity_ms: int = 3000,
     ) -> List[pysubs2.SSAEvent]:
         """
         Scans frames from designated safe gaps and generates ASS Sign events for detected cards.
@@ -156,6 +239,7 @@ class VisualSignDetector:
             return []
 
         detected_events: List[pysubs2.SSAEvent] = []
+        glossary_entries = VisualSignDetector._normalize_glossary_entries(custom_glossary)
         logger.info(f"VisualSignDetector: Scanning {len(gaps)} safe time gaps for title cards...")
 
         prompt = """Jesteś Ekspertem Wizyjnym Przekładu Audiowizualnego (AVT Sign Detector).
@@ -173,6 +257,16 @@ ZASADY BEZPIECZEŃSTWA (FILTR ANTYKOLIZYJNY):
 
 Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
 
+        if glossary_entries:
+            gloss_lines = [
+                f"- '{g['term_en']}' -> '{g['translation_pl']}'"
+                for g in glossary_entries[:25]
+            ]
+            prompt += (
+                "\n\nKANONICZNA TERMINOLOGIA SERII (zastosuj dokładne polskie odpowiedniki pojęć i tytułów):\n"
+                + "\n".join(gloss_lines)
+            )
+
         consecutive_errors = 0
 
         for gap_start, gap_end in gaps:
@@ -180,8 +274,24 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
                 logger.info("VisualSignDetector: Skipping remaining gaps due to Google 503 load and finalizing subtitles...")
                 break
 
-            # Timestamp at middle of gap
+            # Filtr bliskości przed wywołaniem ekstraktora klatek i API Gemini (OBS-22)
+            event_duration = min(4000, max(0, gap_end - gap_start - 500))
+            event_start = gap_start + 250
+            event_end = event_start + max(2000, event_duration)
             mid_ms = (gap_start + gap_end) // 2
+            if existing_events and (
+                VisualSignDetector.is_near_existing_sign(
+                    event_start, event_end, existing_events, proximity_ms=sign_proximity_ms
+                )
+                or VisualSignDetector.is_near_existing_sign(
+                    mid_ms, mid_ms, existing_events, proximity_ms=sign_proximity_ms
+                )
+            ):
+                logger.info(
+                    f"VisualSignDetector: Pominięto lukę {gap_start}-{gap_end}ms z powodu bliskości istniejącej planszy (<= {sign_proximity_ms}ms)."
+                )
+                continue
+
             frame_path = None
             try:
                 frame_path = extract_frame_at_timestamp(video_path, mid_ms, max_width=640)
@@ -214,10 +324,19 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
                         sign_info = DetectedSign.model_validate(data)
                         
                         if sign_info.is_title_or_banner and sign_info.translation_pl:
-                            clean_pl = sign_info.translation_pl.strip().strip("[]").upper()
-                            event_duration = min(4000, gap_end - gap_start - 500)
-                            event_start = gap_start + 250
-                            event_end = event_start + max(2000, event_duration)
+                            clean_pl = sign_info.translation_pl.strip().strip("[]").strip()
+                            if glossary_entries and clean_pl:
+                                try:
+                                    from translator import enforce_locked_glossary_terms
+                                    clean_pl = enforce_locked_glossary_terms(
+                                        en_text=sign_info.original_text or clean_pl,
+                                        candidate_pl=clean_pl,
+                                        glossary_entries=glossary_entries,
+                                        phase1_pl=None,
+                                    )
+                                except Exception:
+                                    pass
+                            clean_pl = clean_pl.upper()
 
                             try:
                                 from typesetting_matcher import TypesettingColorMatcher

@@ -83,10 +83,20 @@ from romaji_helper import to_romaji
 from series_memory import (
     SeriesBible, extract_clean_speaker_name, INHERENT_FEMALE_NOUNS, INHERENT_MALE_NOUNS,
     SECONDARY_LEXICAL_MALE_NOUNS,
-    GENERIC_CATEGORY_TAGS, is_generic_actor_or_category, is_sign_entity, FEMALE_ROLE_KEYWORDS,
+    GENERIC_CATEGORY_TAGS, is_generic_actor_or_category as _sm_is_generic_actor_or_category, is_sign_entity, FEMALE_ROLE_KEYWORDS,
     MALE_ROLE_KEYWORDS, BOY_ROLE_KEYWORDS, EntityCategory, DeclensionParadigm,
     classify_entity_category, generate_polish_name_declension, is_plural_actor
 )
+
+
+def is_generic_actor_or_category(name: str) -> bool:
+    """
+    Standard 12.2.1 (OBS-21): Treats empty tokens or punctuation-only separators
+    (such as '/', '-', '&') as generic/non-character actor labels alongside SeriesMemory tags.
+    """
+    if not name or not re.search(r"[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż0-9]", str(name)):
+        return True
+    return _sm_is_generic_actor_or_category(name)
 from manga_canon import MangaCanonRegistry
 from avt_formatter import (
     split_subtitle_syntactically,
@@ -2475,7 +2485,7 @@ def _classify_collective_speaker_actor(
         if len(non_tech_parts) == 1:
             cleaned = non_tech_parts[0]
         else:
-            return None
+            return "DUAL_DIALOGUE"
 
     low_clean = re.sub(r"^the\s+", "", cleaned.lower()).strip()
     low_base = re.sub(r"\s*#\d+$", "", low_clean).strip()
@@ -3866,6 +3876,8 @@ class MultimodalTranslator:
         if not name:
             return
         clean_name = name.strip()
+        if not re.search(r"[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż0-9]", clean_name):
+            return
         new_desc = f"{gender} ({role or 'postać'})".strip()
         new_lower = new_desc.lower()
 
@@ -4302,7 +4314,12 @@ class MultimodalTranslator:
         jp_male_marker = (wdd_tag.speaker_gender == "MALE") or any(m in jp_text for m in ["ore", "俺", "boku", "僕"])
 
         # Persist definitive Japanese acoustic pronoun evidence to Character Registry and Series Bible
-        if spk_clean and not canonical_gender and not is_generic_actor_or_category(spk_clean):
+        if (
+            spk_clean
+            and bool(re.search(r"[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż0-9]", spk_clean))
+            and not canonical_gender
+            and not is_generic_actor_or_category(spk_clean)
+        ):
             if wdd_tag.speaker_gender == "MALE":
                 self._register_character_safe(spk_clean, "mężczyzna", role="seiyū Whisper")
                 if hasattr(self, "series_bible") and self.series_bible and hasattr(self.series_bible, "update_character_gender_from_audio"):
@@ -5365,7 +5382,7 @@ class MultimodalTranslator:
                     series_bible=getattr(self, "series_bible", None),
                 )
                 p0_spk_gram = disc_telem.get("grammatical_gender")
-                if collective_virility in ("VIRILE", "NON_VIRILE"):
+                if collective_virility in ("VIRILE", "NON_VIRILE", "DUAL_DIALOGUE"):
                     p0_spk_gram = None
                     line_spk_gender = None
                 elif p0_spk_gram in ("MASCULINE", "FEMININE"):
@@ -5476,7 +5493,7 @@ class MultimodalTranslator:
 
                 # Pre-Generation Morphosyntactic Contract (Stream 4 - Standard 3.0 / 9.5)
                 contract_spk_gender = "UNKNOWN"
-                if collective_virility in ("VIRILE", "NON_VIRILE"):
+                if collective_virility in ("VIRILE", "NON_VIRILE", "DUAL_DIALOGUE"):
                     contract_spk_gender = "UNKNOWN"
                 elif p0_spk_gram in ("MASCULINE", "FEMININE"):
                     contract_spk_gender = p0_spk_gram
@@ -6678,7 +6695,7 @@ class MultimodalTranslator:
                 series_bible=sb_inst,
             )
             p0_spk_gram = disc_telem.get("grammatical_gender")
-            if collective_virility_f2 in ("VIRILE", "NON_VIRILE"):
+            if collective_virility_f2 in ("VIRILE", "NON_VIRILE", "DUAL_DIALOGUE"):
                 p0_spk_gram = None
                 speaker_gender = None
                 spk_conf = 0.0
@@ -6709,7 +6726,7 @@ class MultimodalTranslator:
             tgt_conf = 0.70 if is_tgt_hypothesis else (1.0 if addressee_cat else 0.0)
 
             # Declarative Scene State Telemetry Vector (Standard 7.0 SSOT / 9.5 / 9.8)
-            if collective_virility_f2 in ("VIRILE", "NON_VIRILE"):
+            if collective_virility_f2 in ("VIRILE", "NON_VIRILE", "DUAL_DIALOGUE"):
                 spk_gram_tag = None
             else:
                 spk_gram_tag = p0_spk_gram if p0_spk_gram in ("MASCULINE", "FEMININE") else (
@@ -8790,7 +8807,7 @@ class MultimodalTranslator:
         # Generowanie paradygmatów odmiany dla wszystkich unikalnych aktorów
         actor_map = {}
         from metadata import normalize_actor_tag
-        from series_memory import generate_polish_name_declension, COLLECTIVE_LABELS, is_generic_actor_or_category
+        from series_memory import generate_polish_name_declension, COLLECTIVE_LABELS
         for ev_it in subs.events:
             raw_spk = getattr(ev_it, "name", "")
             if raw_spk and raw_spk not in actor_map:
@@ -10116,7 +10133,10 @@ class MultimodalTranslator:
                         video_path=video_path,
                         gaps=gaps,
                         client=self.client,
-                        model=self.model_phase1
+                        model=self.model_phase1,
+                        custom_glossary=combined_glossary,
+                        existing_events=final_subs.events,
+                        sign_proximity_ms=3000,
                     )
                     if detected_signs:
                         for sign_ev in detected_signs:
