@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-26 — Hotfix 12.0.0a na bazie Standardu 12.0.0)
-- **Aktualny certyfikowany standard produkcyjny:** `Hotfix 12.0.0a (Domknięcie Audytu Konfrontacyjnego 12.0.0 — naprawa BUG #1..#5: A-1 2-tuple, F-1 scene_diagnosis, A/B harness, G-1 anime_title, F-3 ASS tags)`
-- **Commit certyfikacji kodu:** `23290c7` (Commit 2/3 Hotfixu `12.0.0a`, baza `1ebbea1` / `365e260`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-26 — Standard 12.1.0 Pakiet A na bazie 12.0.0b)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 12.1.0 (Pakiet A — Domknięcie jakości z benchmarku 12.0.0: A-1 strażnik par F2, A-3 kierunkowy T-V, A-4 lock tytułów w RAM, A-5 rozwinięcia mln/mld/tys. w dialogu + OBS-16)`
+- **Commit certyfikacji kodu:** `bfc9b58` (Commit 3/4 Standardu `12.1.0`, baza `e6116ee`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -63,18 +63,27 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Mikro-Hotfixu 12.0.0a:**
   * Commit 1 (`db12547`): `fix(pipeline): Hotfix 12.0.0a — BUG #1 (A-1 2-tuple), BUG #2 (F-1 scene_diagnosis), BUG #3 (A/B harness), BUG #4 (G-1 anime_title), BUG #5 (F-3 ASS tags)`
   * Commit 2 (`23290c7`): `test(pipeline): Hotfix 12.0.0a — regression tests for BUG #1..#5 in tests/test_standard_12_0_0.py` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 3 (`HEAD`): `docs(release): Hotfix 12.0.0a — update PROJECT_MEMORY (ARB-081) & Raport_wdrozenia_12.0.0`
-- **Status 12.0.0 + 12.0.0a:** `CERTIFIED IN TESTS / READY FOR LIVE A/B (F-1) & 2-EPISODE PROD BENCHMARK (2026-11-26)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a`; **bezwzględne 0 B diffu** na wszystkich 29 plikach chronionych Z16 oraz `scene_discourse.py` względem `365e260` i `1ebbea1`)
-- **Stan metryk:** `496 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `566 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: HOTFIX 12.0.0a ZWERYFIKOWANY (496/496 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-12.0.0a:** Wszelkie przyszłe prace rozwojowe startują z baseline'u `Hotfix 12.0.0a` (`365e260..HEAD`) i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard `12.0.0` + Hotfix `12.0.0a`: obsługa 2-krotek w `_filter_dialogue_audio_events`, strukturalny słownik `scene_diagnosis` + `B-2` w `_consolidate_phase2_batches`, pełna rekonstrukcja schematu `events.jsonl` i zliczanie tokenów `--live` w `verify_f2_consolidation_ab.py`, `series_bible.anime_title` w `_auto_ingest_episode_to_tm` oraz `_uppercase_preserving_ass_tags`).
+  * Commit 3 (`b7112d7`): `docs(release): Hotfix 12.0.0a — update PROJECT_MEMORY (ARB-081) & Raport_wdrozenia_12.0.0`
+- **Commity domykające 12.0.0 (Tools & Hotfix 12.0.0b):**
+  * `0ab2d94`: `fix(tools): add visual_type for is_sign, load profile_brief & .env in verify_f2_consolidation_ab.py`
+  * `e6116ee` (`12.0.0b`): `fix(12.0.0b): default AVT_CONSOLIDATE_F2=0 after A/B rollback & align Zero-Cache Lean CostGovernance ceiling to 6.00 PLN` *(formalna adnotacja Z16: zmiana sufitu `4.00 → 6.00 PLN` dla Hydrogen Zero-Cache Lean w `pricing_guard.py` zatwierdzona przez Operatora)*
+- **Commity Standardu 12.1.0 (Pakiet A):**
+  * Commit 1 (`6a4bbce`): `fix(pipeline): 12.1.0 [1/4] — F2 split-sentence & echo pair consistency guard (A-1)`
+  * Commit 2 (`74b8820`): `fix(pipeline): 12.1.0 [2/4] — directional T-V register pinning, aristocratic title lock & spoken numeric expansion (A-3, A-4, A-5)`
+  * Commit 3 (`bfc9b58`): `test(pipeline): 12.1.0 [3/4] — non-tautological production-schema tests for A-1, A-3, A-4, A-5 in tests/test_standard_12_1_0.py` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 4 (`HEAD`): `docs(release): 12.1.0 [4/4] — PROJECT_MEMORY (OBS-16, D-1 REJECTED, 12.0.0b, ARB-082) & Raport_wdrozenia_12.1.0`
+- **Decyzja strategiczna (`12.x`):** **`D-1 (Flash F1/F2) — REJECTED BY OPERATOR (quality-first policy; no model change in 12.x horizon)`**. Model Hydrogen pozostaje jedynym flagowym modelem produkcyjnym.
+- **Status 12.1.0:** `CERTIFIED IN TESTS / READY FOR PROD BENCHMARK (2026-11-26)`
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a`; **bezwzględne 0 B diffu** w `12.1.0` na wszystkich 29 plikach chronionych Z16, `scene_discourse.py`, `scene_snapper.py`, `whisper_disambiguator.py` oraz `series_memory.py` względem `e6116ee`)
+- **Stan metryk:** `506 passed` w `tests/` (`8` w `test_standard_12_1_0.py` + `498` z `12.0.0b` i starszych) oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `576 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: STANDARD 12.1.0 ZWERYFIKOWANY (506/506 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-12.1.0:** Wszelkie przyszłe prace rozwojowe startują z baseline'u `Standard 12.1.0` (`e6116ee..HEAD`) i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard `12.1.0`: spójność par międzyliniowych w F2 `A-1`, kierunkowy resolver T-V w F1/F2 `A-3`, epizodyczne blokady tytułów arystokratycznych w RAM `A-4`, ekspansja `mln`/`mld`/`tys.` w dialogu mówionym `A-5`, przy domyślnym `AVT_CONSOLIDATE_F2=0` oraz `CostGovernance` `6.00 PLN` z `12.0.0b`).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (`496 passed` w `tests/`)
-  * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -BaseRef "365e260" -ForbiddenTerms "<lista>"`
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (`506 passed` w `tests/`)
+  * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -BaseRef "e6116ee" -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
 ---
@@ -948,6 +957,24 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   3. **`BUG #3` (`F-1` A/B harness, `tools/verify_f2_consolidation_ab.py`):** rekonstrukcja pełnych paczek F1 z `scene_discourse` + `line_evolution` + `phase1_batch` (`112/112` kandydatów w logu *Chii Fuyo-07*, `8 -> 3` wywołania F2 bez podwójnej selekcji i bez placeholderów) oraz zliczanie rzeczywistych tokenów z `DialogueVerifier._thread_local.last_batch_token_usage` w trybie `--live`.
   4. **`BUG #4` (`G-1`, `translator.py`):** `_auto_ingest_episode_to_tm` pobiera kanoniczny tytuł serii z `self.series_bible.anime_title`, umożliwiając trafienia `require_same_series=True` w kolejnych odcinkach.
   5. **`BUG #5` (`F-3`, `translator.py`):** dodano `_uppercase_preserving_ass_tags`, dzięki czemu wymuszenie `ALL CAPS` na `SIGN` oszczędza inline tagi `{...}` oraz `\N`, `\n`, `\h`.
+
+---
+
+### 🔹 ARB-082 / INC-AVT-080 — Standard 12.1.0 (Pakiet A): Domknięcie jakości z benchmarku 12.0.0 + `OBS-16`
+- **Data wdrożenia:** `2026-11-26` (baza startowa: `e6116ee` / `12.0.0b`; `4` atomowe commity `6a4bbce .. HEAD`)
+- **Decyzje zakresu i formalne adnotacje:**
+  - **`12.0.0b` (`e6116ee`, zamknięte):** przywrócono domyślne `AVT_CONSOLIDATE_F2=0` w `translator.py` po rollbacku A/B F2 oraz wyrównano sufit `CostGovernance CRITICAL` (`4.00 → 6.00 PLN`) dla modelu `gemini-4-hydrogen` / trybu Zero-Cache Lean w `pricing_guard.py` (`ZERO_CACHE_LEAN_CEILING_PLN = 6.00`) i `translator.py` (formalna adnotacja zatwierdzenia zmiany w `pricing_guard.py` względem `e6116ee`).
+  - **`D-1 (Flash F1/F2)` — `REJECTED BY OPERATOR`:** polityka `quality-first`; brak zmiany modelu bazowego w całym horyzoncie `12.x` (flagowym modelem produkcyjnym pozostaje `gemini-4-hydrogen`).
+  - **`A-2` (`avt_linter.py` parser liczb Filar CLXXI) & `OBS-13a/b/c`:** przesunięte do wydania **`12.2.0`** (wspólny `Z16-amendment #16`).
+- **Izolacja `12.1.0` (`0 B` diffu względem `e6116ee`):** wszystkie `29` plików chronionych Z16 (`avt_linter.py`, `verifier.py`, `client_factory.py`, `rules.py`, `test_system.py`, `verify_purity.py`, `pricing_guard.py`, `main.py`, `context_cache.py`, `series_memory/.onomastic_lexicon.json`, `series_memory/*_bible.json`), oraz `scene_discourse.py`, `scene_snapper.py`, `whisper_disambiguator.py` i `series_memory.py`.
+- **Wdrożone mechanizmy w [translator.py](translator.py):**
+  1. **`A-1` (Strażnik spójności par międzyliniowych w F2):** `_is_split_sentence_pair` i `_is_lexical_echo_pair` automatycznie parują w `_select_hydrogen_phase2_candidates` kontynuacje zdań rozbitych i krótkie echa między mówcami w oknie `<= 1500 ms` (z zachowaniem sufitu `<= 50%` i adnotacjami `[Para spójności z #...]`), a deterministyczny `_guard_phase2_split_pair_integrity` po F2 usuwa błędnie dopisane kropki lub wycofuje rozbite konflikty modalno-bezokolicznikowe przy niezweryfikowanym następniku.
+  2. **`A-3` (Kierunkowy rejestr T-V z rozwiązywaniem aliasów):** `_resolve_tv_address_form` przeszukuje kierunkowe relacje `LHS -> RHS` z `episode_profile.characters` oraz `series_bible.get_relations_snapshot()` przez pełny zbiór aliasów postaci, izolując kierunek asymetryczny (`A -> B` nigdy nie dziedziczy po `B -> A`) i odfiltrowując sufiksy telemetrii `[...]` przed klasyfikacją formalną (`pan/pani`) lub nieformalną (`na ty`); wstrzyknięcie do `_prepare_batch_prompt` (`Rejestr T-V`) i `notes` w `_process_phase1_only` (`[Zwrot T-V: ...]`) bez eskalacji budżetu CoT (`2048` LOW).
+  3. **`A-4` (Epizodyczny lock tytułów arystokratycznych w RAM):** `_extract_episode_honorific_title_locks` wykrywa powtarzające się pary `Title + ProperName` (bez nadpisywania Kanonu Mangi i `SeriesBible`) wyłącznie w `self.combined_glossary` w RAM (0 B zmian na dysku) i przekazuje je do `active_gloss_entries` w F2 (`enforce_locked_glossary_terms`).
+  4. **`A-5` (Ekspansja skrótów `mln`/`mld`/`tys.` w dialogu mówionym):** `_expand_spoken_numeric_abbreviations` odmienia pełne liczebniki poza tagami ASS `{...}` z ochroną interpunkcji i `is_sign=True` po F2 i przy zapisie końcowym, uzupełnione o zwięzłą regułę F2 `_append_phase2_numeric_hygiene_rule`.
+- **Rejestr obserwacji:**
+  - **`OBS-16` (`ŚREDNI` — `OPEN (non-blocking)`):** skrypty `.bat` uruchamiające potok nie dziedziczą zmiennych środowiskowych sesji PowerShell; wymagają jawnego `setlocal` + `set VAR=...`, wpisu w `.env` lub przekazania parametrów przez flagi CLI.
+- **Testy regresyjne & dokumentacja:** [test_standard_12_1_0.py](tests/test_standard_12_1_0.py) (**8 / 8 PASSED**), `tests/` (**506 / 506 PASSED**), `test_system.py` (**70 passed, 154 deselected**), `4/4` bramki PASS, `audit_diff.ps1` **VICTORY CONFIRMED** oraz raport [Raport_wdrozenia_12.1.0.md](Artefakty/Raport_wdrozenia_12.1.0.md).
 
 
 
