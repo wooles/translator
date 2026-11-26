@@ -2124,6 +2124,94 @@ def _analyze_local_polylogue_window(
     }
 
 
+_TECHNICAL_ACTOR_SUFFIXES = frozenset({
+    "id", "voice", "offscreen", "phone", "radio", "flashback",
+    "mono", "thought", "past", "young", "sfx", "sign", "text",
+    "narration", "inner", "internal",
+})
+_COLLECTIVE_SPEAKER_LABELS = frozenset({
+    "all", "both", "everyone", "everybody", "crowd", "mob", "audience",
+    "people", "chorus", "group", "team", "squad", "class", "brothers",
+    "sisters", "siblings", "twins", "kids", "children", "boys", "girls",
+    "men", "women", "soldiers", "guards", "knights", "villagers",
+    "townspeople", "citizens", "students", "members", "guild members",
+    "adventurers", "bandits", "officers", "staff", "crew", "reporters",
+    "passersby", "voices", "wszyscy", "oboje", "tłum", "chór", "bracia",
+    "siostry", "dzieci", "dziewczyny", "kobiety", "żołnierze", "uczniowie",
+    "mieszkańcy", "strażnicy",
+})
+
+
+def _classify_collective_speaker_actor(
+    raw_actor: Optional[str],
+    series_bible: Any = None,
+) -> Optional[str]:
+    """
+    Standard 12.2.0 (OBS-13b): Protects collective/chorus speaker labels from high-F0
+    female defaults. Returns 'NON_VIRILE' only when all members (or explicit collective
+    record) are verified FEMALE in series_bible; otherwise 'VIRILE', or None for individuals.
+    """
+    if not raw_actor:
+        return None
+    cleaned = re.sub(r"\([^)]*\)", "", str(raw_actor)).strip()
+    cleaned = re.sub(r"\s+", " ", cleaned).strip()
+    if not cleaned:
+        return None
+
+    def _is_verified_female_record(actor_token: str) -> bool:
+        if not series_bible or not actor_token:
+            return False
+        rec = None
+        if hasattr(series_bible, "resolve_character_record"):
+            rec = series_bible.resolve_character_record(actor_token)
+        if rec is None:
+            chars_map = getattr(series_bible, "characters", None)
+            if chars_map is None and getattr(series_bible, "data", None):
+                chars_map = series_bible.data.get("characters", {})
+            if isinstance(chars_map, dict):
+                t_low = actor_token.strip().lower()
+                rec = chars_map.get(actor_token)
+                if rec is None:
+                    for ck, cv in chars_map.items():
+                        if str(ck or "").strip().lower() == t_low:
+                            rec = cv
+                            break
+                        if isinstance(cv, dict) and t_low in [
+                            str(a or "").strip().lower() for a in (cv.get("aliases") or [])
+                        ]:
+                            rec = cv
+                            break
+        if isinstance(rec, dict):
+            g_v = str(rec.get("gender") or rec.get("grammatical_gender") or "").strip().upper()
+            verified = bool(rec.get("has_verified_gender", False)) or str(rec.get("priority") or "").upper() == "P0"
+            return verified and g_v in ("FEMALE", "FEMININE", "KOBIETA")
+        if rec is not None:
+            g_v = str(getattr(rec, "gender", None) or getattr(rec, "grammatical_gender", None) or "").strip().upper()
+            verified = bool(getattr(rec, "has_verified_gender", False)) or str(getattr(rec, "priority", "") or "").upper() == "P0"
+            return verified and g_v in ("FEMALE", "FEMININE", "KOBIETA")
+        return False
+
+    if re.search(r"[/&+|]", cleaned):
+        raw_parts = [p.strip() for p in re.split(r"[/&+|]+", cleaned) if p.strip()]
+        non_tech_parts = [p for p in raw_parts if p.lower() not in _TECHNICAL_ACTOR_SUFFIXES]
+        if len(non_tech_parts) >= 2:
+            if all(_is_verified_female_record(p) for p in non_tech_parts):
+                return "NON_VIRILE"
+            return "VIRILE"
+        if len(non_tech_parts) == 1:
+            cleaned = non_tech_parts[0]
+        else:
+            return None
+
+    low_clean = re.sub(r"^the\s+", "", cleaned.lower()).strip()
+    low_base = re.sub(r"\s*#\d+$", "", low_clean).strip()
+    if low_clean in _COLLECTIVE_SPEAKER_LABELS or low_base in _COLLECTIVE_SPEAKER_LABELS:
+        if _is_verified_female_record(cleaned):
+            return "NON_VIRILE"
+        return "VIRILE"
+    return None
+
+
 def _append_phase2_numeric_hygiene_rule(
     focused_rules_str: str,
     batch_items: List[Dict[str, Any]],
@@ -4947,8 +5035,15 @@ class MultimodalTranslator:
                     is_sign=vtype["is_sign"],
                     actor_gender_consensus=getattr(self, "actor_gender_consensus", None)
                 )
+                collective_virility = _classify_collective_speaker_actor(
+                    event.name,
+                    series_bible=getattr(self, "series_bible", None),
+                )
                 p0_spk_gram = disc_telem.get("grammatical_gender")
-                if p0_spk_gram in ("MASCULINE", "FEMININE"):
+                if collective_virility in ("VIRILE", "NON_VIRILE"):
+                    p0_spk_gram = None
+                    line_spk_gender = None
+                elif p0_spk_gram in ("MASCULINE", "FEMININE"):
                     line_spk_gender = "mężczyzna" if p0_spk_gram == "MASCULINE" else "kobieta"
                 else:
                     line_spk_gender, _ = self._arbitrate_speaker_gender(
@@ -5025,7 +5120,9 @@ class MultimodalTranslator:
 
                 # Pre-Generation Morphosyntactic Contract (Stream 4 - Standard 3.0 / 9.5)
                 contract_spk_gender = "UNKNOWN"
-                if p0_spk_gram in ("MASCULINE", "FEMININE"):
+                if collective_virility in ("VIRILE", "NON_VIRILE"):
+                    contract_spk_gender = "UNKNOWN"
+                elif p0_spk_gram in ("MASCULINE", "FEMININE"):
                     contract_spk_gender = p0_spk_gram
                 elif line_spk_gender:
                     g_l = line_spk_gender.lower()
@@ -5051,7 +5148,7 @@ class MultimodalTranslator:
                 ) else "SINGULAR"
 
                 detected_entities: List[str] = []
-                if event.name and not is_generic_actor_or_category(event.name):
+                if event.name and not is_generic_actor_or_category(event.name) and not collective_virility:
                     cl_spk = extract_clean_speaker_name(event.name).strip()
                     if cl_spk and len(cl_spk) >= 3 and cl_spk not in detected_entities:
                         detected_entities.append(cl_spk)
@@ -5122,7 +5219,11 @@ class MultimodalTranslator:
                 if has_male_speaker_in_line:
                     is_fem_scene = False
 
-                if is_fem_scene:
+                if collective_virility in ("VIRILE", "NON_VIRILE"):
+                    is_fem_scene = (collective_virility == "NON_VIRILE")
+                    pl_grp_val = collective_virility
+                    you_grp_val = "VIRILE" if (has_male_addressee_in_line or line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if line_addr_cat in ["grupa_kobiet", "kobieta_dual"] else None)
+                elif is_fem_scene:
                     pl_grp_val = "NON_VIRILE"
                     you_grp_val = "VIRILE" if (has_male_addressee_in_line or line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if line_addr_cat in ["grupa_kobiet", "kobieta_dual"] else None)
                 else:
@@ -6212,8 +6313,17 @@ class MultimodalTranslator:
                 is_internal_monologue=is_internal_monologue,
                 actor_gender_consensus=getattr(self, "actor_gender_consensus", None)
             )
+            collective_virility_f2 = _classify_collective_speaker_actor(
+                getattr(event, "name", None) or effective_raw_actor,
+                series_bible=sb_inst,
+            )
             p0_spk_gram = disc_telem.get("grammatical_gender")
-            if p0_spk_gram in ("MASCULINE", "FEMININE"):
+            if collective_virility_f2 in ("VIRILE", "NON_VIRILE"):
+                p0_spk_gram = None
+                speaker_gender = None
+                spk_conf = 0.0
+                arb_alerts = []
+            elif p0_spk_gram in ("MASCULINE", "FEMININE"):
                 speaker_gender = "mężczyzna" if p0_spk_gram == "MASCULINE" else "kobieta"
                 spk_conf = 1.0
                 arb_alerts = []
@@ -6239,11 +6349,14 @@ class MultimodalTranslator:
             tgt_conf = 0.70 if is_tgt_hypothesis else (1.0 if addressee_cat else 0.0)
 
             # Declarative Scene State Telemetry Vector (Standard 7.0 SSOT / 9.5 / 9.8)
-            spk_gram_tag = p0_spk_gram if p0_spk_gram in ("MASCULINE", "FEMININE") else (
-                "MASCULINE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["male", "mężczyzna", "chłopak"]) else (
-                    "FEMININE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["female", "kobieta", "dziewczyna"]) else None
+            if collective_virility_f2 in ("VIRILE", "NON_VIRILE"):
+                spk_gram_tag = None
+            else:
+                spk_gram_tag = p0_spk_gram if p0_spk_gram in ("MASCULINE", "FEMININE") else (
+                    "MASCULINE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["male", "mężczyzna", "chłopak"]) else (
+                        "FEMININE" if speaker_gender and any(w in str(speaker_gender).lower() for w in ["female", "kobieta", "dziewczyna"]) else None
+                    )
                 )
-            )
             p0_tgt_gram = disc_telem.get("target_gender")
             tgt_gram_tag = p0_tgt_gram if p0_tgt_gram in ("MASCULINE", "FEMININE") else (
                 "FEMININE" if addressee_cat in ["kobieta", "kobieta_dual", "grupa_kobiet"] else (
@@ -6302,7 +6415,11 @@ class MultimodalTranslator:
             if has_male_speaker_in_line:
                 is_fem_scene = False
 
-            if is_fem_scene:
+            if collective_virility_f2 in ("VIRILE", "NON_VIRILE"):
+                is_fem_scene = (collective_virility_f2 == "NON_VIRILE")
+                line_pl_grp = collective_virility_f2
+                line_you_grp = "VIRILE" if (has_male_addressee_in_line or addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
+            elif is_fem_scene:
                 line_pl_grp = "NON_VIRILE"
                 line_you_grp = "VIRILE" if (has_male_addressee_in_line or addressee_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if addressee_cat in ["grupa_kobiet", "kobieta_dual"] else "AMBIGUOUS")
             else:
@@ -6634,7 +6751,7 @@ class MultimodalTranslator:
             manga_canon_line_str = " | ".join(manga_canon_line_alerts[:3]) if manga_canon_line_alerts else ""
 
             p2_paradigms: List[str] = []
-            if resolved_spk_name and len(resolved_spk_name) >= 3:
+            if resolved_spk_name and len(resolved_spk_name) >= 3 and not collective_virility_f2:
                 sb_inst = getattr(self, "series_bible", None)
                 par = None
                 if sb_inst and hasattr(sb_inst, "get_declension_paradigm"):
