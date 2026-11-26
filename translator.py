@@ -540,6 +540,52 @@ def split_oversized_ass_events(events: List[pysubs2.SSAEvent]) -> List[pysubs2.S
 
     return processed
 
+def _restore_phase2_trailing_period(
+    refined_pl: str,
+    orig_pl: str,
+    orig_en: str,
+    is_sign: bool = False,
+) -> str:
+    """
+    Standard 12.2.1 (OBS-19): Restores a missing trailing period after Phase 2
+    refinement while inspecting visible text without ASS tags, inserting the dot
+    directly before trailing closing ASS tags instead of after '}'.
+    """
+    if is_sign or not refined_pl:
+        return refined_pl
+    orig_pl_vis = re.sub(r"\{[^}]*\}", "", str(orig_pl or "")).rstrip()
+    orig_en_vis = re.sub(r"\{[^}]*\}", "", str(orig_en or "")).rstrip()
+    if not (orig_pl_vis.endswith(".") and orig_en_vis.endswith(".")):
+        return refined_pl
+
+    ref_strip = str(refined_pl).rstrip()
+    ref_visible = re.sub(r"\{[^}]*\}", "", ref_strip).rstrip()
+    if not ref_visible or re.search(r"[.!?…\"”»\-\—]$", ref_visible):
+        return refined_pl
+
+    m_trail = re.search(r"((?:\{[^}]*\})+)$", ref_strip)
+    if m_trail:
+        return ref_strip[:m_trail.start()] + "." + m_trail.group(1)
+    return ref_strip + "."
+
+
+def _has_non_italic_alnum_text(raw_text: str) -> bool:
+    """Returns True when alphanumeric text appears outside active italic tag spans."""
+    in_italic = False
+    for token in re.split(r"(\{[^}]*\})", str(raw_text or "")):
+        if not token:
+            continue
+        if token.startswith("{") and token.endswith("}"):
+            for m_cmd in re.finditer(r"\\i([01])(?![0-9])", token):
+                in_italic = (m_cmd.group(1) == "1")
+        else:
+            if not in_italic:
+                plain_part = re.sub(r"\\[Nnh]", " ", token)
+                if re.search(r"[A-Za-z0-9ĄĆĘŁŃÓŚŹŻąćęłńóśźż]", plain_part):
+                    return True
+    return False
+
+
 def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
     """
     Extracts valid ASS positioning and styling tags (e.g., {\\an8}, {\\pos(x,y)}, {\\fad(..)})
@@ -557,10 +603,16 @@ def extract_typesetting_tags(raw_text: str) -> Tuple[str, str]:
         if "\\" in tag_prefix and not tag_prefix.endswith("\\"):
             remaining = raw_text[len(tag_prefix):]
             if r"\i1" in tag_prefix and r"\i0" in remaining:
+                whole_line_italic = not _has_non_italic_alnum_text(raw_text)
                 tag_prefix = re.sub(r"\{\\i1\}", "", tag_prefix)
                 tag_prefix = re.sub(r"\\i1(?=[\\\}])", "", tag_prefix)
                 tag_prefix = re.sub(r"\{\s*\}", "", tag_prefix)
-                remaining = re.sub(r"\{\\i0\}", "", remaining)
+                if whole_line_italic:
+                    remaining = re.sub(r"\{\\i[01]\}", "", remaining)
+                    remaining = re.sub(r"\\i[01](?=[\\\}])", "", remaining)
+                    remaining = re.sub(r"\{\s*\}", "", remaining)
+                else:
+                    remaining = r"{\i1}" + remaining
             clean_remaining = sanitize_sub_text(remaining)
             return tag_prefix, clean_remaining
 
@@ -8066,12 +8118,12 @@ class MultimodalTranslator:
                                 r.refined_pl = re.sub(r"\bPrzyjąłem[.!]*", rep_przyjalem, r.refined_pl, flags=re.IGNORECASE)
                                 r.refined_pl = re.sub(r"\bZrozumiałem[.!]*", rep_zrozumialem, r.refined_pl, flags=re.IGNORECASE)
 
-                        orig_pl_strip = str(orig_it.get("pl", "")).rstrip()
-                        orig_en_strip = str(orig_it.get("en", "")).rstrip()
-                        if orig_pl_strip.endswith(".") and orig_en_strip.endswith("."):
-                            ref_strip = r.refined_pl.rstrip()
-                            if not re.search(r"[.!?…\"”»\-\—]$", ref_strip) and not orig_it.get("is_sign"):
-                                r.refined_pl = ref_strip + "."
+                        r.refined_pl = _restore_phase2_trailing_period(
+                            r.refined_pl,
+                            orig_pl=str(orig_it.get("pl", "")),
+                            orig_en=str(orig_it.get("en", "")),
+                            is_sign=bool(orig_it.get("is_sign")),
+                        )
 
                 _refined_is_sign = {
                     it.get("id"): bool(it.get("is_sign"))
