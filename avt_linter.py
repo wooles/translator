@@ -7570,8 +7570,16 @@ class EpisodeQualityGate:
             # Numerical Sanity Gate (Filar CLXXI): Ensure numbers from source_en are preserved without mutation
             source_en = getattr(ev, "source_en", "") or ""
             if source_en:
-                en_digits = re.findall(r"\b\d+\b", source_en)
-                clean_pl_digits = re.findall(r"\b\d+\b", re.sub(r"\{[^\}]*\}", "", ev.text))
+                clean_pl_text = re.sub(r"\{[^\}]*\}", "", ev.text)
+                norm_en = re.sub(r"(?<=\d),(?=\d{3}\b)", "", source_en)
+                for m_mil in re.finditer(r"\b([01]?\d|2[0-3])([0-5]\d)\s*(?:hours?|hrs?)\b", norm_en, re.IGNORECASE):
+                    hh_int = int(m_mil.group(1))
+                    mm_str = m_mil.group(2)
+                    if re.search(rf"\b0?{hh_int}:{mm_str}\b", clean_pl_text):
+                        norm_en = norm_en[:m_mil.start()] + (" " * (m_mil.end() - m_mil.start())) + norm_en[m_mil.end():]
+                norm_pl = re.sub(r"(?<=\d)[\s\u00a0](?=\d{3}\b)", "", clean_pl_text)
+                en_digits = re.findall(r"\b\d+\b", norm_en)
+                clean_pl_digits = re.findall(r"\b\d+\b", norm_pl)
                 for num_str in en_digits:
                     if num_str not in clean_pl_digits:
                         mutated = [p for p in clean_pl_digits if (p in num_str or num_str in p) and p != num_str]

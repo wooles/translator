@@ -2435,6 +2435,63 @@ def _append_phase2_numeric_hygiene_rule(
     return f"{base}\n{rule_note}" if base else rule_note
 
 
+def _append_phase2_genre_tone_rule(
+    focused_rules_str: str,
+    episode_profile: Any = None,
+    active_sequence_str: str = "",
+) -> str:
+    """
+    Standard 12.2.0 (C-2): Appends a single positive genre/era tone directive for Phase 2
+    when setting_and_era or dominant_tone metadata are available (Z2/Z3 compliant).
+    """
+    era_summary = ""
+    tone_summary = ""
+    if episode_profile is not None:
+        era_raw = (
+            episode_profile.get("setting_and_era")
+            if isinstance(episode_profile, dict)
+            else getattr(episode_profile, "setting_and_era", None)
+        )
+        if era_raw:
+            era_summary = re.sub(r"\s+", " ", str(era_raw)).strip()[:120]
+        seqs = (
+            episode_profile.get("dramatic_sequences")
+            if isinstance(episode_profile, dict)
+            else getattr(episode_profile, "dramatic_sequences", None)
+        )
+        if isinstance(seqs, list) and seqs and not active_sequence_str:
+            first_t = (
+                seqs[0].get("dominant_tone")
+                if isinstance(seqs[0], dict)
+                else getattr(seqs[0], "dominant_tone", None)
+            )
+            if first_t:
+                tone_summary = re.sub(r"\s+", " ", str(first_t)).strip()[:80]
+    if active_sequence_str:
+        m_ton = re.search(r"Ton:\s*([^|\n]+)", str(active_sequence_str))
+        if m_ton and m_ton.group(1).strip():
+            tone_summary = re.sub(r"\s+", " ", m_ton.group(1)).strip()[:80]
+        elif not tone_summary:
+            tone_summary = re.sub(r"\s+", " ", str(active_sequence_str)).strip()[:80]
+
+    if not era_summary and not tone_summary:
+        return focused_rules_str or ""
+
+    parts: List[str] = []
+    if era_summary:
+        parts.append(era_summary)
+    if tone_summary:
+        parts.append(f"ton sceny: {tone_summary}")
+    meta_detail = "; ".join(parts)
+    rule_note = (
+        f"TON GATUNKU I EPOKI: Dopasuj leksykę, rytm i rejestr dialogów do realiów utworu ({meta_detail})."
+    )
+    base = (focused_rules_str or "").strip()
+    if rule_note in base:
+        return base
+    return f"{base}\n{rule_note}" if base else rule_note
+
+
 def _filter_dialogue_audio_events(
     events_tuples: List[Any],
     style_report: Optional[Any] = None,
@@ -7671,9 +7728,16 @@ class MultimodalTranslator:
             pbar.write(f" ├─ [{cot_info_str}]")
 
         t0_p2 = time.perf_counter()
+        _cons_diag = cons_group.get("scene_diagnosis") or {}
+        _cons_tone = str(_cons_diag.get("dominant_tone") or "") if isinstance(_cons_diag, dict) else ""
         focused_rules = get_focused_rules_for_batch(verifier_items, max_rules=5 if len(verifier_items) > 40 else 3)
         focused_rules = _append_phase2_linebreak_hygiene_rule(focused_rules, verifier_items)
         focused_rules = _append_phase2_numeric_hygiene_rule(focused_rules, verifier_items)
+        focused_rules = _append_phase2_genre_tone_rule(
+            focused_rules,
+            episode_profile=cons_group.get("episode_profile"),
+            active_sequence_str=_cons_tone or (cons_group.get("scene_desc") or ""),
+        )
         clean_f2_reg = _build_clean_f2_character_registry(
             getattr(self, "character_registry", None),
             episode_profile=cons_group.get("episode_profile"),
@@ -7860,12 +7924,7 @@ class MultimodalTranslator:
                         prev_speaker_name = spk_name
 
                     t0_phase2 = time.perf_counter()
-                    phase2_focused_rules = get_focused_rules_for_batch(verifier_batch_items, max_rules=5 if len(verifier_batch_items) > 40 else 3)
-                    phase2_focused_rules = _append_phase2_linebreak_hygiene_rule(phase2_focused_rules, verifier_batch_items)
-                    phase2_focused_rules = _append_phase2_numeric_hygiene_rule(phase2_focused_rules, verifier_batch_items)
-                    f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx
-                    _v_pool, _f2_tls = self._enter_f2_retry_observer(b_idx)
-
+                    _p2_seq = ""
                     f2_scene_summary = scene_desc or ""
                     if episode_profile and verifier_batch_items:
                         try:
@@ -7877,6 +7936,17 @@ class MultimodalTranslator:
                                     f2_scene_summary = f"{f2_scene_summary}\n[AKTYWNA SEKWENCJA DRAMATURGICZNA]: {_p2_seq}".strip()
                         except Exception:
                             logger.debug("Rozwiązanie aktywnej sekwencji dramaturgicznej F2 nieudane", exc_info=True)
+
+                    phase2_focused_rules = get_focused_rules_for_batch(verifier_batch_items, max_rules=5 if len(verifier_batch_items) > 40 else 3)
+                    phase2_focused_rules = _append_phase2_linebreak_hygiene_rule(phase2_focused_rules, verifier_batch_items)
+                    phase2_focused_rules = _append_phase2_numeric_hygiene_rule(phase2_focused_rules, verifier_batch_items)
+                    phase2_focused_rules = _append_phase2_genre_tone_rule(
+                        phase2_focused_rules,
+                        episode_profile=episode_profile,
+                        active_sequence_str=_p2_seq,
+                    )
+                    f2_affinity_idx = b_idx + 1 if hasattr(self, "client_pool") and self.client_pool else b_idx
+                    _v_pool, _f2_tls = self._enter_f2_retry_observer(b_idx)
 
                     clean_f2_registry = _build_clean_f2_character_registry(
                         getattr(self, "character_registry", None),

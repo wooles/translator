@@ -787,7 +787,7 @@ class DialogueVerifier:
 
         prompt_lines = []
         prompt_lines.append("Zredaguj poniższe kwestie dialogowe. Koniecznie wyeliminuj dosłowne tłumaczenie 1 do 1, sztuczne konstrukcje i kalki.")
-        prompt_lines.append("Zastąp drewniane sformułowania żywym, potoczystym językiem polskim mówionym (tak jak w profesjonalnym dubbingu / u polskich nastolatków):")
+        prompt_lines.append("Zastąp drewniane sformułowania żywym, naturalnym językiem polskim mówionym (dostosowanym do gatunku, epoki i charakteru postaci, jak w profesjonalnym dubbingu):")
 
         prompt_lines.append("W polu 'changes_made' dla KAŻDEJ poprawionej kwestii podaj DOKŁADNE uzasadnienie i numer Filaru AVT (uzasadnienie weryfikatora ze wskazaniem reguły). Jeśli kwestia nie wymagała poprawek, wpisz null.")
         
