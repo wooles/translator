@@ -154,6 +154,40 @@ class EpisodeProfile(BaseModel):
     key_conventions: List[str] = Field(default_factory=list, description="Kluczowe wytyczne stylistyczne dla tego konkretnego odcinka")
 
 
+def _tokens_min4(text: str) -> Set[str]:
+    """Extracts lowercase word tokens of length >= 4 for overlap filtering."""
+    return set(re.findall(r"\b[a-zA-Z0-9ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]{4,}\b", str(text or "").lower()))
+
+
+def _split_catchphrase_variants(phrase: str) -> List[str]:
+    """Splits slash/pipe-separated catchphrase variants into individual stripped forms."""
+    s = str(phrase or "").strip()
+    if not s:
+        return []
+    if "/" in s or "|" in s:
+        parts = [p.strip() for p in re.split(r"[/|]+", s) if p.strip()]
+        if parts:
+            return parts
+    return [s]
+
+
+def _map_catchphrase_variant_pairs(
+    original_phrase: str,
+    canonical_pl: str,
+) -> List[Tuple[str, str]]:
+    """Maps split source catchphrase variants to aligned canonical_pl equivalents."""
+    orig_variants = _split_catchphrase_variants(original_phrase)
+    if not orig_variants:
+        return []
+    canon_str = str(canonical_pl or "").strip()
+    pl_variants = _split_catchphrase_variants(canon_str) if len(orig_variants) > 1 else [canon_str]
+    pairs: List[Tuple[str, str]] = []
+    for idx, ov in enumerate(orig_variants):
+        mapped_pl = pl_variants[idx] if len(pl_variants) == len(orig_variants) else canon_str
+        pairs.append((ov, mapped_pl))
+    return pairs
+
+
 def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
     """Formats episode profile into a concise system prompt block (Profiler 4.0)."""
     if not profile:
@@ -173,11 +207,21 @@ def format_episode_profile_for_prompt(profile: Optional[EpisodeProfile]) -> str:
     if profile.tone_and_genre:
         lines.append(f"Ton dialogów: {profile.tone_and_genre}")
 
+    frozen_cp_tokens: Set[str] = set()
+    if getattr(profile, "character_catchphrases", None):
+        for cp in profile.character_catchphrases:
+            frozen_cp_tokens.update(_tokens_min4(getattr(cp, "original_phrase", "")))
+
     if profile.danger_lines_prescan:
-        lines.append("\nSKANER MIN JĘZYKOWYCH I PUŁAPEK WIELOZNACZNOŚCI (DANGER-LINES PRE-SCAN):")
+        dl_rendered = []
         for dl in profile.danger_lines_prescan:
+            if frozen_cp_tokens and (_tokens_min4(getattr(dl, "english_phrase", "")) & frozen_cp_tokens):
+                continue
             spk = f" ({dl.speaker})" if dl.speaker else ""
-            lines.append(f"• [{dl.approx_time}]{spk} '{dl.english_phrase}' -> PUŁAPKA: {dl.contextual_trap} => Znaczenie kontekstowe: {dl.contextual_guidance}")
+            dl_rendered.append(f"• [{dl.approx_time}]{spk} '{dl.english_phrase}' -> PUŁAPKA: {dl.contextual_trap} => Znaczenie kontekstowe: {dl.contextual_guidance}")
+        if dl_rendered:
+            lines.append("\nSKANER MIN JĘZYKOWYCH I PUŁAPEK WIELOZNACZNOŚCI (DANGER-LINES PRE-SCAN):")
+            lines.extend(dl_rendered)
 
     if profile.relationship_pivots:
         lines.append("\n🔄 PUNKTY ZWROTNE I ZMIANY RELACJI W TRAKCIE ODCINKA (RELATIONSHIP PIVOTS):")
@@ -878,13 +922,43 @@ def resolve_profile_alerts_to_events(
         if isinstance(ev_item, (list, tuple)) and len(ev_item) > 0 and isinstance(ev_item[0], int):
             orig_idx_map[idx] = ev_item[0]
 
-    # 1. Resolve danger_lines_prescan
+    # 1. Resolve character_catchphrases FIRST (wyższy priorytet niż danger_lines_prescan, OBS-23)
+    frozen_cp_line_tokens: Dict[int, Set[str]] = {}
+    if getattr(profile, "character_catchphrases", None):
+        for cp in profile.character_catchphrases:
+            if not cp.original_phrase:
+                continue
+            variant_pairs = _map_catchphrase_variant_pairs(cp.original_phrase, cp.canonical_pl)
+            cp_all_min4 = _tokens_min4(cp.original_phrase)
+
+            for orig_var, mapped_pl in variant_pairs:
+                var_tokens = _tokenize(orig_var)
+                var_min4 = _tokens_min4(orig_var)
+                var_norm = re.sub(r"[.!?,;:…\"'()\[\]]+", " ", orig_var).strip().lower()
+                var_norm = re.sub(r"\s+", " ", var_norm)
+                if not var_norm:
+                    continue
+                tag = f"[💬 KWESTIA-WIZYTÓWKA: '{mapped_pl}']"
+
+                for idx, s_ms, e_ms, txt, ev_tokens in parsed_events:
+                    txt_norm = re.sub(r"[.!?,;:…\"'()\[\]]+", " ", txt).strip().lower()
+                    txt_norm = re.sub(r"\s+", " ", txt_norm)
+                    word_match = bool(re.search(rf"\b{re.escape(var_norm)}\b", txt_norm))
+                    if word_match or var_norm in txt.lower() or _jaccard(var_tokens, ev_tokens) >= 0.6:
+                        if idx not in resolved_alerts:
+                            resolved_alerts[idx] = []
+                        if tag not in resolved_alerts[idx]:
+                            resolved_alerts[idx].append(tag)
+                        frozen_cp_line_tokens.setdefault(idx, set()).update(cp_all_min4 | var_min4)
+
+    # 2. Resolve danger_lines_prescan (tłumione, gdy pokrywa się z zamrożoną kwestią-wizytówką)
     if getattr(profile, "danger_lines_prescan", None):
         for dl in profile.danger_lines_prescan:
             if not dl.english_phrase:
                 continue
             target_ms = parse_approx_time_ms(dl.approx_time)
             phrase_tokens = _tokenize(dl.english_phrase)
+            phrase_min4 = _tokens_min4(dl.english_phrase)
             phrase_clean = dl.english_phrase.strip().lower()
 
             best_idx = None
@@ -921,28 +995,14 @@ def resolve_profile_alerts_to_events(
                             best_idx = idx
 
             if best_idx is not None:
+                if best_idx in frozen_cp_line_tokens and (phrase_min4 & frozen_cp_line_tokens[best_idx]):
+                    continue
                 guide = dl.contextual_guidance
                 tag = f"[TELEMETRIA: pułapka_profilera: {dl.contextual_trap} | wskazówka: {guide}]"
                 if best_idx not in resolved_alerts:
                     resolved_alerts[best_idx] = []
                 if tag not in resolved_alerts[best_idx]:
                     resolved_alerts[best_idx].append(tag)
-
-    # 2. Resolve character_catchphrases
-    if getattr(profile, "character_catchphrases", None):
-        for cp in profile.character_catchphrases:
-            if not cp.original_phrase:
-                continue
-            cp_tokens = _tokenize(cp.original_phrase)
-            cp_clean = cp.original_phrase.strip().lower()
-            tag = f"[💬 KWESTIA-WIZYTÓWKA: '{cp.canonical_pl}']"
-
-            for idx, s_ms, e_ms, txt, ev_tokens in parsed_events:
-                if cp_clean in txt.lower() or _jaccard(cp_tokens, ev_tokens) >= 0.6:
-                    if idx not in resolved_alerts:
-                        resolved_alerts[idx] = []
-                    if tag not in resolved_alerts[idx]:
-                        resolved_alerts[idx].append(tag)
 
     # 3. Resolve puns_and_wordplays
     if getattr(profile, "puns_and_wordplays", None):

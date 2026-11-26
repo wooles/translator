@@ -66,7 +66,10 @@ from verifier import DialogueVerifier, RefinedLine, _is_whole_line_italic
 from extract import extract_frame_at_timestamp, extract_audio_slice
 from metadata import get_anime_context, format_anime_context_for_prompt, normalize_actor_tag, normalize_anime_slug
 from memory import TranslationMemory, format_translation_memory_for_prompt
-from profiler import EpisodeProfiler, EpisodeProfile, format_episode_profile_for_prompt, format_lean_episode_brief
+from profiler import (
+    EpisodeProfiler, EpisodeProfile, format_episode_profile_for_prompt,
+    format_lean_episode_brief, _split_catchphrase_variants, _map_catchphrase_variant_pairs, _tokens_min4
+)
 from whisper_engine import JapaneseWhisperEngine
 from whisper_disambiguator import WhisperDisambiguator
 from avt_linter import (
@@ -2586,6 +2589,119 @@ def _append_phase2_genre_tone_rule(
     if rule_note in base:
         return base
     return f"{base}\n{rule_note}" if base else rule_note
+
+
+_F1_OFFICIAL_ANNOUNCEMENT_RE = re.compile(
+    r"\b(?:next\s+up|we(?:'ll|\s+will)\s+hear\s+from|representative\s+of|"
+    r"welcome,\s*students|opening\s+ceremony|ladies\s+and\s+gentlemen|"
+    r"attention,\s*everyone|hereby\s+announce)\b",
+    re.IGNORECASE,
+)
+
+_PL_OFFICIAL_ANNOUNCEMENT_RE = re.compile(
+    r"\b(?:szanowni|zapraszamy|wysłuchamy|przedstawiciel[a]?|uroczystoś\w+|ogłaszam)\b",
+    re.IGNORECASE,
+)
+
+_EN_OFFICIAL_ANNOUNCEMENT_SCORE_RE = re.compile(
+    r"\b(?:next\s+up|we(?:'ll|\s+will)\s+hear\s+from|representative\s+of|"
+    r"opening\s+ceremony|welcome,\s*students|new\s+students)\b",
+    re.IGNORECASE,
+)
+
+_CASUAL_ANNOUNCEMENT_VOCATIVE_RE = re.compile(
+    r"\b(?:ziom\w*|stary|mord\w*|brachu|bracie|kumpl\w*|kolego|ej)\b",
+    re.IGNORECASE,
+)
+
+_VALID_REPEATED_SYLLABLE_PREFIXES = (
+    "mama", "tata", "baba", "kaka", "papa", "haha", "hehe", "hihi", "hoho",
+    "nana", "lala", "koko", "popo", "bibu", "mimi", "mimo", "banan", "ananas",
+    "kukurydz", "kokos", "tatami", "barbar", "tartar", "paparaz", "kakao",
+    "kakadu", "chichi", "fufu", "dodo", "pipi", "sisi", "bubu",
+)
+
+
+def _append_phase1_official_announcement_rule(
+    focused_rules_str: str,
+    batch_items: List[Dict[str, Any]],
+) -> str:
+    """
+    Standard 12.2.1 (OBS-23): Appends a single positive formal-announcement register
+    guidance for Phase 1 when the batch contains ceremonial or official announcements.
+    """
+    if not batch_items:
+        return focused_rules_str or ""
+    has_signal = any(
+        not it.get("is_sign") and bool(_F1_OFFICIAL_ANNOUNCEMENT_RE.search(str(it.get("en") or "")))
+        for it in batch_items
+    )
+    if not has_signal:
+        return focused_rules_str or ""
+
+    rule_note = (
+        "• [REJESTR KOMUNIKATÓW OFICJALNYCH]: W zapowiedziach ceremonialnych i ogłoszeniach "
+        "szkolnych lub urzędowych zachowuj rzeczowy, neutralny rejestr wierny oryginałowi, "
+        "bez dodawania potocznych ani wartościujących dopowiedzeń."
+    )
+    base = (focused_rules_str or "").strip()
+    if rule_note in base:
+        return base
+    return f"{base}\n{rule_note}" if base else rule_note
+
+
+def _detect_polish_typo_anomaly(pl_text: str) -> bool:
+    """
+    Standard 12.2.1 (OBS-23): Detects likely Polish draft typos (malformed 'naji...'
+    superlatives, 'jesterem', unnatural syllable doubling, or stray 'ji' clusters).
+    """
+    clean_pl = re.sub(r"\{[^}]*\}", " ", str(pl_text or "")).replace(r"\N", " ").strip()
+    if not clean_pl:
+        return False
+
+    if re.search(
+        r"\bnaji(?!(?:stotn|ntel|ntens|deal|ndyw|ilustr|ron|ryt))[bcćdfghklłmnńprsśtwzźż]",
+        clean_pl,
+        re.IGNORECASE,
+    ):
+        return True
+
+    if re.search(r"\bjesterem\b", clean_pl, re.IGNORECASE):
+        return True
+
+    for tok in re.findall(r"[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]{4,}", clean_pl):
+        low_tok = tok.lower()
+        if any(low_tok.startswith(pref) or pref in low_tok for pref in _VALID_REPEATED_SYLLABLE_PREFIXES):
+            continue
+        m_rep = re.search(r"([a-ząćęłńóśźż]{2,3})\1", low_tok)
+        if m_rep and len(set(m_rep.group(1))) >= 2:
+            return True
+
+    for m_ji in re.finditer(r"\b(\w*ji[bcćdfghklłmnńprsśtwzźż]{2,}\w*)\b", clean_pl, re.IGNORECASE):
+        w_low = m_ji.group(1).lower()
+        if w_low.startswith(("dżin", "dzin", "jihad", "jiujits")):
+            continue
+        if re.match(r"^naji(?:stotn|ntel|ntens|deal|ndyw|ilustr|ron|ryt)", w_low):
+            continue
+        return True
+
+    return False
+
+
+def _detect_official_announcement_line(en_text: str, pl_text: str) -> bool:
+    """
+    Standard 12.2.1 (OBS-23): Detects ceremonial or official announcement lines so
+    Phase 2 prioritizes register fidelity checks against hallucinated slang/casual shifts.
+    """
+    en_s = str(en_text or "").strip()
+    pl_s = re.sub(r"\{[^}]*\}", " ", str(pl_text or "")).replace(r"\N", " ").strip()
+    has_en = bool(en_s and _EN_OFFICIAL_ANNOUNCEMENT_SCORE_RE.search(en_s))
+    if has_en:
+        return True
+    has_pl = bool(pl_s and _PL_OFFICIAL_ANNOUNCEMENT_RE.search(pl_s))
+    if has_pl and not _CASUAL_ANNOUNCEMENT_VOCATIVE_RE.search(pl_s):
+        return True
+    return False
 
 
 def _filter_dialogue_audio_events(
@@ -5730,16 +5846,29 @@ class MultimodalTranslator:
                     for pa in pinned_alerts:
                         lines.append(f"  {pa}")
                 else:
+                    clean_txt_norm = re.sub(r"[.!?,;:…\"'()\[\]]+", " ", clean_text).strip().lower()
+                    clean_txt_norm = re.sub(r"\s+", " ", clean_txt_norm)
+                    matched_cp_tokens_f1: Set[str] = set()
+                    if getattr(episode_profile, "character_catchphrases", None):
+                        for cp in episode_profile.character_catchphrases:
+                            if not cp.original_phrase:
+                                continue
+                            cp_all_4 = _tokens_min4(cp.original_phrase)
+                            for orig_var, mapped_pl in _map_catchphrase_variant_pairs(cp.original_phrase, cp.canonical_pl):
+                                ov_norm = re.sub(r"[.!?,;:…\"'()\[\]]+", " ", orig_var).strip().lower()
+                                ov_norm = re.sub(r"\s+", " ", ov_norm)
+                                if ov_norm and (re.search(rf"\b{re.escape(ov_norm)}\b", clean_txt_norm) or ov_norm in clean_text.lower()):
+                                    cp_tag = f"  [💬 KWESTIA-WIZYTÓWKA: '{mapped_pl}' ({cp.context_notes})]"
+                                    if cp_tag not in lines:
+                                        lines.append(cp_tag)
+                                    matched_cp_tokens_f1.update(cp_all_4 | _tokens_min4(orig_var))
                     if getattr(episode_profile, "danger_lines_prescan", None):
                         for dl in episode_profile.danger_lines_prescan:
                             if dl.english_phrase and dl.english_phrase.lower() in clean_text.lower():
+                                if matched_cp_tokens_f1 and (_tokens_min4(dl.english_phrase) & matched_cp_tokens_f1):
+                                    continue
                                 guide = getattr(dl, "contextual_guidance", "")
                                 lines.append(f"  [TELEMETRIA: pułapka_kontekstowa: {dl.contextual_trap} | wskazówka: {guide}]")
-                                break
-                    if getattr(episode_profile, "character_catchphrases", None):
-                        for cp in episode_profile.character_catchphrases:
-                            if cp.original_phrase and cp.original_phrase.lower() in clean_text.lower():
-                                lines.append(f"  [💬 KWESTIA-WIZYTÓWKA: '{cp.canonical_pl}' ({cp.context_notes})]")
                                 break
                     if getattr(episode_profile, "puns_and_wordplays", None):
                         for pun in episode_profile.puns_and_wordplays:
@@ -6421,6 +6550,7 @@ class MultimodalTranslator:
                 "notes": prag_note or ""
             })
         focused_rules_str = get_focused_rules_for_batch(batch_items_for_rules, max_rules=5 if len(untranslated_in_batch) > 40 else 3)
+        focused_rules_str = _append_phase1_official_announcement_rule(focused_rules_str, batch_items_for_rules)
 
         # Dynamic JIT Scoping of Series Bible Context for current batch
         scoped_series_bible_str = series_bible_str
@@ -6924,18 +7054,30 @@ class MultimodalTranslator:
                 for pa in pinned_alerts:
                     notes = f"{notes} {pa}".strip()
             elif episode_profile:
+                clean_en_norm = re.sub(r"[.!?,;:…\"'()\[\]]+", " ", clean_en).strip().lower()
+                clean_en_norm = re.sub(r"\s+", " ", clean_en_norm)
+                matched_cp_tokens_f2: Set[str] = set()
+                if getattr(episode_profile, "character_catchphrases", None):
+                    for cp in episode_profile.character_catchphrases:
+                        if not cp.original_phrase:
+                            continue
+                        cp_all_4 = _tokens_min4(cp.original_phrase)
+                        for orig_var, mapped_pl in _map_catchphrase_variant_pairs(cp.original_phrase, cp.canonical_pl):
+                            ov_norm = re.sub(r"[.!?,;:…\"'()\[\]]+", " ", orig_var).strip().lower()
+                            ov_norm = re.sub(r"\s+", " ", ov_norm)
+                            if ov_norm and (re.search(rf"\b{re.escape(ov_norm)}\b", clean_en_norm) or ov_norm in clean_en.lower()):
+                                cp_tag = f"[💬 KWESTIA-WIZYTÓWKA: '{mapped_pl}']"
+                                if cp_tag not in notes:
+                                    notes = f"{notes} {cp_tag}".strip()
+                                matched_cp_tokens_f2.update(cp_all_4 | _tokens_min4(orig_var))
                 if getattr(episode_profile, "danger_lines_prescan", None):
                     for dl in episode_profile.danger_lines_prescan:
                         if dl.english_phrase and dl.english_phrase.lower() in clean_en.lower():
+                            if matched_cp_tokens_f2 and (_tokens_min4(dl.english_phrase) & matched_cp_tokens_f2):
+                                continue
                             guide = getattr(dl, "contextual_guidance", "")
                             trap_tag = f"[TELEMETRIA: pułapka_profilera: {dl.contextual_trap} | wskazówka: {guide}]"
                             notes = f"{notes} {trap_tag}".strip()
-                            break
-                if getattr(episode_profile, "character_catchphrases", None):
-                    for cp in episode_profile.character_catchphrases:
-                        if cp.original_phrase and cp.original_phrase.lower() in clean_en.lower():
-                            cp_tag = f"[💬 KWESTIA-WIZYTÓWKA: '{cp.canonical_pl}']"
-                            notes = f"{notes} {cp_tag}".strip()
                             break
                 if getattr(episode_profile, "puns_and_wordplays", None):
                     for pun in episode_profile.puns_and_wordplays:
@@ -7411,6 +7553,18 @@ class MultimodalTranslator:
         if word_cnt >= 9:
             score += 15 + min(15, word_cnt - 8)
 
+        pl_val = str(item.get("pl") or item.get("polish_text") or "")
+        has_pl_typo = _detect_polish_typo_anomaly(pl_val)
+        if has_pl_typo:
+            score += 40
+
+        has_official_announcement = _detect_official_announcement_line(
+            str(item.get("en") or ""),
+            pl_val,
+        )
+        if has_official_announcement:
+            score += 30
+
         # D-2 (12.0.0): Suppress trivial <=3-word replies when free of critical/editorial alerts
         is_trivial_short = (
             word_cnt <= 3
@@ -7424,6 +7578,8 @@ class MultimodalTranslator:
             and not item.get("ambiguity_note")
             and not has_profiler_alert
             and not has_rel_pivot
+            and not has_pl_typo
+            and not has_official_announcement
         )
         if is_trivial_short:
             score = max(0, score - 25)
