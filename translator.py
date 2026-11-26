@@ -1951,6 +1951,179 @@ def _expand_spoken_numeric_abbreviations(text: str, is_sign: bool = False) -> st
     return "".join(out_segments)
 
 
+def _analyze_local_polylogue_window(
+    batch_events: List[Any],
+    event_idx: int,
+    curr_spk: str,
+    curr_start_ms: int,
+    lookback_history: Optional[List[Dict[str, Any]]] = None,
+    cuts_ms: Optional[List[int]] = None,
+    window_size: int = 6,
+) -> Dict[str, Any]:
+    """
+    Standard 12.2.0 (OBS-13a): Scans up to `window_size` preceding dialogue turns within DEF-02
+    scene boundaries to detect local polylogues (>= 3 speakers), short 1-2 word third-party
+    interjections, and confirmed alternating ping-pong exchanges.
+    """
+    from series_memory import extract_clean_speaker_name
+
+    _non_dlg = ("sign", "signs", "title", "txt", "szyld", "napis", "caption")
+
+    def _is_cut(t_prev_end: int, t_next_start: int) -> bool:
+        gap_v = max(0, int(t_next_start) - int(t_prev_end))
+        if gap_v >= 3500:
+            return True
+        if gap_v >= 2500 and cuts_ms:
+            for b_cut in cuts_ms:
+                if t_prev_end < b_cut < t_next_start:
+                    return True
+        return False
+
+    curr_clean = extract_clean_speaker_name(str(curr_spk or "")).strip().lower()
+    words_re = re.compile(r"\b\w+\b", re.UNICODE)
+
+    def _clean_wc(raw_t: str) -> int:
+        cleaned = re.sub(r"\{[^}]*\}", " ", str(raw_t or ""))
+        cleaned = cleaned.replace(r"\N", " ").replace(r"\n", " ").replace("\n", " ").strip()
+        return len(words_re.findall(cleaned))
+
+    collected_rev: List[Dict[str, Any]] = []
+    frontier_start_ms = int(curr_start_ms or 0)
+    cut_hit = False
+
+    if batch_events and event_idx > 0:
+        for b_off in range(1, event_idx + 1):
+            if len(collected_rev) >= window_size:
+                break
+            cand_pos = event_idx - b_off
+            if cand_pos < 0 or cand_pos >= len(batch_events):
+                continue
+            cand_item = batch_events[cand_pos]
+            cand_ev = cand_item[1] if len(cand_item) > 1 else None
+            if cand_ev is None:
+                continue
+            cand_style = str(getattr(cand_ev, "style", "") or "").lower()
+            cand_spk = str(getattr(cand_ev, "name", None) or getattr(cand_ev, "actor", None) or "").strip()
+            cand_clean = extract_clean_speaker_name(cand_spk).strip().lower()
+            if (not cand_clean or cand_clean in _non_dlg
+                    or any(k in cand_style for k in ("sign", "title", "caption", "italic", "thought", "internal"))
+                    or getattr(cand_ev, "is_internal_monologue", False)):
+                continue
+            cand_start_ms = int(getattr(cand_ev, "start", 0) or 0)
+            cand_end_ms = int(getattr(cand_ev, "end", 0) or 0)
+            if _is_cut(cand_end_ms, frontier_start_ms):
+                cut_hit = True
+                break
+            if cand_start_ms <= frontier_start_ms:
+                frontier_start_ms = cand_start_ms
+            cand_en = cand_item[2] if len(cand_item) > 2 and cand_item[2] is not None else getattr(cand_ev, "text", "")
+            collected_rev.append({
+                "spk": cand_clean,
+                "raw_spk": cand_spk,
+                "word_count": _clean_wc(str(cand_en or "")),
+            })
+
+    if not cut_hit and len(collected_rev) < window_size and lookback_history:
+        for cand_h in reversed(lookback_history):
+            if len(collected_rev) >= window_size:
+                break
+            if cand_h.get("is_thought"):
+                continue
+            cand_spk = str(cand_h.get("speaker") or cand_h.get("speaker_name") or "").strip()
+            cand_clean = extract_clean_speaker_name(cand_spk).strip().lower()
+            if not cand_clean or cand_clean in _non_dlg:
+                continue
+            cand_end_h = cand_h.get("end_ms")
+            cand_start_h = cand_h.get("start_ms")
+            if cand_end_h is not None and _is_cut(int(cand_end_h), frontier_start_ms):
+                cut_hit = True
+                break
+            if cand_start_h is not None and int(cand_start_h) <= frontier_start_ms:
+                frontier_start_ms = int(cand_start_h)
+            collected_rev.append({
+                "spk": cand_clean,
+                "raw_spk": cand_spk,
+                "word_count": _clean_wc(str(cand_h.get("en") or "")),
+            })
+
+    recent_turns = list(reversed(collected_rev))
+    local_speakers = {t["spk"] for t in recent_turns if t.get("spk")}
+    if curr_clean:
+        local_speakers.add(curr_clean)
+
+    immediate_other = ""
+    immediate_other_word_count = 0
+    for i_t in range(len(recent_turns) - 1, -1, -1):
+        if recent_turns[i_t]["spk"] != curr_clean:
+            immediate_other = recent_turns[i_t]["spk"]
+            immediate_other_word_count = int(recent_turns[i_t]["word_count"])
+            break
+
+    if len(local_speakers) < 3 and immediate_other and immediate_other_word_count <= 2 and batch_events:
+        curr_ev_item = batch_events[event_idx] if 0 <= event_idx < len(batch_events) else None
+        curr_ev_obj = curr_ev_item[1] if curr_ev_item and len(curr_ev_item) > 1 else None
+        fwd_prev_end = int(getattr(curr_ev_obj, "end", curr_start_ms) or curr_start_ms or 0)
+        fwd_seen = 0
+        for f_pos in range(event_idx + 1, len(batch_events)):
+            if fwd_seen >= 2:
+                break
+            f_item = batch_events[f_pos]
+            f_ev = f_item[1] if len(f_item) > 1 else None
+            if f_ev is None:
+                continue
+            f_style = str(getattr(f_ev, "style", "") or "").lower()
+            f_spk = str(getattr(f_ev, "name", None) or getattr(f_ev, "actor", None) or "").strip()
+            f_clean = extract_clean_speaker_name(f_spk).strip().lower()
+            if (not f_clean or f_clean in _non_dlg
+                    or any(k in f_style for k in ("sign", "title", "caption", "italic", "thought", "internal"))
+                    or getattr(f_ev, "is_internal_monologue", False)):
+                continue
+            f_start_ms = int(getattr(f_ev, "start", 0) or 0)
+            f_end_ms = int(getattr(f_ev, "end", 0) or 0)
+            if _is_cut(fwd_prev_end, f_start_ms):
+                break
+            if f_end_ms >= fwd_prev_end:
+                fwd_prev_end = f_end_ms
+            local_speakers.add(f_clean)
+            fwd_seen += 1
+
+    is_local_polylogue = len(local_speakers) >= 3
+
+    blocks: List[str] = []
+    for t in recent_turns:
+        sp = t["spk"]
+        if not blocks or blocks[-1] != sp:
+            blocks.append(sp)
+
+    is_confirmed_ping_pong = False
+    is_third_party_interjection = False
+    if curr_clean and immediate_other:
+        for bi in range(len(blocks) - 2):
+            tri = (blocks[bi], blocks[bi + 1], blocks[bi + 2])
+            if tri == (curr_clean, immediate_other, curr_clean) or tri == (immediate_other, curr_clean, immediate_other):
+                is_confirmed_ping_pong = True
+                break
+        if immediate_other_word_count <= 2 and not is_confirmed_ping_pong:
+            other_block_idx = len(blocks) - 1
+            while other_block_idx >= 0 and blocks[other_block_idx] != immediate_other:
+                other_block_idx -= 1
+            earlier_spks = set(blocks[:other_block_idx]) if other_block_idx > 0 else set()
+            if any(s not in (curr_clean, immediate_other) for s in earlier_spks) or any(
+                s not in (curr_clean, immediate_other) for s in local_speakers
+            ):
+                is_third_party_interjection = True
+                is_confirmed_ping_pong = False
+
+    return {
+        "local_speakers": local_speakers,
+        "is_local_polylogue": is_local_polylogue,
+        "immediate_other": immediate_other,
+        "immediate_other_word_count": immediate_other_word_count,
+        "is_confirmed_ping_pong": is_confirmed_ping_pong,
+        "is_third_party_interjection": is_third_party_interjection,
+    }
+
+
 def _append_phase2_numeric_hygiene_rule(
     focused_rules_str: str,
     batch_items: List[Dict[str, Any]],
@@ -3999,6 +4172,50 @@ class MultimodalTranslator:
         curr_spk = (getattr(event, "name", None) or getattr(event, "actor", None) or "").strip()
         from series_memory import resolve_actor_gender, extract_clean_speaker_name, is_inherently_female_name, is_generic_actor_or_category
 
+        # Standard 12.2.0 (OBS-13a): Local polylogue Z2 guard before prev_interlocutor / forward lookahead
+        curr_start_ms_val = int(getattr(event, "start", 0) or 0)
+        poly_ctx = _analyze_local_polylogue_window(
+            batch_events=batch_events,
+            event_idx=event_idx,
+            curr_spk=curr_spk,
+            curr_start_ms=curr_start_ms_val,
+            lookback_history=lookback_history,
+            cuts_ms=cuts_ms,
+            window_size=6,
+        )
+        if poly_ctx["is_local_polylogue"] and (
+            not poly_ctx["is_confirmed_ping_pong"] or poly_ctx["is_third_party_interjection"]
+        ):
+            is_direct_2p_qa_dyad = False
+            clean_q = re.sub(r"[\s\"'”»)\]]+$", "", re.sub(r"\{[^}]*\}", "", str(clean_text or ""))).strip()
+            has_2p_q = clean_q.endswith("?") and bool(
+                re.search(r"\b(?:you|your|you're|you've|you'd|you'll)\b", clean_q, re.IGNORECASE)
+            )
+            if has_2p_q and not poly_ctx["is_third_party_interjection"] and poly_ctx["immediate_other"] and batch_events and event_idx + 1 < len(batch_events):
+                curr_end_ms_val = int(getattr(event, "end", curr_start_ms_val) or curr_start_ms_val or 0)
+                curr_clean_q = extract_clean_speaker_name(curr_spk).strip().lower()
+                for q_off in range(1, min(4, len(batch_events) - event_idx)):
+                    q_item = batch_events[event_idx + q_off]
+                    q_ev = q_item[1] if len(q_item) > 1 else None
+                    if q_ev is None:
+                        continue
+                    q_style = str(getattr(q_ev, "style", "") or "").lower()
+                    q_spk = str(getattr(q_ev, "name", None) or getattr(q_ev, "actor", None) or "").strip()
+                    q_clean = extract_clean_speaker_name(q_spk).strip().lower()
+                    if (not q_clean or q_clean in _NON_DIALOGUE_ACTORS
+                            or any(k in q_style for k in ("sign", "title", "caption", "italic", "thought", "internal"))
+                            or getattr(q_ev, "is_internal_monologue", False)):
+                        continue
+                    q_start = int(getattr(q_ev, "start", 0) or 0)
+                    if _is_scene_cut_boundary(curr_end_ms_val, q_start) or max(0, q_start - curr_end_ms_val) > 1500:
+                        break
+                    if q_clean != curr_clean_q:
+                        if q_clean == poly_ctx["immediate_other"]:
+                            is_direct_2p_qa_dyad = True
+                        break
+            if not is_direct_2p_qa_dyad:
+                return None, None
+
         # 1. Multi-Step Backward Interlocutor Search (up to 4 events, rygor cięć scen z DEF-02)
         prev_interlocutor = None
         prev_interlocutor_ev = None
@@ -4031,10 +4248,14 @@ class MultimodalTranslator:
             curr_clean = extract_clean_speaker_name(curr_spk).lower()
             curr_start_ms = int(getattr(event, "start", 0) or 0)
             if lookback_history:
-                for cand_h in reversed(lookback_history[-4:]):
+                frontier_ms_h = curr_start_ms
+                for cand_h in reversed(lookback_history[-6:]):
                     cand_end_h = cand_h.get("end_ms")
-                    if cand_end_h is not None and _is_scene_cut_boundary(int(cand_end_h), curr_start_ms):
+                    if cand_end_h is not None and _is_scene_cut_boundary(int(cand_end_h), frontier_ms_h):
                         break
+                    cand_start_h = cand_h.get("start_ms")
+                    if cand_start_h is not None and int(cand_start_h) <= frontier_ms_h:
+                        frontier_ms_h = int(cand_start_h)
                     if cand_h.get("is_thought"):
                         continue
                     cand_spk = (cand_h.get("speaker") or cand_h.get("speaker_name") or "").strip()
@@ -4418,15 +4639,24 @@ class MultimodalTranslator:
         # Previous dialogue history
         lines.append("--- POPRZEDNIE KWESTIE W SCENIE (kontekst przeszły) ---")
         if history_context:
+            batch_actors_preview = {
+                extract_clean_speaker_name(str(getattr(b_ev, "name", None) or getattr(b_ev, "actor", None) or "")).strip().lower()
+                for _, b_ev, _, _ in batch_events
+                if (getattr(b_ev, "name", None) or getattr(b_ev, "actor", None) or "").strip()
+                and not is_generic_actor_or_category(str(getattr(b_ev, "name", None) or getattr(b_ev, "actor", None) or ""))
+            }
+            batch_actors_preview.discard("")
+            hist_budget = 8 if len(batch_actors_preview) >= 3 else 6
             history_slice = []
-            if len(history_context) >= 5:
-                last_spk = (history_context[-1].get("speaker") or history_context[-1].get("speaker_name") or "").strip().lower()
-                first_spk = (history_context[0].get("speaker") or history_context[0].get("speaker_name") or "").strip().lower()
-                if last_spk and first_spk and last_spk == first_spk:
-                    # Continuous monologue detected: anchor on initial premise + last 3 lines (exact 4-line budget)
+            last_spk = (history_context[-1].get("speaker") or history_context[-1].get("speaker_name") or "").strip().lower()
+            first_spk = (history_context[0].get("speaker") or history_context[0].get("speaker_name") or "").strip().lower()
+            if last_spk and first_spk and last_spk == first_spk:
+                if len(history_context) == 5 and hist_budget == 6:
                     history_slice = [("monologue_start", history_context[0])] + [("normal", h) for h in history_context[-3:]]
+                elif len(history_context) > hist_budget:
+                    history_slice = [("monologue_start", history_context[0])] + [("normal", h) for h in history_context[-(hist_budget - 1):]]
             if not history_slice:
-                history_slice = [("normal", h) for h in history_context[-4:]]
+                history_slice = [("normal", h) for h in history_context[-hist_budget:]]
 
             for mode, h in history_slice:
                 spk_label = ""
@@ -5395,7 +5625,7 @@ class MultimodalTranslator:
         lookback_history = []
         if b_idx > 0 and b_idx - 1 < len(batches):
             prev_batch = batches[b_idx - 1]
-            for prev_orig_idx, prev_event, prev_clean_en, _ in prev_batch[-4:]:
+            for prev_orig_idx, prev_event, prev_clean_en, _ in prev_batch[-8:]:
                 prev_pl = translated_results.get(prev_orig_idx, "") if translated_results else ""
                 spk = prev_event.name.strip() if getattr(prev_event, "name", None) else ""
                 is_th = "italic" in (prev_event.style or "").lower() or _is_whole_line_italic(prev_event.text or "")
@@ -5413,7 +5643,7 @@ class MultimodalTranslator:
                     history_snapshot = list(history)
             else:
                 history_snapshot = list(history)
-            lookback_history = list(history_snapshot[-4:])
+            lookback_history = list(history_snapshot[-8:])
 
         # Hotfix 11.1.6 (Zadanie 1.1): Przygotowanie listy zablokowanych wpisów glosariusza
         batch_glossary_items: List[Any] = []
