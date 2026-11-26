@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-26 — Standard 12.2.0 na bazie 12.1.0 + 12.1.0a)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 12.2.0 (OBS-13a/b/c lokalny polylog Z2 + chór F0 shield/VIRILE + próg pewności 0.90, C-1 sąsiedzi read-only F2 oraz autoryzowany Z16-amendment #16: C-2 ton gatunkowo-adaptacyjny F2, A-2 Filar CLXXI separatory/czas wojskowy)`
-- **Commit certyfikacji kodu:** `e58358b` (Commit 5/6 Standardu `12.2.0`, baza `bd4c76b`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-26 — Standard 12.2.0 + 12.2.0a + 12.2.0b CLOSED — CAŁA MAPA 12.x CLOSED)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 12.2.0 + 12.2.0a (OBS-13a/b/c lokalny polylog Z2 + chór F0 shield/VIRILE + próg pewności 0.90, C-1 sąsiedzi read-only F2, synchronizacja F1/Z2 0.90 + ochrona diad 0.92 + NON_VIRILE bez SeriesBible + C-2 word-safe, oraz autoryzowany Z16-amendment #16: C-2 ton gatunkowo-adaptacyjny F2, A-2 Filar CLXXI separatory/czas wojskowy)`
+- **Commit certyfikacji kodu:** `de4aeb2` (`Mikro-Hotfix 12.2.0a` nad `11bafcf`; pełny łańcuch `12.2.0`: `7f897cd .. de4aeb2`, baza `bd4c76b`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -79,19 +79,22 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
   * Commit 2 (`0581d27`): `fix(discourse): 12.2.0 [2/6] — OBS-13b collective/chorus speaker F0 shield & default VIRILE group`
   * Commit 3 (`bbdcbdb`): `fix(pipeline): 12.2.0 [3/6] — OBS-13c real target_confidence 0.90 Z2 gate & C-1 read-only F2 neighbors`
   * Commit 4 (`9947688`): `fix(z16): 12.2.0 [4/6] — Z16-amendment #16: genre-adaptive F2 tone (C-2) & Filar CLXXI numerical parser (A-2)`
-  * Commit 5 (`e58358b`): `test(pipeline): 12.2.0 [5/6] — non-tautological production-schema tests for OBS-13a/b/c, C-1, C-2, A-2 & DEF-02/A-3` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 6 (`HEAD`): `docs(release): 12.2.0 [6/6] — PROJECT_MEMORY (ARB-083, Z16-amendment #16, OBS-13 CLOSED, D-1 REJECTED) & Raport_wdrozenia_12.2.0`
+  * Commit 5 (`e58358b`): `test(pipeline): 12.2.0 [5/6] — non-tautological production-schema tests for OBS-13a/b/c, C-1, C-2, A-2 & DEF-02/A-3`
+  * Commit 6 (`11bafcf`): `docs(release): 12.2.0 [6/6] — PROJECT_MEMORY (ARB-083, Z16-amendment #16, OBS-13 CLOSED, D-1 REJECTED) & Raport_wdrozenia_12.2.0`
+- **Commit Mikro-Hotfixu 12.2.0a:** `de4aeb2` — `fix(12.2.0a): align F1 header with 0.90 Z2 gate, preserve dyadic/ping-pong T-V at 0.80 fallback, keep female-only collectives NON_VIRILE & word-safe C-2 truncation` — **NOWY COMMIT CERTYFIKACJI KODU**
+- **Docs Commit 12.2.0b:** `HEAD` — `docs(release): 12.2.0b — benchmark metrics, OBS-17/OBS-18 registry, final 12.x closure`
 - **Decyzja strategiczna (`12.x`):** **`D-1 (Flash F1/F2) — REJECTED BY OPERATOR (quality-first policy; no model change in 12.x horizon)`**. Model Hydrogen pozostaje jedynym flagowym modelem produkcyjnym (`AVT_CONSOLIDATE_F2="0"`).
-- **Status 12.2.0:** `CERTIFIED IN TESTS / READY FOR 2-EPISODE PROD BENCHMARK (2026-11-26)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a` + **autoryzowany `Z16-amendment #16`** z `9947688` ograniczony wyłącznie do `verifier.py:790` i `avt_linter.py:7570–7579`; **bezwzględne 0 B diffu** na pozostałych 27 plikach Z16, `scene_discourse.py`, `scene_snapper.py`, `whisper_disambiguator.py`, `series_memory.py` i `profiler.py` względem `bd4c76b`)
-- **Stan metryk:** `518 passed` w `tests/` (`9` w `test_standard_12_2_0.py` + `11` w `test_standard_12_1_0.py` + `498` z `12.0.0b` i starszych) oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `588 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: STANDARD 12.2.0 ZWERYFIKOWANY (518/518 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-12.2.0:** Wszelkie przyszłe prace rozwojowe startują z baseline'u `Standard 12.2.0` (`bd4c76b..HEAD`) i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard `12.2.0`: lokalny polylog Z2 i historia F1 `6–8` linii `OBS-13a`, ochrona chóru `OBS-13b`, próg pewności adresata `0.90` `OBS-13c`, sąsiedzi read-only F2 `C-1` oraz `Z16-amendment #16`: `C-2` i `A-2`, przy `gemini-4-hydrogen` + domyślnym `AVT_CONSOLIDATE_F2=0`).
+- **Status 12.2.0 i całej mapy 12.x:** **`CLOSED — ACCEPT (2026-11-26, HEAD de4aeb2)`** — potwierdzony 2-odcinkowym benchmarkiem produkcyjnym (`10/10` punktów kontrolnych PASS, `8.44 PLN netto`, `0` błędów API, `0` błędów ASS, `0` regresji `DEF-02`).
+- **Kierunek post-12.x:** **Opcja A (produkcja)** na certyfikowanym `12.2.0a`/`12.2.0b` bez prewencyjnego otwierania `12.3.0`/`13.x` (nowy standard wyłącznie w przypadku realnego defektu krytycznego lub premiery nowej generacji modeli).
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a` + **autoryzowany `Z16-amendment #16`** z `9947688` ograniczony wyłącznie do `verifier.py:790` i `avt_linter.py:7570–7579`; **bezwzględne 0 B diffu** na pozostałych 27 plikach Z16, `scene_discourse.py`, `scene_snapper.py`, `whisper_disambiguator.py`, `series_memory.py` i `profiler.py` względem `bd4c76b` i `11bafcf`)
+- **Stan metryk:** `522 passed` w `tests/` (`13` w `test_standard_12_2_0.py` + `11` w `test_standard_12_1_0.py` + `498` starszych) oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `592 passed`), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD PASS (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15), `audit_diff.ps1` w stanie `PASS` oraz `10/10` punktów kontrolnych benchmarku PASS.
+- **Status CI/CD:** `STATUS: STANDARD 12.2.0 + 12.2.0a + 12.2.0b ZWERYFIKOWANY (522/522 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS, 10/10 BENCHMARK PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-12.x:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 12.2.0a/12.2.0b` (`bd4c76b..HEAD`) i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard `12.2.0 + 12.2.0a`: lokalny polylog Z2 i historia F1 `6–8` linii `OBS-13a`, ochrona chóru `OBS-13b` z `NON_VIRILE` bez `SeriesBible`, próg pewności adresata `0.90` `OBS-13c` + synchronizacja nagłówka F1 i ochrona diad `0.92`, sąsiedzi read-only F2 `C-1`, `C-2` word-safe oraz `Z16-amendment #16`: `C-2` i `A-2`, przy `gemini-4-hydrogen` + domyślnym `AVT_CONSOLIDATE_F2=0`).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (`518 passed` w `tests/`)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (`522 passed` w `tests/`)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -BaseRef "bd4c76b" -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -987,8 +990,8 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
 
 ---
 
-### 🔹 ARB-083 / INC-AVT-081 — Standard 12.2.0 (`OBS-13a/b/c`, `C-1`, autoryzowany `Z16-amendment #16`: `C-2`, `A-2`)
-- **Data wdrożenia:** `2026-11-26` (baza startowa: `bd4c76b` / `12.1.0 + 12.1.0a`; `6` atomowych commitów `7f897cd .. HEAD`)
+### 🔹 ARB-083 / INC-AVT-081 — Standard 12.2.0 (`OBS-13a/b/c`, `C-1`, autoryzowany `Z16-amendment #16`: `C-2`, `A-2`) + `12.2.0a` + `12.2.0b`
+- **Data wdrożenia:** `2026-11-26` (baza startowa: `bd4c76b` / `12.1.0 + 12.1.0a`; `6` atomowych commitów `7f897cd .. 11bafcf` + Mikro-Hotfix `12.2.0a` (`de4aeb2`) + Docs Commit `12.2.0b` (`HEAD`))
 - **Decyzje zakresu i formalna autoryzacja `Z16-amendment #16`:**
   - **`OBS-13` (`ŚREDNI`):** **`RESOLVED — Standard 12.2.0`** (w pełni rozwiązane i zweryfikowane testowo oraz replayem offline; `OBS-13a/b/c` zrealizowane w całości w `translator.py` z `0 B` diffu w `scene_discourse.py`).
   - **`D-1 (Flash F1/F2)`:** **`REJECTED BY OPERATOR (quality-first policy; no model change in 12.x horizon)`** — flagowym modelem pozostaje wyłącznie `gemini-4-hydrogen` (`AVT_CONSOLIDATE_F2="0"`).
@@ -1007,7 +1010,31 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   3. **`OBS-13c` (`translator.py`):** parametr `target_min_confidence: float = 0.80` w `format_dry_telemetry_tag` (zachowujący pełną kompatybilność wsteczną `test_system.py:17342–17348` `TEST 178/178`) wraz z `_compute_effective_target_confidence` propagującym rzeczywistą pewność z `event.target_confidence` / lokalnego polylogu pod progiem produkcyjnym `target_min_confidence=0.90` w `_prepare_batch_prompt` i `_process_phase1_only`.
   4. **`C-1` (`translator.py`):** `_attach_phase2_readonly_neighbor_context` doklejający skróconych sąsiadów `read-only` z tej samej sceny (`DEF-02`) do `notes` wybranych kandydatów F2 bez ruszania `audio_alert` / `ambiguity_note` (`CoT = 2048 LOW`).
   5. **`C-2` (`verifier.py:790` + `translator.py`) & `A-2` (`avt_linter.py:7570–7579`):** neutralny gatunkowo prompt F2 + `_append_phase2_genre_tone_rule` oraz poprawka separatorów tysięcy i czasu wojskowego w `Filar CLXXI`.
-- **Testy regresyjne & dokumentacja:** [test_standard_12_2_0.py](tests/test_standard_12_2_0.py) (**9 / 9 PASSED**), regresja `11.2.23..12.1.0` (**49 / 49 PASSED**), `tests/` (**518 / 518 PASSED**), `test_system.py` (**70 passed, 154 deselected**), `4/4` bramki PASS, `audit_diff.ps1` **VICTORY CONFIRMED** oraz raport [Raport_wdrozenia_12.2.0.md](Artefakty/Raport_wdrozenia_12.2.0.md).
+- **Testy regresyjne `12.2.0` (`11bafcf`) & dokumentacja:** [test_standard_12_2_0.py](tests/test_standard_12_2_0.py) (**9 / 9 PASSED**), regresja `11.2.23..12.1.0` (**49 / 49 PASSED**), `tests/` (**518 / 518 PASSED**), `test_system.py` (**70 passed, 154 deselected**), `4/4` bramki PASS, `audit_diff.ps1` **VICTORY CONFIRMED** oraz raport [Raport_wdrozenia_12.2.0.md](Artefakty/Raport_wdrozenia_12.2.0.md).
+- **Mikro-Hotfix `12.2.0a` (`de4aeb2` — domknięcie 4 defektów z audytu konfrontacyjnego przed płatnym benchmarkiem; `0 B` diffu w Z16 i `scene_discourse.py`):**
+  1. `BUG #1` (KRYTYCZNY, `translator.py:5360–5421`): przeniesienie obliczenia `poly_ctx_f1` i `eff_tgt_conf_f1` przed nagłówek `Kwestia [ID: ...]`, usuwając sprzeczność między nagłówkiem a `📡 TELEMETRIA` przy `< 0.90`.
+  2. `BUG #2` (WYSOKI, `translator.py:2230–2243`): zachowanie pewności `0.92` (`>= 0.90`) dla potwierdzonego ping-ponga lub czystej lokalnej diady przy fallbacku `0.80` z `scene_discourse.py` (spadek utraconych linii diadycznych na *Chii Fuyo-07*: `37 → 0`, pełna ochrona `A-3` T-V na *Sasaki S2-08*).
+  3. `BUG #3` (ŚREDNI, `translator.py:2351–2364, 2430–2431`): wydzielenie `_FEMALE_ONLY_COLLECTIVE_LABELS` (`sisters/girls/women/siostry/dziewczyny/kobiety` → domyślne `NON_VIRILE` nawet bez rekordu w `SeriesBible`).
+  4. `BUG #4` (DROBNY, `translator.py:2456–2509`): `_truncate_on_word_boundary(..., 160)` zapobiegające ucinaniu opisu epoki `C-2` w środku wyrazu.
+  5. Testy: `tests/test_standard_12_2_0.py` rozszerzone z `9` do **`13 / 13 PASSED`** (`522 / 522` w `tests/`).
+- **Finalny Benchmark 2-Odcinkowy na żywo (`2026-11-26`, `de4aeb2`, `gemini-4-hydrogen`, `AVT_CONSOLIDATE_F2=0`):**
+  * *Chii Fuyo-07*: `4.59 PLN netto` (`~5.65 PLN brutto`, F1 `2.82` + F2 `1.77`), tryb 1:1 (`8/8` paczek, `CoT 2048 LOW`), `117/386` linii F2 (`29` szlifów), `5 min 12 s`, `0` błędów API/retry, maks. `40` CPL, `0` linii `> 22` CPS, `0` błędów ASS, `0` wycieków `DEF-02`, redukcja niepewnych `Adresat:` `247 → 143`.
+  * *Sasaki S2-08*: `3.85 PLN netto` (`~4.74 PLN brutto`, F1 `2.35` + F2 `1.51`), tryb 1:1 (`6/6` paczek, `CoT 2048 LOW`), `123/326` linii F2 (`20` szlifów), `4 min 25 s`, `0` błędów API/retry, maks. `41` CPL, `1` okrzyk `22.5` CPS (`#2`), `0` błędów ASS, `0` wycieków `DEF-02`, redukcja niepewnych `Adresat:` `190 → 133`.
+  * **Łącznie:** **`8.44 PLN netto`** (`~10.39 PLN brutto`, średnio `~4.22 PLN/odc.` `<= 6.00 PLN`), czas `9 min 37 s`, **`10/10` punktów kontrolnych PASS** (`A-1` echo `#167–168` i zdanie rozbite `#195–196`, `A-2` `1500 metrów` i `14:20` bez alarmów `Filar CLXXI`, `A-3` `4/4` `pani` na *Sasaki → Shizuka* oraz `100%` `na ty` *Lily → Elsie* / `panie prezesie` *Margaret → CEO*, `A-4` `3/3` `lady Elsa`, `A-5` `500 milionów!`, `OBS-13a` `#322` `obwinialibyście się, gdybyście wiedzieli`, `OBS-13b` `BROTHERS`/`ALL` bez `FEMININE` z `Grupa_1os_lm: VIRILE`, `OBS-13c + C-1 + C-2` `0` wystąpień `u polskich nastolatków` w F2).
+- **Rejestr nowych obserwacji produkcyjnych (nieblokujących):**
+  * **`OBS-17` (`NISKI` — `OPERATIONAL / NO CODE ACTION`):** `Local series_bible JSON has historical gender distortion (Lily Flambert: MALE); operator-level fix, not code-level` (plik poza repozytorium git; mimo zniekształcenia `0/52` błędów płci mówcy i `0/25` adresata w polskim tekście dzięki profilowi i audio; korekta ręczna w lokalnym pliku JSON Operatora).
+  * **`OBS-18` (`NISKI` — `OPEN / MONITOR ONLY`):** `Occasional LLM micro-variants (minor casing/word choice after F2 correction, e.g. #322 lowercase after previous speaker ellipsis, #363 'dojść' vs 'dołączyć'); no code action unless recurring >=3 times per episode`.
+- **Retrospektywa Mapy `12.x` (`12.0.0` → `12.2.0b`, dla przyszłego horyzontu `13.x`):**
+  * **Co zadziałało (utrzymać jako żelazny standard):**
+    1. *Audyt konfrontacyjny na realnych logach przed każdym płatnym benchmarkiem* — wyłapał `BUG #1–#5` w `12.0.0`, `BUG #1–#3` w `12.1.0` oraz `BUG #1–#4` w `12.2.0` (łącznie `12` defektów, które przeszły testy jednostkowe, zanim kosztowałyby choć jedną złotówkę w API).
+    2. *Offline replay (`0.00 PLN`)* na `events.jsonl` oraz *twarde bramki A/B* przed zmianą architektury.
+    3. *Polityka izolacji Z16 + opcja lekka w `translator.py`* (`0 B` diffu w `scene_discourse.py` przy pełnym rozwiązaniu `OBS-13a/b/c`, zaledwie ~11 chirurgicznych linii w `Z16-amendment #16`).
+    4. *Zero-Cache Lean na `gemini-4-hydrogen` w trybie 1:1* — stabilny koszt `~4.22 PLN/odc.` netto, `0` błędów API i `10/10` punktów jakościowych.
+  * **Co nie zadziałało / zostało trwale odrzucone (nie powtarzać w `13.x` bez zmiany fundamentów):**
+    1. *`F-1` (konsolidacja paczek F2)* — odrzucone na twardych danych A/B (negatywne ROI, utrata lokalnej precyzji reżyserskiej i ryzyko kosztowe na dużych oknach).
+    2. *`D-1` (Flash F1/F2)* — `REJECTED BY OPERATOR` (polityka *quality-first*; słabszy draft na `65–73%` linii bez F2, niepewny Context Cache poniżej `32k` tokenów i zbędny dług techniczny w całym horyzoncie `12.x`/`13.x`).
+    3. *Zgadywanie `Adresat:` w lokalnych polylogach bez progu pewności `>= 0.90`* oraz bez synchronizacji nagłówka F1 z telemetrią `Z2`.
+  * **Status zamknięcia:** łańcuch `e6116ee` (`12.0.0b`) → `bd4c76b` (`12.1.0a`) → `de4aeb2` (`12.2.0a`) → `HEAD` (`12.2.0b`) — **cała mapa `12.x` `CLOSED — ACCEPT`**.
 
 
 
