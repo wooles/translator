@@ -1636,19 +1636,19 @@ def _guard_phase2_split_pair_integrity(
         en_i = _strip_ass_markup_for_pair(item_i.get("en", ""))
         p1_i_raw = str(item_i.get("pl") or "")
         p1_i = _strip_ass_markup_for_pair(p1_i_raw)
-        if en_i.endswith(".") or p1_i.endswith("."):
-            continue
-
         ref_raw = str(refined_dict[id_i] or "")
         ref_clean = _strip_ass_markup_for_pair(ref_raw)
-        if not (ref_clean.endswith(".") and not ref_clean.endswith("...")):
-            continue
 
         next_pl_clean = _strip_ass_markup_for_pair(item_next.get("pl", ""))
         has_conj_inf = bool(_CONJ_INFINITIVE_START_RE.match(next_pl_clean))
-        if has_conj_inf and _MODAL_GOVERNOR_RE.search(p1_i) and not _MODAL_GOVERNOR_RE.search(ref_clean):
+        modal_broken = bool(
+            has_conj_inf
+            and _MODAL_GOVERNOR_RE.search(p1_i)
+            and not _MODAL_GOVERNOR_RE.search(ref_clean)
+        )
+        if modal_broken:
             refined_dict[id_i] = sanitize_sub_text(p1_i_raw)
-        else:
+        elif not (en_i.endswith(".") or p1_i.endswith(".")) and ref_clean.endswith(".") and not ref_clean.endswith("..."):
             refined_dict[id_i] = re.sub(r"\.(?=(?:\s|\{[^}]*\})*$)", "", ref_raw.rstrip()).strip()
 
 
@@ -1656,6 +1656,15 @@ _GENERIC_TV_LABELS = frozenset({
     "", "sign", "unknown", "unspecified", "grupa", "para", "polylogue",
     "mężczyzna", "kobieta", "nieokreślony", "monolog", "postać", "narrator", "brak",
 })
+_TV_EXPLICIT_PAN_PANI_RE = re.compile(
+    r"\b(?:pan|pani|państwo|panie|panu|pana|proszę\s+pana|proszę\s+pani|"
+    r"wasza\s+wysokość|wasza\s+miłość)\b",
+    re.IGNORECASE,
+)
+_TV_TITULAR_VOCATIVE_RE = re.compile(
+    r"\b(?:mistrzu|mistrzyni|prezesie|kapitanie|profesorze|baronie|hrabio)\b",
+    re.IGNORECASE,
+)
 _TV_FORMAL_RE = re.compile(
     r"\b(?:pan|pani|państwo|panie|panu|pana|proszę\s+pana|proszę\s+pani|"
     r"mistrzu|mistrzyni|prezesie|kapitanie|profesorze|wasza\s+wysokość|"
@@ -1695,7 +1704,7 @@ _SPOKEN_NUMERIC_SCALE_FORMS: Dict[str, Tuple[str, str, str, str]] = {
     "tys": ("tysiąc", "tysiące", "tysięcy", "tysiąca"),
 }
 _SPOKEN_NUMERIC_ABBR_RE = re.compile(
-    r"(\b\d+(?:[\s\u00a0]\d{3})*(?:[.,]\d+)?)\s+(mln|mld|tys)(\.?)(?=$|[\s,!?;:…\"”»)\]\-—.\\])",
+    r"(\b\d+(?:[\s\u00a0]\d{3})*(?:[.,]\d+)?)\s+(mln|mld|tys)(\.(?!\.))?(?=$|[\s,!?;:…\"”»)\]\-—.\\])",
     re.IGNORECASE,
 )
 
@@ -1765,16 +1774,21 @@ def _extract_tv_directive_from_desc(rel_desc: str) -> Optional[str]:
     if not clean_addr_form:
         return None
 
-    is_pure_ty_quote = bool(re.fullmatch(r"(?:na\s+|per\s+)?ty(?:\s*\([^)]*\))?", quoted_form.strip(), re.IGNORECASE))
-    has_formal = bool(_TV_FORMAL_RE.search(quoted_form)) or (not is_pure_ty_quote and bool(_TV_FORMAL_RE.search(base_desc)))
-    has_informal = (
-        bool(_TV_INFORMAL_RE.search(quoted_form))
-        or bool(_TV_INFORMAL_RE.search(base_desc))
-        or bool(re.match(r"^(?:na\s+)?ty\b", quoted_form.strip(), re.IGNORECASE))
+    has_explicit_ty_quote = bool(
+        re.match(r"^(?:na\s+|per\s+)?ty\b", quoted_form.strip(), re.IGNORECASE)
+    ) or bool(_TV_INFORMAL_RE.search(quoted_form))
+    has_explicit_pan_pani_in_quote = bool(_TV_EXPLICIT_PAN_PANI_RE.search(quoted_form))
+    if has_explicit_ty_quote and not has_explicit_pan_pani_in_quote:
+        return f"na ty ({clean_addr_form})"
+
+    has_formal = (
+        has_explicit_pan_pani_in_quote
+        or bool(_TV_TITULAR_VOCATIVE_RE.search(quoted_form))
+        or bool(_TV_FORMAL_RE.search(base_desc))
     )
-    if has_formal and not is_pure_ty_quote:
+    if has_formal:
         return f"pan/pani ({clean_addr_form})"
-    if has_informal:
+    if _TV_INFORMAL_RE.search(base_desc):
         return f"na ty ({clean_addr_form})"
     return None
 

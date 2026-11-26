@@ -553,3 +553,96 @@ def test_12_1_0_offline_replay_on_12_0_0_benchmark_patterns(tmp_path):
     ])
     assert ev_locks == {"Lady Aurelia": "lady Aurelia", "Baron Viktor": "baron Viktor"}
     assert _expand_spoken_numeric_abbreviations("Pożyczę 500 mln!", is_sign=False) == "Pożyczę 500 milionów!"
+
+
+@pytest.mark.unit
+def test_bug1_a3_ty_with_vocative_title_stays_informal(tmp_path):
+    """
+    BUG #1 (A-3): Jawna deklaracja 'Ty' połączona po ukośniku z tytułem-wołaczem ('Ty (Dowódca_B) / Mistrzyni')
+    pozostaje relacją nieformalną ('na ty'), natomiast jawne 'Pan/Pani' lub sam tytuł bez 'ty' ('Pan / Panie Prezesie / Mistrzu Gildii')
+    zachowuje formę dystansową 'pan/pani'.
+    """
+    sb = SeriesBible(anime_title="Seria Beta", storage_dir=tmp_path)
+    sb.data["characters"] = {
+        "Agent_A": {
+            "name": "Agent_A",
+            "gender": "FEMALE",
+            "grammatical_gender": "FEMININE",
+            "confidence": 0.95,
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["Agent_A"],
+            "description": "kobieta (postać)",
+            "entity_category": "ANTHROPONYM",
+        },
+        "Dowódca_B": {
+            "name": "Dowódca_B",
+            "gender": "FEMALE",
+            "grammatical_gender": "FEMININE",
+            "confidence": 0.95,
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["Dowódca_B"],
+            "description": "kobieta (postać)",
+            "entity_category": "ANTHROPONYM",
+        },
+        "Szef_C": {
+            "name": "Szef_C",
+            "gender": "MALE",
+            "grammatical_gender": "MASCULINE",
+            "confidence": 0.95,
+            "priority": "P0",
+            "has_verified_gender": True,
+            "aliases": ["Szef_C"],
+            "description": "mężczyzna (postać)",
+            "entity_category": "ANTHROPONYM",
+        },
+    }
+    sb.data["relations"] = {
+        "Agent_A -> Dowódca_B": "Zwrot: 'Ty (Dowódca_B) / Mistrzyni' (Głęboki szacunek)",
+        "Agent_A -> Szef_C": "Zwrot: 'Pan / Panie Prezesie / Mistrzu Gildii'",
+    }
+
+    res_ty_title = _resolve_tv_address_form("Agent_A", "Dowódca_B", sb)
+    assert res_ty_title == "na ty (Ty (Dowódca_B) / Mistrzyni)"
+
+    res_formal = _resolve_tv_address_form("Agent_A", "Szef_C", sb)
+    assert res_formal == "pan/pani (Pan / Panie Prezesie / Mistrzu Gildii)"
+
+
+@pytest.mark.unit
+def test_bug2_a1_modal_rollback_fires_even_without_added_period():
+    """
+    BUG #2 (A-1 Warstwa 2): Gdy F2 usuwa konstrukcję modalną rządzącą bezokolicznikiem w niezweryfikowanym
+    następniku (#10 -> #11) i nie dopisuje kropki końcowej, _guard_phase2_split_pair_integrity
+    i tak przywraca spójną formę modalną z F1.
+    """
+    it10 = _make_prod_pass1_item(
+        idx=10,
+        en="I want you to head to the outpost at once",
+        pl="Macie natychmiast ruszyć na posterunek",
+        speaker_name="Oficer_B",
+        start_ms=10000,
+        end_ms=12000,
+    )
+    it11 = _make_prod_pass1_item(
+        idx=11,
+        en="and inspect the anomaly.",
+        pl="i zbadać tę anomalię.",
+        speaker_name="Oficer_B",
+        start_ms=12000,
+        end_ms=14000,
+    )
+    refined_dict = {10: "Ruszajcie natychmiast na posterunek", 11: sanitize_sub_text(it11["pl"])}
+    _guard_phase2_split_pair_integrity([it10, it11], refined_dict, verified_ids={10})
+    assert refined_dict[10] == "Macie natychmiast ruszyć na posterunek"
+
+
+@pytest.mark.unit
+def test_bug3_a5_preserves_ellipsis_after_tys_mln():
+    """
+    BUG #3 (A-5): _SPOKEN_NUMERIC_ABBR_RE nie konsumuje pierwszej kropki wielokropka
+    po skrótach 'tys'/'mln', zachowując pełne trzy kropki (...).
+    """
+    assert _expand_spoken_numeric_abbreviations("Zostało 5 tys...", is_sign=False) == "Zostało 5 tysięcy..."
+    assert _expand_spoken_numeric_abbreviations("Pożyczę 500 mln...", is_sign=False) == "Pożyczę 500 milionów..."
