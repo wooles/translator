@@ -2227,6 +2227,19 @@ def _compute_effective_target_confidence(
             and not poly_ctx.get("is_direct_2p_qa_dyad")
         ):
             return min(ev_tgt_conf, 0.85)
+        if ev_tgt_conf < 0.90 and poly_ctx:
+            from series_memory import extract_clean_speaker_name
+            imm_other = str(poly_ctx.get("immediate_other") or "").strip().lower()
+            lbl_clean = extract_clean_speaker_name(lbl_actor).strip().lower() if lbl_actor else ""
+            is_confirmed_dyadic = bool(
+                not poly_ctx.get("is_local_polylogue")
+                and imm_other
+                and lbl_clean
+                and imm_other == lbl_clean
+                and not poly_ctx.get("is_third_party_interjection")
+            )
+            if poly_ctx.get("is_confirmed_ping_pong") or is_confirmed_dyadic:
+                return 0.92
         return ev_tgt_conf
 
     if poly_ctx is not None:
@@ -2335,17 +2348,20 @@ _TECHNICAL_ACTOR_SUFFIXES = frozenset({
     "mono", "thought", "past", "young", "sfx", "sign", "text",
     "narration", "inner", "internal",
 })
+_FEMALE_ONLY_COLLECTIVE_LABELS = frozenset({
+    "sisters", "girls", "women", "siostry", "dziewczyny", "kobiety",
+})
 _COLLECTIVE_SPEAKER_LABELS = frozenset({
     "all", "both", "everyone", "everybody", "crowd", "mob", "audience",
     "people", "chorus", "group", "team", "squad", "class", "brothers",
-    "sisters", "siblings", "twins", "kids", "children", "boys", "girls",
-    "men", "women", "soldiers", "guards", "knights", "villagers",
+    "siblings", "twins", "kids", "children", "boys",
+    "men", "soldiers", "guards", "knights", "villagers",
     "townspeople", "citizens", "students", "members", "guild members",
     "adventurers", "bandits", "officers", "staff", "crew", "reporters",
     "passersby", "voices", "wszyscy", "oboje", "tłum", "chór", "bracia",
-    "siostry", "dzieci", "dziewczyny", "kobiety", "żołnierze", "uczniowie",
+    "dzieci", "żołnierze", "uczniowie",
     "mieszkańcy", "strażnicy",
-})
+}) | _FEMALE_ONLY_COLLECTIVE_LABELS
 
 
 def _classify_collective_speaker_actor(
@@ -2411,6 +2427,8 @@ def _classify_collective_speaker_actor(
 
     low_clean = re.sub(r"^the\s+", "", cleaned.lower()).strip()
     low_base = re.sub(r"\s*#\d+$", "", low_clean).strip()
+    if low_clean in _FEMALE_ONLY_COLLECTIVE_LABELS or low_base in _FEMALE_ONLY_COLLECTIVE_LABELS:
+        return "NON_VIRILE"
     if low_clean in _COLLECTIVE_SPEAKER_LABELS or low_base in _COLLECTIVE_SPEAKER_LABELS:
         if _is_verified_female_record(cleaned):
             return "NON_VIRILE"
@@ -2435,6 +2453,22 @@ def _append_phase2_numeric_hygiene_rule(
     return f"{base}\n{rule_note}" if base else rule_note
 
 
+def _truncate_on_word_boundary(text: str, limit: int) -> str:
+    """Truncates text to <= limit chars without splitting a word, appending ellipsis."""
+    s = re.sub(r"\s+", " ", str(text or "")).strip()
+    if len(s) <= limit:
+        return s
+    budget = max(1, limit - 1)
+    if s[budget:budget + 1].isspace():
+        cut = s[:budget]
+    else:
+        cut = s[:budget]
+        if " " in cut:
+            cut = cut.rsplit(" ", 1)[0]
+    cut = cut.rstrip(" ,;:-—–.")
+    return f"{cut}…" if cut else (s[:budget].rstrip() + "…")
+
+
 def _append_phase2_genre_tone_rule(
     focused_rules_str: str,
     episode_profile: Any = None,
@@ -2453,7 +2487,7 @@ def _append_phase2_genre_tone_rule(
             else getattr(episode_profile, "setting_and_era", None)
         )
         if era_raw:
-            era_summary = re.sub(r"\s+", " ", str(era_raw)).strip()[:120]
+            era_summary = _truncate_on_word_boundary(str(era_raw), 160)
         seqs = (
             episode_profile.get("dramatic_sequences")
             if isinstance(episode_profile, dict)
@@ -2466,13 +2500,13 @@ def _append_phase2_genre_tone_rule(
                 else getattr(seqs[0], "dominant_tone", None)
             )
             if first_t:
-                tone_summary = re.sub(r"\s+", " ", str(first_t)).strip()[:80]
+                tone_summary = _truncate_on_word_boundary(str(first_t), 80)
     if active_sequence_str:
         m_ton = re.search(r"Ton:\s*([^|\n]+)", str(active_sequence_str))
         if m_ton and m_ton.group(1).strip():
-            tone_summary = re.sub(r"\s+", " ", m_ton.group(1)).strip()[:80]
+            tone_summary = _truncate_on_word_boundary(m_ton.group(1), 80)
         elif not tone_summary:
-            tone_summary = re.sub(r"\s+", " ", str(active_sequence_str)).strip()[:80]
+            tone_summary = _truncate_on_word_boundary(str(active_sequence_str), 80)
 
     if not era_summary and not tone_summary:
         return focused_rules_str or ""
@@ -5308,39 +5342,7 @@ class MultimodalTranslator:
                     prosody_tags=prosody_tags
                 )
 
-                if line_addr_cat in ["grupa_kobiet", "kobieta_dual"]:
-                    reg_desc = "L. mnoga niemęskoosobowa"
-                elif line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual"]:
-                    reg_desc = "L. mnoga męskoosobowa"
-                elif line_addr_cat in ["grupa_mieszana", "para_mieszana_dual"]:
-                    reg_desc = "L. mnoga / para mieszana"
-                elif line_addr_cat == "kobieta":
-                    reg_desc = "2. os. lp. 'ty' do kobiety"
-                elif line_addr_cat == "mężczyzna":
-                    reg_desc = "2. os. lp. 'ty' do mężczyzny"
-                else:
-                    reg_desc = "Kontekstowy / Naturalny"
-
-                if event.name and not is_generic_actor_or_category(event.name):
-                    spk_label = event.name
-                    if line_spk_gender:
-                        spk_label += f" ({line_spk_gender.capitalize()})"
-                elif line_spk_gender:
-                    spk_label = line_spk_gender.capitalize()
-                else:
-                    spk_label = "Postać"
-
-                if line_addr_lbl:
-                    addr_label = line_addr_lbl
-                elif line_addr_cat:
-                    addr_label = line_addr_cat.replace("_", " ").capitalize()
-                else:
-                    addr_label = "Nieokreślony / Monolog"
-
-                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}) [MÓWCA: {spk_label} | ADRESAT: {addr_label} | REJESTR: {reg_desc}]{acoustic_str}:")
-                lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ SEMANTYCZNA I FAKTY): {clean_display_text}")
-
-                # Detekcja monologu wewnętrznego (Standard 9.4, 2C.6, Hotfix 10.1.1 2B.2)
+                # Detekcja monologu wewnętrznego i pewności adresata przed nagłówkiem Kwestia [ID: ...] (OBS-13c)
                 st_lower = str(getattr(event, "style", "")).lower()
                 italic_attr = getattr(event, "italic", 0)
                 has_italic_style = any(k in st_lower for k in ["italic", "flashback_italic", "thoughts", "internal"]) or italic_attr in (1, -1)
@@ -5354,6 +5356,69 @@ class MultimodalTranslator:
                 else:
                     has_whisper_monologue = "monolog wewnętrzny" in relation_tag
                     is_internal_monologue = has_italic_style or has_whisper_monologue
+
+                poly_ctx_f1 = _analyze_local_polylogue_window(
+                    batch_events=batch_events,
+                    event_idx=idx,
+                    curr_spk=str(getattr(event, "name", None) or getattr(event, "actor", None) or "").strip(),
+                    curr_start_ms=int(getattr(event, "start", 0) or 0),
+                    lookback_history=history_context,
+                    cuts_ms=getattr(self, "scene_cuts_ms", None),
+                    curr_clean_text=clean_text,
+                    curr_end_ms=int(getattr(event, "end", 0) or 0),
+                )
+                is_voc_f1 = _is_explicit_vocative_for_label(event, clean_text, line_addr_lbl)
+                eff_tgt_conf_f1 = _compute_effective_target_confidence(
+                    event=event,
+                    line_addr_cat=line_addr_cat,
+                    line_addr_lbl=line_addr_lbl,
+                    poly_ctx=poly_ctx_f1,
+                    is_internal_monologue=is_internal_monologue,
+                    line_has_explicit_vocative=is_voc_f1,
+                )
+                is_plural_or_dual_addr_f1 = line_addr_cat in (
+                    "grupa_kobiet", "grupa_mężczyzn", "grupa_mieszana",
+                    "kobieta_dual", "mężczyzna_dual", "para_mieszana_dual",
+                )
+                eff_addr_cat_f1 = (
+                    line_addr_cat
+                    if (eff_tgt_conf_f1 >= 0.90 or is_plural_or_dual_addr_f1)
+                    else None
+                )
+
+                if eff_addr_cat_f1 in ["grupa_kobiet", "kobieta_dual"]:
+                    reg_desc = "L. mnoga niemęskoosobowa"
+                elif eff_addr_cat_f1 in ["grupa_mężczyzn", "mężczyzna_dual"]:
+                    reg_desc = "L. mnoga męskoosobowa"
+                elif eff_addr_cat_f1 in ["grupa_mieszana", "para_mieszana_dual"]:
+                    reg_desc = "L. mnoga / para mieszana"
+                elif eff_addr_cat_f1 == "kobieta":
+                    reg_desc = "2. os. lp. 'ty' do kobiety"
+                elif eff_addr_cat_f1 == "mężczyzna":
+                    reg_desc = "2. os. lp. 'ty' do mężczyzny"
+                else:
+                    reg_desc = "Kontekstowy / Naturalny"
+
+                if event.name and not is_generic_actor_or_category(event.name):
+                    spk_label = event.name
+                    if line_spk_gender:
+                        spk_label += f" ({line_spk_gender.capitalize()})"
+                elif line_spk_gender:
+                    spk_label = line_spk_gender.capitalize()
+                else:
+                    spk_label = "Postać"
+
+                if eff_tgt_conf_f1 < 0.90 and not is_plural_or_dual_addr_f1:
+                    addr_label = "Nieokreślony / Monolog"
+                elif line_addr_lbl:
+                    addr_label = line_addr_lbl
+                elif line_addr_cat:
+                    addr_label = line_addr_cat.replace("_", " ").capitalize()
+                else:
+                    addr_label = "Nieokreślony / Monolog"
+
+                lines.append(f"Kwestia [ID: {idx + 1}] [TYP: [DIALOG] {vtype['type_label']}]{relation_tag} (Czas: {start_str} - {end_str}) [MÓWCA: {spk_label} | ADRESAT: {addr_label} | REJESTR: {reg_desc}]{acoustic_str}:")
+                lines.append(f"  📄 SKRYPT PODSTAWOWY EN (TREŚĆ SEMANTYCZNA I FAKTY): {clean_display_text}")
                 if is_internal_monologue:
                     lines.append("  💭 TRYB WYPOWIEDZI: MONOLOG WEWNĘTRZNY / MYŚLI (is_internal_monologue: true) — Wymagane tagi {\\i1}...{\\i0} w phase1_text.")
 
@@ -5452,8 +5517,11 @@ class MultimodalTranslator:
                     or line_spk_gender == "mężczyzna"
                 )
                 has_male_addressee_in_line = (
-                    contract_target_gender == "MASCULINE"
-                    or line_addr_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn"]
+                    (eff_tgt_conf_f1 >= 0.90 or is_plural_or_dual_addr_f1)
+                    and (
+                        contract_target_gender == "MASCULINE"
+                        or line_addr_cat in ["mężczyzna", "mężczyzna_dual", "grupa_mężczyzn"]
+                    )
                 )
                 if has_male_speaker_in_line:
                     is_fem_scene = False
@@ -5461,35 +5529,15 @@ class MultimodalTranslator:
                 if collective_virility in ("VIRILE", "NON_VIRILE"):
                     is_fem_scene = (collective_virility == "NON_VIRILE")
                     pl_grp_val = collective_virility
-                    you_grp_val = "VIRILE" if (has_male_addressee_in_line or line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if line_addr_cat in ["grupa_kobiet", "kobieta_dual"] else None)
+                    you_grp_val = "VIRILE" if (has_male_addressee_in_line or line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if (line_addr_cat in ["grupa_kobiet", "kobieta_dual"] and (eff_tgt_conf_f1 >= 0.90 or is_plural_or_dual_addr_f1)) else None)
                 elif is_fem_scene:
                     pl_grp_val = "NON_VIRILE"
-                    you_grp_val = "VIRILE" if (has_male_addressee_in_line or line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if line_addr_cat in ["grupa_kobiet", "kobieta_dual"] else None)
+                    you_grp_val = "VIRILE" if (has_male_addressee_in_line or line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if (line_addr_cat in ["grupa_kobiet", "kobieta_dual"] and (eff_tgt_conf_f1 >= 0.90 or is_plural_or_dual_addr_f1)) else None)
                 else:
                     pl_grp_val = "VIRILE" if (has_male_speaker_in_line or line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual"] or (contract_addr_number == "PLURAL" and getattr(self, "scene_has_male", False))) else ("NON_VIRILE" if contract_addr_number == "PLURAL" else None)
                     if has_male_speaker_in_line and pl_grp_val == "NON_VIRILE":
                         pl_grp_val = "VIRILE"
-                    you_grp_val = "VIRILE" if (has_male_addressee_in_line or line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if line_addr_cat in ["grupa_kobiet", "kobieta_dual"] else None)
-
-                poly_ctx_f1 = _analyze_local_polylogue_window(
-                    batch_events=batch_events,
-                    event_idx=idx,
-                    curr_spk=str(getattr(event, "name", None) or getattr(event, "actor", None) or "").strip(),
-                    curr_start_ms=int(getattr(event, "start", 0) or 0),
-                    lookback_history=history_context,
-                    cuts_ms=getattr(self, "scene_cuts_ms", None),
-                    curr_clean_text=clean_text,
-                    curr_end_ms=int(getattr(event, "end", 0) or 0),
-                )
-                is_voc_f1 = _is_explicit_vocative_for_label(event, clean_text, line_addr_lbl)
-                eff_tgt_conf_f1 = _compute_effective_target_confidence(
-                    event=event,
-                    line_addr_cat=line_addr_cat,
-                    line_addr_lbl=line_addr_lbl,
-                    poly_ctx=poly_ctx_f1,
-                    is_internal_monologue=is_internal_monologue,
-                    line_has_explicit_vocative=is_voc_f1,
-                )
+                    you_grp_val = "VIRILE" if (has_male_addressee_in_line or line_addr_cat in ["grupa_mężczyzn", "mężczyzna_dual", "grupa_mieszana", "para_mieszana_dual"]) else ("NON_VIRILE" if (line_addr_cat in ["grupa_kobiet", "kobieta_dual"] and (eff_tgt_conf_f1 >= 0.90 or is_plural_or_dual_addr_f1)) else None)
 
                 batch_actors = {getattr(b_ev, "name", "") for _, b_ev, _, _ in batch_events if getattr(b_ev, "name", "") and not is_generic_actor_or_category(getattr(b_ev, "name", ""))}
                 poly_val = getattr(self, "episode_scene_polylogues", {}).get(original_idx)

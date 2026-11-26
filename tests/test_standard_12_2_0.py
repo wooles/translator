@@ -23,6 +23,8 @@ from translator import (
     format_dry_telemetry_tag,
     _compute_effective_target_confidence,
     _append_phase2_genre_tone_rule,
+    _classify_collective_speaker_actor,
+    _truncate_on_word_boundary,
 )
 from verifier import DialogueVerifier
 
@@ -457,26 +459,26 @@ def test_obs13c_confidence_090_gate_preserves_backward_compat_080_and_propagates
     assert format_dry_telemetry_tag(target_gender="FEMININE", target_confidence=0.85, target_min_confidence=0.90) == ""
 
     sb = _build_synthetic_bible(tmp_path)
-    ev0 = pysubs2.SSAEvent(start=100, end=900, name="Agent_B", text="Did you inspect the perimeter?")
+    # Izolowana linia ev1 (odcięta pauzą 4500 ms od późniejszej diady ev0 <-> ev2) z target_confidence=0.85
     ev1 = pysubs2.SSAEvent(start=1000, end=2500, name="Agent_A", text="Look at the northern ridge.")
-    ev1.target_speaker = "Agent_B"
-    ev1.target_confidence = 0.85  # niska pewność z polylogu (ma zostać wytłumiona w 12.2.0)
+    ev1.target_confidence = 0.85  # niska pewność bez potwierdzenia diadowego (ma zostać wytłumiona w 12.2.0)
 
-    ev2 = pysubs2.SSAEvent(start=2600, end=4200, name="Agent_A", text="Check the second gate now.")
+    ev0 = pysubs2.SSAEvent(start=7000, end=7900, name="Agent_B", text="Did you inspect the perimeter?")
+    ev2 = pysubs2.SSAEvent(start=8000, end=9500, name="Agent_A", text="Check the second gate now.")
     ev2.target_speaker = "Agent_B"
     ev2.target_confidence = 0.95  # wysoka pewność z diady
 
     assert _compute_effective_target_confidence(ev1, "kobieta", "Agent_B (Kobieta)") == pytest.approx(0.85)
     assert _compute_effective_target_confidence(ev2, "kobieta", "Agent_B (Kobieta)") == pytest.approx(0.95)
 
-    batch_events = [(0, ev0, ev0.text, ""), (1, ev1, ev1.text, ""), (2, ev2, ev2.text, "")]
+    batch_events = [(0, ev1, ev1.text, ""), (1, ev0, ev0.text, ""), (2, ev2, ev2.text, "")]
 
     def handler(request: httpx.Request) -> httpx.Response:
         body = {
             "scene_diagnosis": None,
             "translations": [
-                {"id": 1, "polish_text": "Sprawdziłeś obwód?", "speaker_name": "Agent_B"},
-                {"id": 2, "polish_text": "Spójrz na północną grań.", "speaker_name": "Agent_A"},
+                {"id": 1, "polish_text": "Spójrz na północną grań.", "speaker_name": "Agent_A"},
+                {"id": 2, "polish_text": "Sprawdziłeś obwód?", "speaker_name": "Agent_B"},
                 {"id": 3, "polish_text": "Sprawdź teraz drugą bramę.", "speaker_name": "Agent_A"},
             ],
             "characters_identified": [],
@@ -495,12 +497,14 @@ def test_obs13c_confidence_090_gate_preserves_backward_compat_080_and_propagates
     tr.client_pool.clients = [mock_c]
     tr.client = mock_c
     tr.series_bible = sb
+    tr.episode_scene_genders = {0: "kobieta"}
     tr.character_registry = {"Agent_A": "mężczyzna (postać)", "Agent_B": "kobieta (postać)"}
 
     prompt = tr._prepare_batch_prompt(batch_events=batch_events, history_context=[])
-    p_line1 = prompt.split("Kwestia [ID: 2]")[1].split("Kwestia [ID: 3]")[0]
+    p_line1 = prompt.split("Kwestia [ID: 1]")[1].split("Kwestia [ID: 2]")[0]
     p_line2 = prompt.split("Kwestia [ID: 3]")[1]
     assert "Adresat:" not in p_line1
+    assert "ADRESAT: Nieokreślony / Monolog" in p_line1
     assert "Adresat: Agent_B (FEMININE)" in p_line2
 
     p1 = tr._process_phase1_only(
@@ -522,7 +526,7 @@ def test_obs13c_confidence_090_gate_preserves_backward_compat_080_and_propagates
         history=[],
         pbar=_DummyPbar(),
     )
-    _, it1, it2 = p1["pass1_items"]
+    it1, _, it2 = p1["pass1_items"]
     assert it1["target_confidence"] == pytest.approx(0.85)
     assert it1["addressee"] is None
     assert it1["addressee_label"] == ""
@@ -735,3 +739,132 @@ def test_12_2_0_def02_regression_5_scene_cuts_and_sasaki_pattern(tmp_path):
             target_min_confidence=0.90,
         )
         assert "Adresat:" not in tag
+
+
+@pytest.mark.unit
+def test_bug1_f1_prompt_header_suppresses_addressee_when_eff_conf_below_090(tmp_path):
+    """
+    BUG #1 (OBS-13c): Gdy event.target_confidence == 0.85 w niepewnym polylogu,
+    prompt _prepare_batch_prompt nie zawiera ani 'Adresat: Oficer_C' w TELEMETRIA,
+    ani 'ADRESAT: Oficer_C' / '2. os. lp.' w nagłówku Kwestia [ID: ...].
+    """
+    sb = _build_synthetic_bible(tmp_path)
+    tr = MultimodalTranslator(api_key="mock_k0", model="gemini-4-hydrogen", enable_verifier=False)
+    tr.series_bible = sb
+    tr.episode_scene_genders = {3: "mężczyzna"}
+    tr.character_registry = {
+        "Dowódca_A": "kobieta (postać)",
+        "Agent_B": "kobieta (postać)",
+        "Oficer_C": "mężczyzna (postać)",
+    }
+
+    ev1 = pysubs2.SSAEvent(start=1000, end=2500, name="Agent_B", text="The northern sector is quiet.")
+    ev2 = pysubs2.SSAEvent(start=2600, end=4200, name="Dowódca_A", text="Hold that ridge until relief arrives.")
+    ev3 = pysubs2.SSAEvent(start=4300, end=5300, name="Oficer_C", text="Dowódca_A...")
+    ev4 = pysubs2.SSAEvent(start=5500, end=7800, name="Dowódca_A", text="Should we withdraw or stay here?")
+    ev4.target_speaker = "Oficer_C"
+    ev4.target_confidence = 0.85
+
+    batch_events = [(i, ev, ev.text, "") for i, ev in enumerate([ev1, ev2, ev3, ev4])]
+    prompt = tr._prepare_batch_prompt(batch_events=batch_events, history_context=[])
+    block4 = prompt.split("Kwestia [ID: 4]")[1]
+    assert "Adresat: Oficer_C" not in block4
+    assert "ADRESAT: Oficer_C" not in block4
+    assert "ADRESAT: Nieokreślony / Monolog" in block4
+    assert "REJESTR: Kontekstowy / Naturalny" in block4
+    assert "2. os. lp." not in block4
+
+
+@pytest.mark.unit
+def test_bug2_confirmed_dyad_or_ping_pong_without_you_preserves_addressee_and_a3_tv(tmp_path):
+    """
+    BUG #2 (OBS-13c + A-3): Po SceneDiscourseGraph.build_discourse_topology zdanie bez słowa 'you'
+    otrzymuje fallback 0.80 z Kroku 4. W aktywnym ping-pongu Agent_A <-> Agent_B (lub czystej diadzie)
+    _compute_effective_target_confidence zwraca 0.92 (>= 0.90) i zachowuje A-3 Rejestr T-V,
+    natomiast izolowany fallback 0.80 bez lokalnej wymiany pozostaje wytłumiony (< 0.90).
+    """
+    sb = _build_synthetic_bible(tmp_path)
+    sb.data["relations"] = {
+        "Agent_A -> Agent_B": "Zwrot: 'pani Agent_B' (oficjalna relacja służbowa)",
+    }
+
+    # 1. Aktywny ping-pong bez słowa 'you' -> SD fallback 0.80 promowany do 0.92 (>= 0.90) + T-V
+    ev_a1 = pysubs2.SSAEvent(start=1000, end=2500, name="Agent_A", text="The cargo arrived before dawn.")
+    ev_b1 = pysubs2.SSAEvent(start=2600, end=4200, name="Agent_B", text="All containers passed inspection.")
+    ev_a2 = pysubs2.SSAEvent(start=4300, end=6000, name="Agent_A", text="Wait until the manifest is signed.")
+    ev_b2 = pysubs2.SSAEvent(start=6100, end=7800, name="Agent_B", text="The clerk is bringing the stamp now.")
+    ev_a3 = pysubs2.SSAEvent(start=7900, end=9800, name="Agent_A", text="That arrangement saves plenty of time.")
+    evs = [ev_a1, ev_b1, ev_a2, ev_b2, ev_a3]
+
+    SceneDiscourseGraph.build_discourse_topology(evs, series_bible=sb)
+    assert getattr(ev_a3, "target_confidence", 0.0) <= 0.85
+
+    tr = MultimodalTranslator(api_key="mock_k0", model="gemini-4-hydrogen", enable_verifier=False)
+    tr.series_bible = sb
+    tr.character_registry = {"Agent_A": "mężczyzna (postać)", "Agent_B": "kobieta (postać)"}
+    batch_events = [(i, ev, ev.text, "") for i, ev in enumerate(evs)]
+    prompt = tr._prepare_batch_prompt(batch_events=batch_events, history_context=[])
+    block5 = prompt.split("Kwestia [ID: 5]")[1]
+    assert "Adresat: Agent_B (FEMININE)" in block5
+    assert "Rejestr T-V (Agent_A -> Agent_B): pan/pani (pani Agent_B)" in block5
+
+    # 2. Izolowany fallback 0.80 bez lokalnej wymiany -> pozostaje 0.80 (< 0.90)
+    ev_isolated = pysubs2.SSAEvent(start=20000, end=22000, name="Agent_A", text="Nothing else remains to report.")
+    ev_isolated.target_speaker = "Agent_B"
+    ev_isolated.target_confidence = 0.80
+    poly_empty = {
+        "local_speakers": {"agent_a"},
+        "is_local_polylogue": False,
+        "immediate_other": "",
+        "immediate_other_word_count": 0,
+        "is_confirmed_ping_pong": False,
+        "is_third_party_interjection": False,
+        "is_direct_2p_qa_dyad": False,
+    }
+    assert _compute_effective_target_confidence(
+        ev_isolated,
+        "kobieta",
+        "Agent_B (Kobieta)",
+        poly_ctx=poly_empty,
+    ) == pytest.approx(0.80)
+
+
+@pytest.mark.unit
+def test_bug3_female_only_collective_labels_default_non_virile_without_bible():
+    """
+    BUG #3 (OBS-13b): Wyłącznie żeńskie zbiorowości (GIRLS, WOMEN, SISTERS, SIOSTRY)
+    domyślnie dają NON_VIRILE bez wymogu wpisu w SeriesBible, natomiast grupy mieszane/męskie/neutralne
+    (BROTHERS, CROWD, ALL) zachowują VIRILE.
+    """
+    assert _classify_collective_speaker_actor("GIRLS", None) == "NON_VIRILE"
+    assert _classify_collective_speaker_actor("WOMEN", None) == "NON_VIRILE"
+    assert _classify_collective_speaker_actor("SISTERS", None) == "NON_VIRILE"
+    assert _classify_collective_speaker_actor("SIOSTRY", None) == "NON_VIRILE"
+    assert _classify_collective_speaker_actor("GIRLS (255 Hz)", None) == "NON_VIRILE"
+    assert _classify_collective_speaker_actor("BROTHERS", None) == "VIRILE"
+    assert _classify_collective_speaker_actor("CROWD", None) == "VIRILE"
+    assert _classify_collective_speaker_actor("ALL", None) == "VIRILE"
+
+
+@pytest.mark.unit
+def test_bug4_c2_genre_tone_truncation_preserves_whole_words():
+    """
+    BUG #4 (C-2): Długie opisy setting_and_era (> 160 znaków) w _append_phase2_genre_tone_rule
+    są przycinane wyłącznie na granicy pełnego wyrazu z wielokropkiem (…).
+    """
+    long_era = (
+        "Współczesna Japonia przełomu wieków z rozbudowaną administracją rządową, "
+        "tajnymi wydziałami dochodzeniowymi i siecią powiązań między prowincjami Japonii Północnej"
+    )
+    assert len(long_era) > 160
+    trunc = _truncate_on_word_boundary(long_era, 160)
+    assert len(trunc) <= 160
+    assert trunc.endswith("…")
+    assert not trunc.endswith(" J…")
+
+    profile = EpisodeProfile(setting_and_era=long_era)
+    rule_out = _append_phase2_genre_tone_rule("", episode_profile=profile, active_sequence_str="")
+    assert "TON GATUNKU I EPOKI:" in rule_out
+    assert trunc in rule_out
+    assert "Japonii…" not in rule_out or "między prowincjami Japonii…" in rule_out
+    assert not rule_out.endswith(" J…).")
