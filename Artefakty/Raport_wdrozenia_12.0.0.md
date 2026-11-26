@@ -67,3 +67,26 @@
 - **`OBS-06`:** `RESOLVED IN CODE (12.0.0, H-3 threading.local() ref-counted dispatcher)` — wymaga weryfikacji produkcyjnej przy `max_workers_f2 >= 2`.
 - **`OBS-13a/b/c`:** `DEFERRED → 12.1.0` (`0 B` diffu w `scene_discourse.py` i `_resolve_line_addressee`).
 - **`KNOWN GAP` (`OPEN (non-blocking — awaiting prod benchmark)`):** `DEF-04`, `OBS-01`, `OBS-04`, `DEF-05`, `OBS-09`, `OBS-11`, `OBS-12`, `OBS-14`, `OBS-15` oraz wszystkie nowo wdrożone mechanizmy `12.0.0` (`A-1..H-3`, `G-1..G-2`, `F-1 --live`).
+
+---
+
+## 5. Hotfix `12.0.0a` (Domknięcie Audytu Konfrontacyjnego `12.0.0`)
+
+- **Baza startowa:** `1ebbea1` (`Standard 12.0.0`)
+- **Commity Hotfixu `12.0.0a`:** `db12547` (`fix(pipeline)`), `23290c7` (`test(pipeline)`), `HEAD` (`docs(release)`)
+- **Izolacja Z16 i dyskursu:** **`0 B` diffu** względem `365e260` i `1ebbea1` na wszystkich `29` plikach chronionych Z16, `scene_discourse.py`, `_resolve_line_addressee` oraz `client_pool_f1`/`client_pool_f2`.
+
+| Defekt | Moduł | Przyczyna źródłowa w `1ebbea1` | Naprawa w `12.0.0a` |
+|---|---|---|---|
+| `BUG #1` (`A-1`) | [translator.py](../translator.py) | `_filter_dialogue_audio_events` rozpakowywał wyłącznie 4-krotki i rzucał `IndexError` na produkcyjnych 2-krotkach `(b_id, SSAEvent)` z linii `4990` | Obsługa 2/3/4-krotek z ekstrakcją tagów ASS i zwrotem oryginalnego kształtu elementu |
+| `BUG #2` (`F-1`) | [translator.py](../translator.py) | `_consolidate_phase2_batches` zapisywał `scene_diagnosis` jako `str`, blokując sekcję diagnozy i `elif scene_summary` w `verifier.py` | Budowa strukturalnego `dict` (`dramatic_context`, `dominant_tone`, ...) oraz wstrzyknięcie aktywnego tonu `B-2` z `episode_profile` |
+| `BUG #3` (`F-1` A/B) | [verify_f2_consolidation_ab.py](../tools/verify_f2_consolidation_ab.py) | Nieistniejący klucz `payload["items"]`, fallback na `refined_pl` + placeholdery, podwójna selekcja oraz zerowe `tok_a`/`tok_b` w `--live` | Pełna rekonstrukcja z `scene_discourse` + `line_evolution` + `phase1_batch` (`8 -> 3` wywołania, `112` linii w *Chii Fuyo-07*) + sumowanie `_thread_local.last_batch_token_usage` |
+| `BUG #4` (`G-1`) | [translator.py](../translator.py) | Odczyt nieistniejącego `self.series_bible.series_title` powodował fallback na nazwę pliku wideo i `0` trafień `require_same_series=True` | Priorytetowy odczyt `self.series_bible.anime_title` z fallbackiem na `self.series_title` i nazwę pliku |
+| `BUG #5` (`F-3`) | [translator.py](../translator.py) | Surowe `.upper()` zamieniało tagi inline `{\i1}`, `{\b1}`, `\N`, `\n`, `\h` na wielkie litery | Helper `_uppercase_preserving_ass_tags` podnoszący wielkość liter wyłącznie poza `{...}` i `\[Nnh]` |
+
+### Wyniki bramek po Hotfixie `12.0.0a`
+- `pytest tests/test_standard_12_0_0.py -v`: **24 / 24 PASSED** (w tym `test_bug1..test_bug5`).
+- `pytest tests/ -q`: **496 passed**.
+- `pytest test_system.py -m "not slow and not network" -k "not test_batch_coalescence_ssot_prompt_and_cot_streamlining_guard" -q`: **70 passed, 154 deselected**.
+- Bramki statyczne i audyt: `verify_purity.py` **12/12 PASS**, `verify_8_fixes.py` **8/8 PASS**, `verify_12_fixes.py` **12/12 PASS**, `verify_ultimate_pipeline.py` **15/15 PASS**, `audit_diff.ps1 -BaseRef "365e260"` **VICTORY CONFIRMED**.
+- Dry-run `verify_f2_consolidation_ab.py --events logs/chii_fuyo_ASW__Chii_Fuyo_-_07__1080p_HEVC__AB658E9E__extracted_20261125_223445_events.jsonl`: **Wariant A: `8 wywołań F2, 112 linii`** vs **Wariant B: `3 wywołania F2, 112 linii`** (`~0.4300 PLN` szacowanego spadku kosztu promptu).

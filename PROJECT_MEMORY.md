@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-26 — Standard 12.0.0 Etap 1 wdrożony na gałęzi `main`)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 12.0.0 — Architektura Jakości Stylistycznej, Zero-Cache SSOT, Konsolidacja F2 i Pętla Uczenia (Etap 1: A-1/2/3, B-1/2/3, D-1/2, E-1/2, F-1/2/3, G-1/2, H-3)`
-- **Commit certyfikacji kodu:** `bc5c5f2` (Commit 5/6 Standardu `12.0.0`, baza startowa: `365e260`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-26 — Hotfix 12.0.0a na bazie Standardu 12.0.0)
+- **Aktualny certyfikowany standard produkcyjny:** `Hotfix 12.0.0a (Domknięcie Audytu Konfrontacyjnego 12.0.0 — naprawa BUG #1..#5: A-1 2-tuple, F-1 scene_diagnosis, A/B harness, G-1 anime_title, F-3 ASS tags)`
+- **Commit certyfikacji kodu:** `23290c7` (Commit 2/3 Hotfixu `12.0.0a`, baza `1ebbea1` / `365e260`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -59,17 +59,21 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
   * Commit 3 (`93b1f5c`): `perf(prompts): 12.0.0 [3/6] — Zero-Cache SSOT dedup, episode SIGN dedup & stylistic F2 scoring (F-2/C-1, F-3, D-2)`
   * Commit 4 (`8f0c0bc`): `perf(phase2): 12.0.0 [4/6] — consolidated F2 batches, thread-safe retry observer (OBS-06) & A/B harness (F-1, H-3)`
   * Commit 5 (`bc5c5f2`): `feat(learning): 12.0.0 [5/6] — TM quality_tier auto-ingestion & user-edit diff CLI (G-1, G-2)` — **NOWY COMMIT CERTYFIKACJI KODU**
-  * Commit 6 (`HEAD`): `docs(release): Standard 12.0.0 — PROJECT_MEMORY (ARB-081), Raport_wdrozenia_12.0.0 & link hygiene`
-- **Status 12.0.0:** `CERTIFIED IN TESTS / AWAITING LIVE PROD & F-1 API A/B BENCHMARK (2026-11-26)`
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a`; **bezwzględne 0 B diffu** na wszystkich 29 plikach chronionych Z16 oraz `scene_discourse.py` względem `365e260` i `6f1b310`)
-- **Stan metryk:** `491 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `561 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: ETAP 1 STANDARD 12.0.0 ZWERYFIKOWANY (491/491 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-12.0.0:** Wszelkie przyszłe prace rozwojowe startują z baseline'u `Standard 12.0.0` (`365e260..HEAD`) i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard `12.0.0`: czyste sygnały akustyczne i Whisper/StyleMatrix `A-1/2/3`, RAM strip honoryfikatywów i homoglify 1–4 znaków `E-1/2`, most stylistyczny Profilera i ton sekwencji `B-1/2/3 + D-1`, Zero-Cache SSOT dedup `F-2/C-1`, episode SIGN dedup `F-3`, scoring stylistyczny F2 `D-2`, skonsolidowane grupy F2 `F-1` z bezpiecznym przełącznikiem `AVT_CONSOLIDATE_F2=0`, thread-safe observer F2 `H-3 / OBS-06`, TM `quality_tier` `G-1` oraz CLI `tools/learn_from_edits.py` `G-2`).
+  * Commit 6 (`1ebbea1`): `docs(release): Standard 12.0.0 — PROJECT_MEMORY (ARB-081), Raport_wdrozenia_12.0.0 & link hygiene`
+- **Commity Mikro-Hotfixu 12.0.0a:**
+  * Commit 1 (`db12547`): `fix(pipeline): Hotfix 12.0.0a — BUG #1 (A-1 2-tuple), BUG #2 (F-1 scene_diagnosis), BUG #3 (A/B harness), BUG #4 (G-1 anime_title), BUG #5 (F-3 ASS tags)`
+  * Commit 2 (`23290c7`): `test(pipeline): Hotfix 12.0.0a — regression tests for BUG #1..#5 in tests/test_standard_12_0_0.py` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`HEAD`): `docs(release): Hotfix 12.0.0a — update PROJECT_MEMORY (ARB-081) & Raport_wdrozenia_12.0.0`
+- **Status 12.0.0 + 12.0.0a:** `CERTIFIED IN TESTS / READY FOR LIVE A/B (F-1) & 2-EPISODE PROD BENCHMARK (2026-11-26)`
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a`; **bezwzględne 0 B diffu** na wszystkich 29 plikach chronionych Z16 oraz `scene_discourse.py` względem `365e260` i `1ebbea1`)
+- **Stan metryk:** `496 passed` w `tests/` oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `566 passed` fast unit/integration + `154 deselected` slow/network), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: HOTFIX 12.0.0a ZWERYFIKOWANY (496/496 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-12.0.0a:** Wszelkie przyszłe prace rozwojowe startują z baseline'u `Hotfix 12.0.0a` (`365e260..HEAD`) i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard `12.0.0` + Hotfix `12.0.0a`: obsługa 2-krotek w `_filter_dialogue_audio_events`, strukturalny słownik `scene_diagnosis` + `B-2` w `_consolidate_phase2_batches`, pełna rekonstrukcja schematu `events.jsonl` i zliczanie tokenów `--live` w `verify_f2_consolidation_ab.py`, `series_bible.anime_title` w `_auto_ingest_episode_to_tm` oraz `_uppercase_preserving_ass_tags`).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (`491 passed` w `tests/`)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (`496 passed` w `tests/`)
   * Audyt śledczy diffu: `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -BaseRef "365e260" -ForbiddenTerms "<lista>"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -937,7 +941,13 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   - **`OBS-06` (`NISKI`):** `RESOLVED IN CODE (12.0.0, H-3 threading.local() ref-counted dispatcher)` — wymaga potwierdzenia w równoległym przebiegu produkcyjnym (`max_workers_f2 >= 2`).
   - **`OBS-13a/b/c` (`ŚREDNI`):** `DEFERRED → 12.1.0` — płeć/liczba adresata i chóru celowo zamrożona (`0 B` diffu w `scene_discourse.py` oraz `_resolve_line_addressee`).
   - **`KNOWN GAP` (pełna lista):** **`DEF-04`, `OBS-01`, `OBS-04`, `DEF-05`**, otwarte obserwacje **`OBS-09`, `OBS-11`, `OBS-12`, `OBS-14`, `OBS-15`** oraz nowe mechanizmy **`12.0.0` (`A-1..H-3`)** i benchmark **`F-1 --live`** mają status **`OPEN (non-blocking — awaiting prod benchmark)`**.
-- **Testy regresyjne:** `tests/test_standard_12_0_0.py` (**19 / 19 PASSED**), łącznie `tests/` **491 / 491 PASSED**, `test_system.py` **70 passed, 154 deselected**, `4/4` bramki PASS oraz dokumentacja [Raport_wdrozenia_12.0.0.md](Artefakty/Raport_wdrozenia_12.0.0.md).
+- **Testy regresyjne:** `tests/test_standard_12_0_0.py` (**24 / 24 PASSED**: `19` z `12.0.0` + `5` z `12.0.0a`), łącznie `tests/` **496 / 496 PASSED**, `test_system.py` **70 passed, 154 deselected**, `4/4` bramki PASS oraz dokumentacja [Raport_wdrozenia_12.0.0.md](Artefakty/Raport_wdrozenia_12.0.0.md).
+- **Mikro-Hotfix `12.0.0a` (domknięcie audytu konfrontacyjnego `12.0.0` — `db12547`, `23290c7`, `HEAD`):**
+  1. **`BUG #1` (`A-1`, `translator.py`):** `_filter_dialogue_audio_events` obsługuje produkcyjne 2-krotki `(b_id, SSAEvent)`, 3-krotki i 4-krotki bez `IndexError`, zwracając oryginalny kształt krotek (`prosody_tags` i `speaker_tags` F0 aktywne w produkcji).
+  2. **`BUG #2` (`F-1`, `translator.py`):** `_consolidate_phase2_batches` buduje strukturalny słownik `scene_diagnosis` (`dramatic_context`, `dominant_tone`, `dialogue_flow`, `power_dynamic`, ...) oraz dołącza aktywne sekwencje dramatyczne `B-2` bez naruszania chronionego `verifier.py` (`0 B` diffu).
+  3. **`BUG #3` (`F-1` A/B harness, `tools/verify_f2_consolidation_ab.py`):** rekonstrukcja pełnych paczek F1 z `scene_discourse` + `line_evolution` + `phase1_batch` (`112/112` kandydatów w logu *Chii Fuyo-07*, `8 -> 3` wywołania F2 bez podwójnej selekcji i bez placeholderów) oraz zliczanie rzeczywistych tokenów z `DialogueVerifier._thread_local.last_batch_token_usage` w trybie `--live`.
+  4. **`BUG #4` (`G-1`, `translator.py`):** `_auto_ingest_episode_to_tm` pobiera kanoniczny tytuł serii z `self.series_bible.anime_title`, umożliwiając trafienia `require_same_series=True` w kolejnych odcinkach.
+  5. **`BUG #5` (`F-3`, `translator.py`):** dodano `_uppercase_preserving_ass_tags`, dzięki czemu wymuszenie `ALL CAPS` na `SIGN` oszczędza inline tagi `{...}` oraz `\N`, `\n`, `\h`.
 
 
 
