@@ -4,9 +4,10 @@
 - **Status wydania:** **`CERTIFIED IN TESTS / AWAITING AUDIT`**
 - **Gałąź / Baza startowa:** `main`, baza startowa `d16b869` (`12.2.1 + 12.2.1a CLOSED`)
 - **Model produkcyjny:** `gemini-4-hydrogen` (`D-1 Flash F1/F2 — REJECTED BY OPERATOR`, `AVT_CONSOLIDATE_F2="0"`)
-- **Commity atomowe (`2/2`):**
+- **Commity atomowe (`2/2` + `12.2.2a`):**
   1. `193810f` — `feat(logger): 12.2.2 [1/2] — U1–U8 observability upgrade (F2 score breakdown, line_ids/rules/A-1/A-3/C-1 telemetry, f2_raw/post_f2/EQG diffs, whisper_tags/acoustics batch_id, atomic checkpoint, A/B off-by-one fix)`
-  2. `HEAD` — `test(logger): 12.2.2 [2/2] — non-tautological U1–U8 observability tests + PROJECT_MEMORY & Raport_wdrozenia_12.2.2`
+  2. `2611a3a` — `test(logger): 12.2.2 [2/2] — non-tautological U1–U8 observability tests + PROJECT_MEMORY & Raport_wdrozenia_12.2.2`
+  3. `HEAD` — `fix(12.2.2a): propagate A-1/C-1 notes from F2 selector to line_evolution and match real C-1 tags`
 - **Izolacja `Z16`, `DEF-02` i brak zmian tłumaczeniowych (`0 B` diffu względem `d16b869`):**
   - Wszystkie `30` plików chronionych Z16 ([avt_linter.py](../avt_linter.py), [verifier.py](../verifier.py), [client_factory.py](../client_factory.py), [rules.py](../rules.py), [test_system.py](../test_system.py), [verify_purity.py](../verify_purity.py), [pricing_guard.py](../pricing_guard.py), [main.py](../main.py), [context_cache.py](../context_cache.py), `series_memory/.onomastic_lexicon.json`, `series_memory/*_bible.json`), [scene_discourse.py](../scene_discourse.py), [series_memory.py](../series_memory.py), [profiler.py](../profiler.py), [sign_detector.py](../sign_detector.py) oraz metoda `_resolve_line_addressee` zachowują **`0 B` zmian** w historii commitów `d16b869..HEAD`.
   - **Świadoma decyzja Operatora (odrzucenie `Z16-amendment #17`):** `thoughts` rejestrowane wyłącznie w F1 ([translator.py](../translator.py)), bez dotykania `verifier.py` ani `pricing_guard.py`.
@@ -54,3 +55,23 @@ Uruchomiono `load_phase2_items_from_events` w trybie offline na `3` najnowszych 
 
 1. **Log paczki 1 z luką FBF (`ID 71` skompresowane między `ID 70` i `ID 72`):** zrekonstruowano `54` linie w paczce `1`, mapując `orig_idx=70 -> local_id=13`, **`orig_idx=72 -> local_id=14`** oraz `orig_idx=73 -> local_id=15` (bez przesunięcia `off-by-one` na `15` w starszych logach bez `line_ids`).
 2. **Dwa pozostałe logi wielopaczkowe (`6` oraz `8` paczek produkcyjnych):** pełna rekonstrukcja bez błędów schematu (`0` wyjątków; `orig_idx=72` mapowane spójnie na oczekiwane `local_id` wewnątrz paczki `1`: odpowiednio `13` oraz `16`).
+
+---
+
+## 4. Suplement Mikro-Hotfix `12.2.2a` (`HEAD` — `BUG #1 w U2`)
+
+Audyt powdrożeniowy `12.2.2` ujawnił `1` lukę propagacji metadanych w `U2` (`BUG #1`), zamkniętą pojedynczym atomowym commitem z **`0 B` diffu** we wszystkich `30` plikach Z16, `pipeline_logger.py`, `tools/verify_f2_consolidation_ab.py`, `scene_discourse.py`, `series_memory.py`, `profiler.py`, `sign_detector.py` oraz `translator.py:_resolve_line_addressee`:
+
+- **Przyczyna (`BUG #1`):**
+  1. `_select_hydrogen_phase2_candidates` tworzy płytkie kopie `it_copy = dict(orig_it)` i dopisuje realne tagi par `A-1` (`[Para spójności z #...]`) oraz kontekst sąsiadów `C-1` (`_attach_phase2_readonly_neighbor_context`) wyłącznie do `it_copy["notes"]`, przez co późniejszy zapis `log_line_evolution` (czytający z `pass1_items`) widział `a1_pair_tag=None` i `c1_neighbors=None`.
+  2. `_extract_line_observability_meta` szukał wyłącznie wzorca `[Kontekst sąsiedni...]`, pomijając realne znaczniki `[Poprzednia #... (read-only...)]` i `[Następna #... (read-only...)]`.
+- **Wdrożone rozwiązanie w [translator.py](../translator.py):**
+  1. Bezpośrednio po `_attach_phase2_readonly_neighbor_context` w `_select_hydrogen_phase2_candidates` (`L7941–7946`) zsynchronizowano `sel_copy["notes"]` do osobnego pola pomocniczego `orig_it["f2_effective_notes"]` (bez nadpisywania bazowego `orig_it["notes"]`).
+  2. W `_extract_line_observability_meta` (`L3690–3707`) połączono oba pola (`notes` + `f2_effective_notes`), zastosowano deduplikowane `re.findall` połączone `" | "` dla `a1_pair_tag` oraz rozszerzono `c1_neighbors` o dopasowanie realnych znaczników `[Poprzednia #... (read-only...)]` / `[Następna #... (read-only...)]` przy zachowaniu zgodności wstecznej z `[Kontekst sąsiedni...]`.
+- **Weryfikacja `12.2.2a` (`0.00 PLN`):**
+  - **[test_standard_12_2_2.py](../tests/test_standard_12_2_2.py):** rozszerzone z `8` do **`9 / 9 PASSED`** (`test_u2_12_2_2a_e2e_selector_a1_and_c1_tags_reach_line_evolution` bez ręcznego wstrzykiwania `"Kontekst sąsiedni"`).
+  - **Regresja `12.2.x` + [test_flight_recorder.py](../tests/test_flight_recorder.py):** **`32 passed in 48.78s`**.
+  - **Pełny katalog `tests/`:** **`538 passed in 232.16s (0:03:52)`**.
+  - **`test_system.py` (`-m "not slow and not network" -k "not test_batch_coalescence_ssot_prompt_and_cot_streamlining_guard"`):** **`70 passed, 154 deselected in 21.73s`**.
+  - **`4/4` bramki CI/CD:** `verify_purity.py` (`12/12`), `verify_8_fixes.py` (`8/8`), `verify_12_fixes.py` (`12/12`), `verify_ultimate_pipeline.py` (`15/15`).
+  - **Audyt śledczy:** `tools/check_z16_lock.ps1 -BaseRef "d16b869..HEAD"` (`PASS`) oraz `audit_diff.ps1 -BaseRef "2611a3a"` (`VICTORY CONFIRMED`).

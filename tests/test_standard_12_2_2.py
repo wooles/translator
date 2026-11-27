@@ -954,3 +954,179 @@ def test_u8_verify_f2_consolidation_ab_no_off_by_one_on_fbf_gap(tmp_path: Path):
     assert next(it["id"] for it in items_l if it["orig_idx"] == 72) == 14
     assert next(it["id"] for it in items_l if it["orig_idx"] == 112) == 54
     assert 14 in out_legacy[1]["orig_selected_ids"]
+
+
+# ------------------------------------------------------------------------------
+# U2 (12.2.2a BUG #1): E2E propagation of real selector A-1 & C-1 tags to events
+# ------------------------------------------------------------------------------
+@pytest.mark.unit
+def test_u2_12_2_2a_e2e_selector_a1_and_c1_tags_reach_line_evolution(tmp_path: Path):
+    tr = _make_translator(tmp_path)
+    tr.flight_recorder = EpisodeFlightRecorder(anime_slug="syn_u2_1222a", filename="ep01", trace_dir=tmp_path)
+    tr.verifier.system_prompt = "lean"
+    tr.verifier.model = "gemini-4-hydrogen"
+    tr._audit_batch_context_cache = lambda *a, **kw: None
+    tr.scene_cuts_ms = []
+
+    items = []
+    # #1..#3: high-risk filler lines (score 65)
+    for i in range(1, 4):
+        items.append({
+            "id": i,
+            "orig_idx": i,
+            "start_ms": i * 4000,
+            "end_ms": i * 4000 + 800,
+            "speaker": f"spk_hi_{i}",
+            "speaker_name": f"spk_hi_{i}",
+            "en": "We must investigate this soon.",
+            "pl": "Musimy zbadać tę sprawę wkrótce.",
+            "notes": "",
+            "speaker_confidence": 0.80,
+            "target_confidence": 1.0,
+            "ambiguity_note": "check",
+        })
+
+    # #4: unselected short neighbor directly preceding #5 (< 3500 ms gap, no scene cut)
+    items.append({
+        "id": 4,
+        "orig_idx": 4,
+        "start_ms": 18000,
+        "end_ms": 18800,
+        "speaker": "mowca_b",
+        "speaker_name": "mowca_b",
+        "en": "Sure.",
+        "pl": "Jasne.",
+        "notes": "",
+        "speaker_confidence": 1.0,
+        "target_confidence": 1.0,
+    })
+
+    # #5: A-1 split head with high editorial score (typo + low confidence -> score 70)
+    items.append({
+        "id": 5,
+        "orig_idx": 5,
+        "start_ms": 19200,
+        "end_ms": 20200,
+        "speaker": "mowca_a",
+        "speaker_name": "mowca_a",
+        "en": "Even if we risk everything today,",
+        "pl": "Nawet jeśli podejmiemy najibardziej ryzykowne kroki,",
+        "notes": "",
+        "speaker_confidence": 0.80,
+        "target_confidence": 1.0,
+    })
+
+    # #6: A-1 split continuation (lowercase continuation, low score 20 -> pulled as partner)
+    items.append({
+        "id": 6,
+        "orig_idx": 6,
+        "start_ms": 20500,
+        "end_ms": 21500,
+        "speaker": "mowca_a",
+        "speaker_name": "mowca_a",
+        "en": "we will reach the gate before dawn.",
+        "pl": "dotrzemy pod bramę jeszcze przed świtem.",
+        "relation_tag": "ally",
+        "notes": "",
+        "speaker_confidence": 1.0,
+        "target_confidence": 1.0,
+    })
+
+    # #7: unselected short neighbor directly following #6 (< 3500 ms gap, no scene cut)
+    items.append({
+        "id": 7,
+        "orig_idx": 7,
+        "start_ms": 21900,
+        "end_ms": 22700,
+        "speaker": "mowca_b",
+        "speaker_name": "mowca_b",
+        "en": "Understood.",
+        "pl": "Rozumiem.",
+        "notes": "",
+        "speaker_confidence": 1.0,
+        "target_confidence": 1.0,
+    })
+
+    # #8..#11: high-risk filler lines (score 65) so #6 starts outside initial top-8 and pairs via A-1
+    for i in range(8, 12):
+        items.append({
+            "id": i,
+            "orig_idx": i,
+            "start_ms": (i + 3) * 4000,
+            "end_ms": (i + 3) * 4000 + 800,
+            "speaker": f"spk_hi_{i}",
+            "speaker_name": f"spk_hi_{i}",
+            "en": "We must verify the perimeter now.",
+            "pl": "Musimy sprawdzić cały teren teraz.",
+            "notes": "",
+            "speaker_confidence": 0.80,
+            "target_confidence": 1.0,
+            "ambiguity_note": "check",
+        })
+
+    # #12..#14: zero-score filler lines so len(pass1_items) == 14 > 10
+    for i in range(12, 15):
+        items.append({
+            "id": i,
+            "orig_idx": i,
+            "start_ms": (i + 4) * 5000,
+            "end_ms": (i + 4) * 5000 + 800,
+            "speaker": f"spk_lo_{i}",
+            "speaker_name": f"spk_lo_{i}",
+            "en": "Okay.",
+            "pl": "Dobrze.",
+            "notes": "",
+            "speaker_confidence": 1.0,
+            "target_confidence": 1.0,
+        })
+
+    tr.verifier.verify_batch = lambda **kw: [
+        RefinedLine(id=it["id"], refined_pl=it["pl"], changes_made="Zweryfikowano.")
+        for it in kw["batch_items"]
+    ]
+
+    phase1_data = {
+        "b_idx": 1,
+        "pass1_items": items,
+        "untranslated_in_batch": [],
+        "scene_desc": "Scena A-1 + C-1",
+        "batch_response": None,
+        "lookback_history": [],
+        "lookahead_events": [],
+        "scoped_series_bible_str": "",
+        "user_feedback_str": "",
+        "glossary_str": "",
+        "episode_profile_str": "",
+        "manga_canon_str": "",
+        "batch_glossary_items": [],
+        "speakers_on_ty": set(),
+        "scene_has_first_name_vocative": False,
+        "is_ass": True,
+        "pbar": _DummyPbar(),
+        "combined_glossary": {},
+        "all_user_rules": [],
+        "episode_profile": None,
+        "total_batches": 6,
+    }
+    tr._process_phase2_only(phase1_data)
+
+    events = _read_jsonl(tr.flight_recorder.jsonl_path)
+    line_evts = {e["line_id"]: e["payload"] for e in events if e["stage"] == "line_evolution"}
+
+    # Selected split anchor #5 receives both real A-1 pair tag and preceding read-only neighbor #4
+    meta_5 = line_evts[5]["notes_meta"]
+    assert line_evts[5]["f2_selected"] is True
+    assert "[Para spójności z #6" in (meta_5["a1_pair_tag"] or "")
+    assert "[Poprzednia #4 (read-only" in (meta_5["c1_neighbors"] or "")
+
+    # Selected split partner #6 receives both real A-1 pair tag and following read-only neighbor #7
+    meta_6 = line_evts[6]["notes_meta"]
+    assert line_evts[6]["f2_selected"] is True
+    assert "[Para spójności z #5" in (meta_6["a1_pair_tag"] or "")
+    assert "[Następna #7 (read-only" in (meta_6["c1_neighbors"] or "")
+
+    # Unselected line #4 keeps clean null A-1/C-1 observability fields
+    assert line_evts[4]["f2_selected"] is False
+    assert line_evts[4]["notes_meta"]["a1_pair_tag"] is None
+    assert line_evts[4]["notes_meta"]["c1_neighbors"] is None
+

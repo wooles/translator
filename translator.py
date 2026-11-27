@@ -3689,14 +3689,18 @@ def _write_json_atomic(target_path: Path, payload: Dict[str, Any]) -> None:
 
 def _extract_line_observability_meta(item: Dict[str, Any]) -> Dict[str, Any]:
     """Deterministycznie wyciąga ustrukturyzowane znaczniki A-1 / A-3 / C-1 / OBS-13c linii dialogowej."""
-    notes_str = str(item.get("notes") or "")
-    a1_match = re.search(r"\[Para spójności z #[^\]]+\]", notes_str)
+    notes_str = f"{item.get('notes') or ''} {item.get('f2_effective_notes') or ''}".strip()
+    a1_hits = list(dict.fromkeys(re.findall(r"\[Para spójności z #[^\]]+\]", notes_str)))
     a3_match = re.search(r"\[Zwrot T-V:\s*([^\]]+)\]", notes_str)
-    c1_match = re.search(r"\[Kontekst sąsiedni[^\]]*\]", notes_str)
+    c1_hits = re.findall(
+        r"\[(?:Poprzednia|Następna)\s+#\d+\s+\(read-only[^\]]*\]|\[Kontekst sąsiedni[^\]]*\]",
+        notes_str,
+    )
+    c1_hits = list(dict.fromkeys(c1_hits))
     return {
-        "a1_pair_tag": a1_match.group(0) if a1_match else None,
+        "a1_pair_tag": " | ".join(a1_hits) if a1_hits else None,
         "a3_tv_hint": a3_match.group(1).strip() if a3_match else None,
-        "c1_neighbors": c1_match.group(0) if c1_match else None,
+        "c1_neighbors": " | ".join(c1_hits) if c1_hits else None,
         "obs13c_target_conf": item.get("target_confidence"),
         "obs13c_suppressed": bool(item.get("raw_addressee_hypothesis") and not item.get("addressee")),
         "scene_tone": item.get("active_scene_tone"),
@@ -7938,6 +7942,13 @@ class MultimodalTranslator:
             selected_copies=selected_copies,
             cuts_ms=getattr(self, "scene_cuts_ms", None),
         )
+        orig_by_id = {
+            it.get("id"): it for it in pass1_items if it.get("id") is not None
+        }
+        for sel_copy in selected_copies:
+            sel_id = sel_copy.get("id")
+            if sel_id in orig_by_id:
+                orig_by_id[sel_id]["f2_effective_notes"] = str(sel_copy.get("notes") or "")
         return selected_copies
 
     def _enter_f2_retry_observer(self, b_idx: int) -> Tuple[Any, Any]:
