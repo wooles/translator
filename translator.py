@@ -3707,6 +3707,18 @@ def _extract_line_observability_meta(item: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _compute_adaptive_f2_episode_cap(
+    total_lines: Optional[int],
+    base_cap: int = 115,
+    max_cap: int = 170,
+    target_ratio: float = 0.32,
+) -> int:
+    """Oblicza adaptacyjny sufit liczby linii kierowanych do Fazy 2 dla długich odcinków."""
+    if not total_lines or int(total_lines) <= 0:
+        return int(base_cap)
+    return max(int(base_cap), min(int(max_cap), int(float(target_ratio) * int(total_lines))))
+
+
 class ContextCacheDiscountError(RuntimeError):
     """Zgłaszany w przypadku braku potwierdzenia rabatu Context Cache na Paczce 0."""
     pass
@@ -7584,6 +7596,7 @@ class MultimodalTranslator:
             "all_user_rules": all_user_rules,
             "episode_profile": episode_profile,
             "total_batches": len(batches) if batches else 1,
+            "total_lines": sum(len(b) for b in batches) if batches else len(pass1_items),
         }
         return phase1_data
 
@@ -8034,7 +8047,9 @@ class MultimodalTranslator:
 
         sorted_bidxs = sorted(phase1_outputs.keys())
         total_batches_f2 = max(1, len(sorted_bidxs))
-        episode_remaining = 115
+        total_ep_lines = sum(len(phase1_outputs[b].get("pass1_items") or []) for b in sorted_bidxs)
+        adaptive_cap_cons = _compute_adaptive_f2_episode_cap(total_ep_lines)
+        episode_remaining = adaptive_cap_cons
         selected_stream: List[Tuple[int, Dict[str, Any], Dict[str, Any]]] = []
 
         for b_idx in sorted_bidxs:
@@ -8043,7 +8058,7 @@ class MultimodalTranslator:
             cands = self._select_hydrogen_phase2_candidates(
                 p1_items,
                 total_batches=total_batches_f2,
-                episode_line_cap=115,
+                episode_line_cap=adaptive_cap_cons,
             )
             if episode_remaining <= 0:
                 cands = []
@@ -8333,6 +8348,8 @@ class MultimodalTranslator:
             v_prompt_len = len(getattr(self.verifier, "system_prompt", ""))
             is_h_lean_f2 = is_gemini_4_or_hydrogen_model(v_model_name) and v_prompt_len < 60000
             total_batches_f2 = max(1, int(phase1_data.get("total_batches", 6) or 6))
+            total_lines_f2 = int(phase1_data.get("total_lines") or 0)
+            adaptive_cap_f2 = _compute_adaptive_f2_episode_cap(total_lines_f2)
 
             refined_lines: List[RefinedLine] = []
             if skip_verifier_call:
@@ -8340,7 +8357,11 @@ class MultimodalTranslator:
                 verifier_batch_items = refined_lines
             else:
                 verifier_batch_items = (
-                    self._select_hydrogen_phase2_candidates(pass1_items, total_batches=total_batches_f2)
+                    self._select_hydrogen_phase2_candidates(
+                        pass1_items,
+                        total_batches=total_batches_f2,
+                        episode_line_cap=adaptive_cap_f2,
+                    )
                     if is_h_lean_f2
                     else pass1_items
                 )
