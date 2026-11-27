@@ -503,3 +503,84 @@ def test_obs23_semideterministic_f1_announcement_rule_and_f2_priority_scoring(tm
     sel_ids = {it["id"] for it in selected}
     assert 85 in sel_ids
     assert 93 in sel_ids
+
+
+@pytest.mark.unit
+def test_obs23_12_2_1a_false_positive_protection():
+    """
+    Hotfix 12.2.1a (BUG #1 + BUG #2): Eliminuje fałszywe alarmy na rzeczownikach '-nienie',
+    wyrazach 'lilie'/'Szszsz', imionach z powtórzoną sylabą, zwykłych rozmowach z 'new students'
+    oraz planszach ekranowych is_sign=True, zachowując detekcję realnych defektów (ID 85, ID 93).
+    """
+    # BUG #1: rzeczowniki -nienie, lilie/onomatopeje i fikcyjne imiona z powtórzoną sylabą -> False
+    for valid_pl in (
+        "To przyniesie uwolnienie.",
+        "Zachowam to wspomnienie na zawsze.",
+        "Proszę o krótkie wyjaśnienie tej sprawy.",
+        "Nie skazuj go na zapomnienie.",
+        "Dostał wreszcie wymarzone zatrudnienie.",
+        "Lilie białe jak śnieg!",
+        "Szszsz...",
+        "Momoka?",
+        "Kikiko, gdzie byłeś?",
+        "Lulu też tu jest.",
+    ):
+        assert _detect_polish_typo_anomaly(valid_pl) is False, f"False positive on: {valid_pl}"
+
+    # Pozytywne literówki nadal łapane
+    assert _detect_polish_typo_anomaly("To najibardziej złożony przypadek.") is True
+    assert _detect_polish_typo_anomaly("Przecież jesterem na miejscu.") is True
+
+    # BUG #2: zwykła rozmowa ze zwrotem 'new students' -> False
+    assert (
+        _detect_official_announcement_line(
+            "The situation changed since the new students arrived.",
+            "Sytuacja mocno się zmieniła, odkąd pojawili się nowi uczniowie.",
+        )
+        is False
+    )
+
+    # BUG #2 + BUG #1: plansze ekranowe (is_sign=True) w _score_phase2_editorial_risk -> score == 0
+    score_sign, crit_sign = MultimodalTranslator._score_phase2_editorial_risk(
+        {
+            "en": "WELCOME, STUDENTS — OPENING CEREMONY",
+            "pl": "WITAJCIE, UCZNIOWIE",
+            "is_sign": True,
+            "speaker_confidence": 1.0,
+            "target_confidence": 1.0,
+        }
+    )
+    assert score_sign == 0 and crit_sign is False
+
+    score_sign_typo, _ = MultimodalTranslator._score_phase2_editorial_risk(
+        {
+            "en": "BANNER",
+            "pl": "NAJIBARDZIEJ",
+            "is_sign": True,
+            "speaker_confidence": 1.0,
+            "target_confidence": 1.0,
+        }
+    )
+    assert score_sign_typo == 0
+
+    # Docelowe ID 85 i ID 93 nadal dostają wysoką wagę (odpowiednio >= 30 i >= 40)
+    sc_85, _ = MultimodalTranslator._score_phase2_editorial_risk(
+        {
+            "en": "Next up, we'll hear from the representative of the new students.",
+            "pl": "Teraz wysłuchamy przedstawiciela nowych uczniów.",
+            "is_sign": False,
+            "speaker_confidence": 1.0,
+            "target_confidence": 1.0,
+        }
+    )
+    sc_93, _ = MultimodalTranslator._score_phase2_editorial_risk(
+        {
+            "en": "That was fair.",
+            "pl": "To było najibardziej sprawiedliwe.",
+            "is_sign": False,
+            "speaker_confidence": 1.0,
+            "target_confidence": 1.0,
+        }
+    )
+    assert sc_85 >= 30
+    assert sc_93 >= 40

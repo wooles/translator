@@ -3,10 +3,11 @@
 - **Data wydania:** `2026-11-27`
 - **Gałąź / Baza startowa:** `main`, baza startowa `53751a4` (`12.2.0b` + [check_z16_lock.ps1](../tools/check_z16_lock.ps1))
 - **Model produkcyjny:** `gemini-4-hydrogen` (`D-1 Flash F1/F2 — REJECTED BY OPERATOR`, `AVT_CONSOLIDATE_F2="0"`)
-- **Commity atomowe (`3/3`):**
+- **Commity atomowe (`3/3` + `12.2.1a`):**
   1. `e06c224` — `fix(pipeline): 12.2.1 [1/3] — OBS-19 + OBS-20 (typografia F2: kropki po kursywie i wielowierszowa kursywa)`
   2. `05798bc` — `fix(pipeline): 12.2.1 [2/3] — OBS-21 + OBS-22 (guard '/' w rejestrze/kolektywach + glosariusz i filtr bliskości Sign OCR)`
-  3. `HEAD` — `fix(pipeline): 12.2.1 [3/3] — OBS-23 (priorytet catchphrases, scoring F2 literówek/zapowiedzi) + tests + docs`
+  3. `40053a2` — `fix(pipeline): 12.2.1 [3/3] — OBS-23 (priorytet catchphrases, scoring F2 literówek/zapowiedzi) + tests + docs`
+  4. `HEAD` — `fix(12.2.1a): eliminate false positives in OBS-23 typo & announcement F2 detectors + sync 12.2.1a docs`
 - **Izolacja `Z16` i `DEF-02` (`0 B` diffu względem `53751a4`):**
   - Wszystkie `30` plików chronionych Z16 (`avt_linter.py`, `verifier.py`, `client_factory.py`, `rules.py`, `test_system.py`, `verify_purity.py`, `pricing_guard.py`, `main.py`, `context_cache.py`, `series_memory/.onomastic_lexicon.json`, `series_memory/*_bible.json`), `scene_discourse.py` oraz metoda `_resolve_line_addressee` (`L4444..L4824` w `translator.py`) zachowują **`0 B` zmian** w historii commitów `53751a4..HEAD`.
 
@@ -52,3 +53,21 @@ W katalogu `logs/` na tej stacji nie było surowego pliku `events.jsonl` z sesji
 4. **Bliskość plansz `Sign OCR` (`165290..168500` vs `170250..176540`):** `VisualSignDetector.is_near_existing_sign(..., proximity_ms=3000)` zwraca `True` i blokuje zbędne wywołanie API.
 5. **Warianty rozdzielone `/` (`TermA / TermB`) w `character_catchphrases`:** `resolve_profile_alerts_to_events` podpina `KWESTIA-WIZYTÓWKA` i tłumi sprzeczne `pułapka_profilera` w obu liniach oraz w fallbackach F1/F2.
 6. **Priorytetyzacja F2 (`ID 85` oficjalna zapowiedź + `ID 93` literówka `najibardziej`):** oba elementy selekcjonowane przez `_select_hydrogen_phase2_candidates` w paczce testowej (`>= p90`), podczas gdy zwykłe dialogi dostają `+0` punktów z nowych detektorów.
+
+---
+
+## 4. Suplement Mikro-Hotfix `12.2.1a` (`HEAD`)
+
+Audyt jakościowy po wdrożeniu `40053a2` zidentyfikował `2` źródła fałszywych alarmów w detektorach scoringu F2 `OBS-23` oraz brakujący hash końcowy w dokumentacji (`BUG #1–#3`), zamknięte jednym atomowym commitem z **`0 B` diffu** w `30` plikach Z16, `scene_discourse.py`, `sign_detector.py`, `profiler.py` oraz `translator.py:_resolve_line_addressee`:
+
+| ID | Waga | Zakres w [translator.py](../translator.py) | Rozwiązanie i efekt |
+|---|---|---|---|
+| `BUG #1` | WYSOKI | `L2606–2689`, `L7556` (`_detect_polish_typo_anomaly`) | Usunięto nadmiernie szeroką pętlę powtórzeń sylabowych `([a-ząćęłńóśźż]{2,3})\1` oraz nieużywaną stałą `_VALID_REPEATED_SYLLABLE_PREFIXES` (zero martwego kodu), eliminując fałszywe alarmy na rzeczownikach `-nienie` (`uwolnienie`, `wspomnienie`, `wyjaśnienie`, `zapomnienie`, `zatrudnienie`), wyrazach typu `lilie`/`Szszsz...` oraz imionach z powtórzoną sylabą; zachowano 3 wysokoprecyzyjne reguły (`naji...`, `jesterem`, `ji` + zbitka spółgłosek) i dodano izolację `not item.get("is_sign")`. |
+| `BUG #2` | ŚREDNI | `L2606–2610`, `L7561` (`_EN_OFFICIAL_ANNOUNCEMENT_SCORE_RE`) | Usunięto ogólne `new\s+students` ze wzorca scoringowego (ujednolicając go z precyzyjnymi sygnałami zapowiedzi ceremonialnych) oraz odizolowano detektor od plansz ekranowych (`not item.get("is_sign")`) w `_score_phase2_editorial_risk`. |
+| `BUG #3` | DROBNY | [PROJECT_MEMORY.md](../PROJECT_MEMORY.md), [Raport_wdrozenia_12.2.1.md](Raport_wdrozenia_12.2.1.md) | Zaktualizowano hash Commitu 3/3 `12.2.1` (`40053a2`), status na `CERTIFIED IN TESTS / AWAITING AUDIT` oraz rejestry testów po `12.2.1a`. |
+
+- **Weryfikacja `12.2.1a` (`0.00 PLN`):**
+  - [test_standard_12_2_1.py](../tests/test_standard_12_2_1.py): rozszerzone z `6` do **`7 / 7 PASSED`** (`test_obs23_12_2_1a_false_positive_protection`).
+  - Pełny katalog `tests/`: **`529 / 529 PASSED`**.
+  - `test_system.py -m "not slow and not network" -k "not test_batch_coalescence_ssot_prompt_and_cot_streamlining_guard"`: **`70 passed, 154 deselected`**.
+  - `4/4` bramki CI/CD (`verify_purity.py` `12/12`, `verify_8_fixes.py` `8/8`, `verify_12_fixes.py` `12/12`, `verify_ultimate_pipeline.py` `15/15`), `check_z16_lock.ps1 -BaseRef "53751a4..HEAD"` (`PASS`) oraz `audit_diff.ps1 -BaseRef "40053a2"` (`VICTORY CONFIRMED`).

@@ -4,9 +4,9 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 
 ---
 
-## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-27 — Standard 12.2.1 na bazie 12.2.0b + check_z16_lock)
-- **Aktualny certyfikowany standard produkcyjny:** `Standard 12.2.1 (OBS-19/20 typografia F2 kursywy i kropek, OBS-21 guard bezaktorowego '/' w rejestrze i telemetrii DUAL_DIALOGUE, OBS-22 glosariusz kanoniczny i filtr bliskości Sign OCR, OBS-23 priorytet catchphrases + scoring F2 literówek/zapowiedzi; na bazie 12.2.0 + 12.2.0a + 12.2.0b)`
-- **Commit certyfikacji kodu:** `HEAD` (łańcuch `12.2.1`: `e06c224 .. HEAD`, baza startowa `53751a4`)
+## 🎯 1. AKTUALNY STATUS POTOKU (Stan na 2026-11-27 — Standard 12.2.1 + 12.2.1a na bazie 12.2.0b + check_z16_lock)
+- **Aktualny certyfikowany standard produkcyjny:** `Standard 12.2.1 + 12.2.1a (OBS-19/20 typografia F2 kursywy i kropek, OBS-21 guard bezaktorowego '/' w rejestrze i telemetrii DUAL_DIALOGUE, OBS-22 glosariusz kanoniczny i filtr bliskości Sign OCR, OBS-23 priorytet catchphrases + precyzyjny scoring F2 literówek/zapowiedzi z eliminacją fałszywych alarmów BUG #1/#2; na bazie 12.2.0 + 12.2.0a + 12.2.0b)`
+- **Commit certyfikacji kodu:** `HEAD` (`Mikro-Hotfix 12.2.1a` nad `40053a2`; łańcuch `12.2.1`: `e06c224 .. HEAD`, baza startowa `53751a4`)
 - **Commity implementacyjne 11.1:** `5b7306d` (Commit 1), `5b17ea7` (Commit 2), `2b4bc7d` (Commit 3), `8b72887` (Commit 4), `8a7dd31` (Commit 5), `218af2e` (Commit 6)
 - **Commity Hotfixu 11.1.1:** `328729f` (Commit 1), `9de0b83` (Commit 2), `07c4684` (Commit 3), `96acac7` (Commit 4)
 - **Commity Hotfixu 11.1.2:** `74766d8` (Commit 1), `1b540e3` (Commit 2), `8313658` (Commit 3), `326b7e0` (Commit 4)
@@ -87,19 +87,20 @@ Dokument ten stanowi zsynchronizowany rejestr stanu operacyjnego potoku, telemet
 - **Commity Mikro-Hotfixu 12.2.1 (`OBS-19..OBS-23`):**
   * Commit 1 (`e06c224`): `fix(pipeline): 12.2.1 [1/3] — OBS-19 + OBS-20 (typografia F2: kropki po kursywie i wielowierszowa kursywa)`
   * Commit 2 (`05798bc`): `fix(pipeline): 12.2.1 [2/3] — OBS-21 + OBS-22 (guard '/' w rejestrze/kolektywach + glosariusz i filtr bliskości Sign OCR)`
-  * Commit 3 (`HEAD`): `fix(pipeline): 12.2.1 [3/3] — OBS-23 (priorytet catchphrases, scoring F2 literówek/zapowiedzi) + tests + docs` — **NOWY COMMIT CERTYFIKACJI KODU**
+  * Commit 3 (`40053a2`): `fix(pipeline): 12.2.1 [3/3] — OBS-23 (priorytet catchphrases, scoring F2 literówek/zapowiedzi) + tests + docs`
+- **Commit Mikro-Hotfixu 12.2.1a (`BUG #1–#3`):** `HEAD` — `fix(12.2.1a): eliminate false positives in OBS-23 typo & announcement F2 detectors + sync 12.2.1a docs` — **NOWY COMMIT CERTYFIKACJI KODU**
 - **Decyzja strategiczna (`12.x`):** **`D-1 (Flash F1/F2) — REJECTED BY OPERATOR (quality-first policy; no model change in 12.x horizon)`**. Model Hydrogen pozostaje jedynym flagowym modelem produkcyjnym (`AVT_CONSOLIDATE_F2="0"`).
-- **Status 12.2.1:** **`CLOSED — ACCEPT (2026-11-27, bazuje na 12.2.0b + 53751a4)`** — `0 B` diffu w `30` plikach Z16, `scene_discourse.py` oraz `translator.py:_resolve_line_addressee`.
-- **Kierunek post-12.x:** **Opcja A (produkcja)** na certyfikowanym `12.2.1` bez prewencyjnego otwierania `12.3.0`/`13.x` (nowy standard wyłącznie w przypadku realnego defektu krytycznego lub premiery nowej generacji modeli).
-- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a` + **autoryzowany `Z16-amendment #16`** z `9947688` ograniczony wyłącznie do `verifier.py:790` i `avt_linter.py:7570–7579`; **bezwzględne 0 B diffu** na wszystkich `30` plikach Z16, `scene_discourse.py` i `translator.py:_resolve_line_addressee` w `12.2.1` względem `53751a4`)
-- **Stan metryk:** `528 passed` w `tests/` (`6` w `test_standard_12_2_1.py` + `13` w `test_standard_12_2_0.py` + `11` w `test_standard_12_1_0.py` + `498` starszych) oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `598 passed`), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD PASS (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` / `tools/check_z16_lock.ps1 -BaseRef "53751a4..HEAD"` w stanie `PASS`.
-- **Status CI/CD:** `STATUS: STANDARD 12.2.1 ZWERYFIKOWANY (528/528 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
-- **Zasada utrzymaniowa post-12.x:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 12.2.1` (`53751a4..HEAD`) i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
-- **Gałąź i Architektura:** `main` (Standard `12.2.1`: `12.2.0 + 12.2.0a + 12.2.0b` + typografia kursywy/kropek F2 `OBS-19/20`, guard `'/'` i `DUAL_DIALOGUE` `OBS-21`, glosariusz i filtr bliskości Sign OCR `OBS-22` oraz priorytet `catchphrases` + scoring F2 literówek/zapowiedzi `OBS-23`, przy `gemini-4-hydrogen` + domyślnym `AVT_CONSOLIDATE_F2=0`).
+- **Status 12.2.1 + 12.2.1a:** **`CERTIFIED IN TESTS / AWAITING AUDIT (2026-11-27)`** — `0 B` diffu w `30` plikach Z16, `scene_discourse.py`, `sign_detector.py`, `profiler.py` oraz `translator.py:_resolve_line_addressee`.
+- **Kierunek post-12.x:** **Opcja A (produkcja)** na certyfikowanym `12.2.1 + 12.2.1a` bez prewencyjnego otwierania `12.3.0`/`13.x` (nowy standard wyłącznie w przypadku realnego defektu krytycznego lub premiery nowej generacji modeli).
+- **Commit ochrony Depuracji Legacy 1.0 (Z16):** `c197db73c3dabf887dddbf2337dc3a1d8cff598c` (`c197db7` + Z16-amendment #15 z `6852a5a` + **autoryzowany `Z16-amendment #16`** z `9947688` ograniczony wyłącznie do `verifier.py:790` i `avt_linter.py:7570–7579`; **bezwzględne 0 B diffu** na wszystkich `30` plikach Z16, `scene_discourse.py` i `translator.py:_resolve_line_addressee` w `12.2.1..12.2.1a` względem `53751a4`)
+- **Stan metryk:** `529 passed` w `tests/` (`7` w `test_standard_12_2_1.py` + `13` w `test_standard_12_2_0.py` + `11` w `test_standard_12_1_0.py` + `498` starszych) oraz `70 passed, 154 deselected` w `test_system.py` (łącznie `599 passed`), `20` produkcyjnych baz `SeriesBible`, `42` produkcyjne leksykony `fansub_lexicons`, `4/4` bramki CI/CD PASS (`verify_purity.py` 12/12, `verify_8_fixes.py` 8/8, `verify_12_fixes.py` 12/12, `verify_ultimate_pipeline.py` 15/15) oraz `audit_diff.ps1` / `tools/check_z16_lock.ps1 -BaseRef "53751a4..HEAD"` w stanie `PASS`.
+- **Status CI/CD:** `STATUS: STANDARD 12.2.1 + 12.2.1a ZWERYFIKOWANY (529/529 TESTS PASSED, 70/70 SYSTEM PASSED, 4/4 BRAMKI PASS) - VICTORY CONFIRMED`
+- **Zasada utrzymaniowa post-12.x:** Wszelkie przyszłe prace rozwojowe startują z certyfikowanego baseline'u `Standard 12.2.1 + 12.2.1a` (`53751a4..HEAD`) i podlegają nienaruszalnym zasadom `Z1`, `Z2`, `Z3`, `Z4` oraz `Z16`.
+- **Gałąź i Architektura:** `main` (Standard `12.2.1 + 12.2.1a`: `12.2.0 + 12.2.0a + 12.2.0b` + typografia kursywy/kropek F2 `OBS-19/20`, guard `'/'` i `DUAL_DIALOGUE` `OBS-21`, glosariusz i filtr bliskości Sign OCR `OBS-22` oraz priorytet `catchphrases` + bezkolizyjny scoring F2 literówek/zapowiedzi `OBS-23 + 12.2.1a`, przy `gemini-4-hydrogen` + domyślnym `AVT_CONSOLIDATE_F2=0`).
 - **Środowisko:** Python 3.13 (`.venv`), Windows PowerShell, `ffmpeg` (PATH), `librosa.pyin`, `soundfile`, `pysubs2`, `spaCy en_core_web_sm` (100% offline 0.00 PLN), bezpośrednie klucze Google AI Studio API (`use_vertex = 0`).
 - **Dyrektywa Wykonawcza Testów:**
   * Testy przyrostowe podczas kodowania (< 2 s): `.\.venv\Scripts\python.exe -m pytest -k "<nazwa_testu>"`
-  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (`528 passed` w `tests/`)
+  * Szybki pakiet regresyjny: `.\.venv\Scripts\python.exe -m pytest tests/ -q` (`529 passed` w `tests/`)
   * Audyt śledczy diffu i blokada Z16: `powershell -ExecutionPolicy Bypass -File .\tools\check_z16_lock.ps1 -BaseRef "53751a4..HEAD"` oraz `powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -BaseRef "53751a4"`
   * 4 bramki kwalifikacyjne: `python verify_purity.py`, `python verify_8_fixes.py`, `python verify_12_fixes.py`, `python verify_ultimate_pipeline.py`
 
@@ -1043,8 +1044,8 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
 
 ---
 
-### 🔹 ARB-084 / INC-AVT-082 — Mikro-Hotfix 12.2.1 (`OBS-19..OBS-23` — `0.00 PLN`, `0 B` diff Z16)
-- **Data wdrożenia:** `2026-11-27` (baza startowa: `53751a4` / `12.2.0b + check_z16_lock.ps1`; `3` atomowe commity `e06c224 .. HEAD`)
+### 🔹 ARB-084 / INC-AVT-082 — Mikro-Hotfix 12.2.1 (`OBS-19..OBS-23` — `0.00 PLN`, `0 B` diff Z16) + `12.2.1a`
+- **Data wdrożenia:** `2026-11-27` (baza startowa: `53751a4` / `12.2.0b + check_z16_lock.ps1`; `3` atomowe commity `e06c224 .. 40053a2` + Mikro-Hotfix `12.2.1a` (`HEAD`))
 - **Zakres i izolacja (`0 B` diffu w `53751a4..HEAD`):**
   - Wyłącznie [translator.py](translator.py), [sign_detector.py](sign_detector.py), [profiler.py](profiler.py), [test_standard_12_2_1.py](tests/test_standard_12_2_1.py), [PROJECT_MEMORY.md](PROJECT_MEMORY.md) oraz [Raport_wdrozenia_12.2.1.md](Artefakty/Raport_wdrozenia_12.2.1.md).
   - Bezwzględne `0 B` diffu na wszystkich `30` plikach Z16, `scene_discourse.py` oraz metodzie `translator.py:_resolve_line_addressee` (`L4444..L4824`).
@@ -1055,7 +1056,8 @@ Dodanie w `tools/consolidate_bibles.py` opcjonalnej flagi `--migrate-misplaced-s
   4. **`OBS-22` (deterministyczne, `sign_detector.py` + `translator.py`):** `VisualSignDetector.is_near_existing_sign` (`proximity_ms=3000`) filtruje kolidujące luki przed ekstrakcją klatek i wywołaniem API; `detect_signs_in_gaps` przyjmuje `custom_glossary`, `existing_events` i `sign_proximity_ms`, wstrzykując terminologię kanoniczną i uruchamiając `enforce_locked_glossary_terms`.
   5. **`OBS-23` — część 1 (w 100% deterministyczna, `profiler.py` + `translator.py`):** `_split_catchphrase_variants` i `_map_catchphrase_variant_pairs` rozbijają warianty na `/` i `|`; `resolve_profile_alerts_to_events`, `format_episode_profile_for_prompt` i fallbacki F1/F2 rozwiązują `character_catchphrases` **przed** `danger_lines_prescan` i tłumią sprzeczny tag `pułapka_profilera` przy pokryciu tokenowym (`len >= 4`).
   6. **`OBS-23` — część 2 (półdeterministyczna, `translator.py`):** pozytywna reguła F1 `_append_phase1_official_announcement_rule` (`Bramka 5B`-czysta) oraz detektory `_detect_polish_typo_anomaly` (`+40`) i `_detect_official_announcement_line` (`+30`) w `_score_phase2_editorial_risk`. **Adnotacja architektoniczna:** poprawa promptu F1 oraz scoringu F2 zwiększają prawdopodobieństwo wyłapania literówek i potocznych zapowiedzi przez Fazę 2, ale z natury generacji LLM nie stanowią gwarancji 100% eliminacji każdego błędu F1.
-- **Testy i bramki CI/CD:** [test_standard_12_2_1.py](tests/test_standard_12_2_1.py) (**6 / 6 PASSED**), regresja `11.2.23..12.2.1 + test_translator` (**95 / 95 PASSED**), `tests/` (**528 / 528 PASSED**), `test_system.py` (**70 passed, 154 deselected**), `4/4` bramki (`verify_purity.py` `12/12`, `verify_8_fixes.py` `8/8`, `verify_12_fixes.py` `12/12`, `verify_ultimate_pipeline.py` `15/15`), `check_z16_lock.ps1 -BaseRef "53751a4..HEAD"` (`PASS`), `audit_diff.ps1` (`VICTORY CONFIRMED`) oraz raport [Raport_wdrozenia_12.2.1.md](Artefakty/Raport_wdrozenia_12.2.1.md).
+- **Mikro-Hotfix `12.2.1a` (`HEAD`):** usunięcie fałszywych alarmów `BUG #1` w `_detect_polish_typo_anomaly` (usunięcie pętli powtórzeń sylabowych i nieużywanej stałej `_VALID_REPEATED_SYLLABLE_PREFIXES` na rzecz 3 bezkolizyjnych reguł: brak false positives dla rzeczowników `-nienie`, `lilie`/`Szszsz`, imion z powtórzoną sylabą + wykluczenie `is_sign`) oraz `BUG #2` w `_detect_official_announcement_line` / `_score_phase2_editorial_risk` (usunięcie `new students` ze wzorca scoringowego `_EN_OFFICIAL_ANNOUNCEMENT_SCORE_RE` oraz izolacja `not item.get("is_sign")`).
+- **Testy i bramki CI/CD:** [test_standard_12_2_1.py](tests/test_standard_12_2_1.py) (**7 / 7 PASSED**), regresja `11.2.23..12.2.1 + test_translator` (**96 / 96 PASSED**), `tests/` (**529 / 529 PASSED**), `test_system.py` (**70 passed, 154 deselected**), `4/4` bramki (`verify_purity.py` `12/12`, `verify_8_fixes.py` `8/8`, `verify_12_fixes.py` `12/12`, `verify_ultimate_pipeline.py` `15/15`), `check_z16_lock.ps1 -BaseRef "53751a4..HEAD"` (`PASS`), `audit_diff.ps1` (`VICTORY CONFIRMED`) oraz raport [Raport_wdrozenia_12.2.1.md](Artefakty/Raport_wdrozenia_12.2.1.md).
 
 
 

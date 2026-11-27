@@ -2605,20 +2605,14 @@ _PL_OFFICIAL_ANNOUNCEMENT_RE = re.compile(
 
 _EN_OFFICIAL_ANNOUNCEMENT_SCORE_RE = re.compile(
     r"\b(?:next\s+up|we(?:'ll|\s+will)\s+hear\s+from|representative\s+of|"
-    r"opening\s+ceremony|welcome,\s*students|new\s+students)\b",
+    r"opening\s+ceremony|welcome,\s*students|ladies\s+and\s+gentlemen|"
+    r"attention,\s*everyone|hereby\s+announce)\b",
     re.IGNORECASE,
 )
 
 _CASUAL_ANNOUNCEMENT_VOCATIVE_RE = re.compile(
     r"\b(?:ziom\w*|stary|mord\w*|brachu|bracie|kumpl\w*|kolego|ej)\b",
     re.IGNORECASE,
-)
-
-_VALID_REPEATED_SYLLABLE_PREFIXES = (
-    "mama", "tata", "baba", "kaka", "papa", "haha", "hehe", "hihi", "hoho",
-    "nana", "lala", "koko", "popo", "bibu", "mimi", "mimo", "banan", "ananas",
-    "kukurydz", "kokos", "tatami", "barbar", "tartar", "paparaz", "kakao",
-    "kakadu", "chichi", "fufu", "dodo", "pipi", "sisi", "bubu",
 )
 
 
@@ -2652,8 +2646,9 @@ def _append_phase1_official_announcement_rule(
 
 def _detect_polish_typo_anomaly(pl_text: str) -> bool:
     """
-    Standard 12.2.1 (OBS-23): Detects likely Polish draft typos (malformed 'naji...'
-    superlatives, 'jesterem', unnatural syllable doubling, or stray 'ji' clusters).
+    Standard 12.2.1a (BUG #1): High-precision Polish typo detector covering malformed
+    'naji...' superlatives, 'jesterem', and stray 'ji' + consonant clusters without
+    false positives on '-nienie' nouns, 'lilie', 'Szszsz...', or repeated-syllable names.
     """
     clean_pl = re.sub(r"\{[^}]*\}", " ", str(pl_text or "")).replace(r"\N", " ").strip()
     if not clean_pl:
@@ -2668,14 +2663,6 @@ def _detect_polish_typo_anomaly(pl_text: str) -> bool:
 
     if re.search(r"\bjesterem\b", clean_pl, re.IGNORECASE):
         return True
-
-    for tok in re.findall(r"[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]{4,}", clean_pl):
-        low_tok = tok.lower()
-        if any(low_tok.startswith(pref) or pref in low_tok for pref in _VALID_REPEATED_SYLLABLE_PREFIXES):
-            continue
-        m_rep = re.search(r"([a-ząćęłńóśźż]{2,3})\1", low_tok)
-        if m_rep and len(set(m_rep.group(1))) >= 2:
-            return True
 
     for m_ji in re.finditer(r"\b(\w*ji[bcćdfghklłmnńprsśtwzźż]{2,}\w*)\b", clean_pl, re.IGNORECASE):
         w_low = m_ji.group(1).lower()
@@ -7554,13 +7541,16 @@ class MultimodalTranslator:
             score += 15 + min(15, word_cnt - 8)
 
         pl_val = str(item.get("pl") or item.get("polish_text") or "")
-        has_pl_typo = _detect_polish_typo_anomaly(pl_val)
+        has_pl_typo = (not item.get("is_sign")) and _detect_polish_typo_anomaly(pl_val)
         if has_pl_typo:
             score += 40
 
-        has_official_announcement = _detect_official_announcement_line(
-            str(item.get("en") or ""),
-            pl_val,
+        has_official_announcement = (
+            not item.get("is_sign")
+            and _detect_official_announcement_line(
+                str(item.get("en") or ""),
+                pl_val,
+            )
         )
         if has_official_announcement:
             score += 30
