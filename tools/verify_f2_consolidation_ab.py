@@ -14,7 +14,7 @@ import os
 import sys
 import types
 from pathlib import Path
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -28,12 +28,13 @@ def _extract_api_keys_from_env() -> List[str]:
     return [k.strip() for k in raw_val.replace(";", ",").split(",") if k.strip()]
 
 
-def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]]:
+def load_phase2_items_from_events(events_path: Union[str, Path]) -> Dict[int, Dict[str, Any]]:
     """
     Reconstructs F1 batches and Phase 2 candidate pools from FlightRecorder events.jsonl.
     Prefers real scene_discourse (batches_summary) + line_evolution + phase1_batch.scene_diagnosis
     schema, falling back to phase1_batch.items or minimal phase2_verifier logs when absent.
     """
+    events_path = Path(events_path)
     p1_outputs: Dict[int, Dict[str, Any]] = {}
     if not events_path.exists():
         raise FileNotFoundError(f"Brak pliku zdarzeń: {events_path}")
@@ -77,8 +78,16 @@ def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]
             first_id = int(b_entry.get("first_id", 0))
             last_id = int(b_entry.get("last_id", first_id - 1))
 
+            p1_payload = p1_by_batch.get(b_idx) or {}
+            p1_line_ids = p1_payload.get("line_ids")
+            if isinstance(p1_line_ids, list) and p1_line_ids:
+                lid_pairs = [(local_id, int(lid)) for local_id, lid in enumerate(p1_line_ids, 1)]
+            else:
+                present_lids = [lid for lid in range(first_id, last_id + 1) if lid in by_line_id]
+                lid_pairs = [(local_id, lid) for local_id, lid in enumerate(present_lids, 1)]
+
             items: List[Dict[str, Any]] = []
-            for lid in range(first_id, last_id + 1):
+            for local_id, lid in lid_pairs:
                 le = by_line_id.get(lid)
                 if not le:
                     continue
@@ -86,9 +95,15 @@ def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]
                 end_ms = int(le.get("end_ms", start_ms) or start_ms)
                 t_tag = str(le.get("telemetry_tag") or "")
                 actor = str(le.get("actor") or "")
-                is_sign = ("[mówca: sign" in t_tag.lower()) or (actor.strip().lower() == "sign")
+                is_sign = (
+                    bool(le["is_sign"])
+                    if le.get("is_sign") is not None
+                    else (("[mówca: sign" in t_tag.lower()) or (actor.strip().lower() == "sign"))
+                )
+                is_song = bool(le["is_song"]) if le.get("is_song") is not None else False
+                eff_local_id = int(le["local_id"]) if le.get("local_id") is not None else local_id
                 items.append({
-                    "id": (lid - first_id) + 1,
+                    "id": eff_local_id,
                     "orig_idx": lid,
                     "en": str(le.get("en_text") or ""),
                     "pl": str(le.get("phase1_pl") or ""),
@@ -100,15 +115,17 @@ def load_phase2_items_from_events(events_path: Path) -> Dict[int, Dict[str, Any]
                     "end_ms": end_ms,
                     "is_sign": is_sign,
                     "visual_type": "Napis ekranowy" if is_sign else "Dialog",
-                    "is_song": False,
+                    "is_song": is_song,
                     "calque_score": 0.5,
                     "notes": "",
+                    "batch_id": le.get("batch_id", b_idx),
+                    "f2_score": le.get("f2_score"),
+                    "notes_meta": le.get("notes_meta"),
                 })
 
             if not items:
                 continue
 
-            p1_payload = p1_by_batch.get(b_idx) or {}
             raw_resp = p1_payload.get("raw_response") or {}
             s_diag = raw_resp.get("scene_diagnosis") if isinstance(raw_resp, dict) else None
             scene_desc = (

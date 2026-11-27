@@ -3647,6 +3647,62 @@ def format_phase1_candidate_text(pl_candidate: str, event: Any, is_sign: bool = 
     return cand
 
 
+def _get_repo_git_head() -> str:
+    """Zwraca skrócony hash HEAD repozytorium lub 'unknown' przy błędzie odczytu."""
+    import subprocess
+    try:
+        out = subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=str(Path(__file__).resolve().parent),
+            stderr=subprocess.DEVNULL,
+            timeout=3,
+            text=True,
+        )
+        head = (out or "").strip()
+        return head or "unknown"
+    except Exception:
+        return "unknown"
+
+
+def _write_json_atomic(target_path: Path, payload: Dict[str, Any]) -> None:
+    """Atomowo zapisuje obiekt JSON poprzez plik tymczasowy w tym samym katalogu i os.replace."""
+    target = Path(target_path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = target.with_name(f".{target.name}.{threading.get_ident()}.tmp")
+    try:
+        with open(tmp_path, "w", encoding="utf-8") as cf:
+            json.dump(payload, cf, ensure_ascii=False, indent=2)
+            cf.flush()
+            try:
+                os.fsync(cf.fileno())
+            except OSError:
+                pass
+        os.replace(tmp_path, target)
+    except Exception:
+        try:
+            if tmp_path.exists():
+                tmp_path.unlink()
+        except OSError:
+            pass
+        raise
+
+
+def _extract_line_observability_meta(item: Dict[str, Any]) -> Dict[str, Any]:
+    """Deterministycznie wyciąga ustrukturyzowane znaczniki A-1 / A-3 / C-1 / OBS-13c linii dialogowej."""
+    notes_str = str(item.get("notes") or "")
+    a1_match = re.search(r"\[Para spójności z #[^\]]+\]", notes_str)
+    a3_match = re.search(r"\[Zwrot T-V:\s*([^\]]+)\]", notes_str)
+    c1_match = re.search(r"\[Kontekst sąsiedni[^\]]*\]", notes_str)
+    return {
+        "a1_pair_tag": a1_match.group(0) if a1_match else None,
+        "a3_tv_hint": a3_match.group(1).strip() if a3_match else None,
+        "c1_neighbors": c1_match.group(0) if c1_match else None,
+        "obs13c_target_conf": item.get("target_confidence"),
+        "obs13c_suppressed": bool(item.get("raw_addressee_hypothesis") and not item.get("addressee")),
+        "scene_tone": item.get("active_scene_tone"),
+    }
+
+
 class ContextCacheDiscountError(RuntimeError):
     """Zgłaszany w przypadku braku potwierdzenia rabatu Context Cache na Paczce 0."""
     pass
@@ -3858,6 +3914,23 @@ class MultimodalTranslator:
                 logger.error(f"[Context Cache Audit] Anomalia kalkulacji kosztu PricingGuard: {pe}")
                 return None
 
+        def _emit_budget_audit(kind: str, net_pln: Optional[float], tok_cached: int, note: str) -> None:
+            fr = getattr(self, "flight_recorder", None)
+            if not fr:
+                return
+            try:
+                fr.log_budget_audit(
+                    event_kind=kind,
+                    phase=phase,
+                    batch_id=b_idx,
+                    session_net_pln=net_pln,
+                    ceiling_pln=HARD_BUDGET_LIMIT_PLN,
+                    cached_tokens=tok_cached,
+                    detail=note,
+                )
+            except Exception:
+                logger.debug("Rejestracja audytu budżetu zakończona wyjątkiem", exc_info=True)
+
         def _trigger_hard_halt(cost_disp: str, reason_line: str) -> None:
             err_msg = (
                 "\n"
@@ -3877,6 +3950,7 @@ class MultimodalTranslator:
                     ContextCacheManager.cleanup_all_active_caches(client_to_clean)
             except Exception as e:
                 logger.debug(f"[Context Cache] Czyszczenie pamięci podręcznej zakończone wyjątkiem: {e}")
+            _emit_budget_audit("HALT", _compute_session_net_pln(), cached_tokens, f"{reason_line} ({cost_disp})")
             os._exit(1)
             raise ContextCacheDiscountError(
                 f"Brak aktywnego rabatu Context Cache (-95%) lub przekroczenie limitu bezpieczeństwa na {phase} (paczka {b_idx}). Tłumaczenie przerwane."
@@ -3888,16 +3962,16 @@ class MultimodalTranslator:
                 print(f"\n  💰 [Context Cache AKTYWNY]: Serwer potwierdził CachedContent ({phase}, paczka {b_idx}): {cached_tokens} tokenów (Rabat -95% aktywny) [Context Cache ACTIVE].")
             logger.info(f"[Context Cache CONFIRMED]: Server confirmed CachedContent token count for {phase} batch {b_idx}: {cached_tokens} (-95% input discount active)")
             # Standard 11.2.17: Globalny audyt budżetu również dla paczek z aktywnym cache (likwidacja martwego pola)
-            if not allow_uncached:
-                current_net_pln = _compute_session_net_pln()
-                if current_net_pln is not None and current_net_pln > HARD_BUDGET_LIMIT_PLN:
-                    _trigger_hard_halt(f"{current_net_pln:.2f} PLN", "Przekroczono globalny sufit budżetu sesji.")
+            current_net_pln = _compute_session_net_pln() if not allow_uncached else None
+            if not allow_uncached and current_net_pln is not None and current_net_pln > HARD_BUDGET_LIMIT_PLN:
+                _trigger_hard_halt(f"{current_net_pln:.2f} PLN", "Przekroczono globalny sufit budżetu sesji.")
+            _emit_budget_audit("ACTIVE", current_net_pln, cached_tokens, "cache_active")
         elif 0 < cached_tokens < 32768:
             logger.warning(f"[Context Cache PARTIAL_HIT]: Server confirmed partial CachedContent ({phase}, paczka {b_idx}): {cached_tokens} tokenów (< 32768).")
-            if not allow_uncached:
-                current_net_pln = _compute_session_net_pln()
-                if current_net_pln is not None and current_net_pln > HARD_BUDGET_LIMIT_PLN:
-                    _trigger_hard_halt(f"{current_net_pln:.2f} PLN", "Przekroczono globalny sufit budżetu sesji (partial hit).")
+            current_net_pln = _compute_session_net_pln() if not allow_uncached else None
+            if not allow_uncached and current_net_pln is not None and current_net_pln > HARD_BUDGET_LIMIT_PLN:
+                _trigger_hard_halt(f"{current_net_pln:.2f} PLN", "Przekroczono globalny sufit budżetu sesji (partial hit).")
+            _emit_budget_audit("PARTIAL_HIT", current_net_pln, cached_tokens, "partial_hit")
         elif cached_tokens == 0:
             # 1. Master Override: Ręczne obejście operatorskie
             if allow_uncached:
@@ -3906,6 +3980,7 @@ class MultimodalTranslator:
                     "     Wykryto flagę AVT_ALLOW_UNCACHED_BILLING=1. Kontynuacja sesji bez rabatu (Kontynuacja tłumaczenia pomimo braku rabatu serwerowego)."
                 )
                 logger.warning(f"[Context Cache BYPASS / INC-AVT-057]: Flaga AVT_ALLOW_UNCACHED_BILLING aktywna. Kontynuacja {phase} paczka {b_idx}.")
+                _emit_budget_audit("BYPASS", None, 0, "AVT_ALLOW_UNCACHED_BILLING=1")
                 return
 
             if not hasattr(self, "uncached_batches"):
@@ -3937,12 +4012,14 @@ class MultimodalTranslator:
                 )
                 print(init_msg)
                 logger.info(f"[Context Cache INIT / Self-Warming]: Initial batch on {phase} b_idx {b_idx}. Cost: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN ({mode_note}).")
+                audit_kind, audit_detail = "INIT", mode_note
             elif is_hydrogen_lean:
                 lean_msg = (
                     f"\n  ℹ️ [Hydrogen Zero-Cache Lean]: Paczka {b_idx} ({phase}) — bieżący koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN."
                 )
                 print(lean_msg)
                 logger.info(f"[Hydrogen Zero-Cache Lean]: Paczka {b_idx} ({phase}) — bieżący koszt sesji: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN.")
+                audit_kind, audit_detail = "ZERO_CACHE_LEAN", "hydrogen_zero_cache_lean"
             else:
                 warn_msg = (
                     f"\n  ⚠️ [Context Cache WARN / INC-AVT-057]: Wykryto 0 tokenów cache ({phase}, paczka {b_idx}).\n"
@@ -3951,6 +4028,8 @@ class MultimodalTranslator:
                 )
                 print(warn_msg)
                 logger.warning(f"[Context Cache WARN / INC-AVT-057]: 0 cache on {phase} b_idx {b_idx}. Cost: {current_net_pln:.2f} PLN <= {HARD_BUDGET_LIMIT_PLN:.2f} PLN. Graceful fallback active.")
+                audit_kind, audit_detail = "WARN", "graceful_fallback"
+            _emit_budget_audit(audit_kind, current_net_pln, 0, audit_detail)
 
     def _audit_batch0_context_cache(self, cached_tokens: int) -> None:
         """Wstecznie kompatybilna delegacja dla Paczki 0."""
@@ -5120,6 +5199,9 @@ class MultimodalTranslator:
                     alias_owners.setdefault(k_cov, []).append((c_name, rank))
 
             rendered_char_lines: List[str] = []
+            if not hasattr(self, "_thread_local") or self._thread_local is None:
+                self._thread_local = threading.local()
+            self._thread_local.last_f1_rendered_characters = []
             for name in sorted(self.character_registry.keys()):
                 raw_val = self.character_registry[name]
                 if isinstance(raw_val, dict):
@@ -5142,7 +5224,13 @@ class MultimodalTranslator:
                         continue
 
                 clean_det = _strip_relation_meta_tags(det_str)
-                rendered_char_lines.append(f"• {name}: {clean_det or 'postać'}")
+                char_label = f"{name}: {clean_det or 'postać'}"
+                rendered_char_lines.append(f"• {char_label}")
+                if not hasattr(self, "_thread_local") or self._thread_local is None:
+                    self._thread_local = threading.local()
+                chars_acc = getattr(self._thread_local, "last_f1_rendered_characters", None)
+                if isinstance(chars_acc, list):
+                    chars_acc.append(name)
 
             if rendered_char_lines:
                 lines.append("--- ZNANE POSTACIE W ODCINKU (spójność ról, statusu i płci) ---")
@@ -6030,6 +6118,7 @@ class MultimodalTranslator:
                         "prompt": p_cnt,
                         "cached": c_cnt,
                         "output": out_cnt,
+                        "thoughts": thoughts,
                         "model": current_model,
                     }
                     with self.lock:
@@ -6474,7 +6563,8 @@ class MultimodalTranslator:
             try:
                 self.flight_recorder.log_acoustics_and_whisper(
                     f0_metrics={"prosody_tags": prosody_tags, "speaker_tags": speaker_tags},
-                    whisper_results=whisper_transcriptions
+                    whisper_results=whisper_transcriptions,
+                    batch_id=b_idx
                 )
             except Exception:
                 logger.debug("Zapis zdarzenia rejestratora fazy 1 zakończony wyjątkiem", exc_info=True)
@@ -6608,14 +6698,25 @@ class MultimodalTranslator:
         # aby pełna telemetria (prompt/cached/output/czas) zachowała się w events.jsonl również przy HALT.
         if self.flight_recorder:
             try:
-                raw_resp = batch_response.model_dump() if hasattr(batch_response, "model_dump") else (batch_response.dict() if hasattr(batch_response, "dict") else str(batch_response))
+                raw_resp = (
+                    batch_response.model_dump(exclude_none=True)
+                    if hasattr(batch_response, "model_dump")
+                    else (batch_response.dict(exclude_none=True) if hasattr(batch_response, "dict") else str(batch_response))
+                )
                 p1_tok_usage = dict(_last_tu) if _last_tu else None
+                rendered_chars_f1 = list(getattr(_tl, "last_f1_rendered_characters", None) or []) if _tl is not None else []
+                p1_line_ids = [int(it[0]) for it in untranslated_in_batch]
+                locked_g_cnt = len(combined_glossary) if combined_glossary else 0
                 self.flight_recorder.log_phase1_batch(
                     batch_id=b_idx,
                     prompt_dump=prompt_text,
                     raw_response=raw_resp,
                     response_time_sec=elapsed_phase1,
-                    token_usage=p1_tok_usage
+                    token_usage=p1_tok_usage,
+                    focused_rules=focused_rules_str,
+                    locked_glossary_count=locked_g_cnt,
+                    rendered_characters=rendered_chars_f1,
+                    line_ids=p1_line_ids,
                 )
             except Exception:
                 logger.debug("Rejestracja odpowiedzi modelu zakończona wyjątkiem", exc_info=True)
@@ -7483,67 +7584,90 @@ class MultimodalTranslator:
         return phase1_data
 
     @staticmethod
-    def _score_phase2_editorial_risk(item: Dict[str, Any]) -> Tuple[int, bool]:
+    def _score_phase2_editorial_risk(
+        item: Dict[str, Any],
+        reasons_out: Optional[List[str]] = None,
+    ) -> Tuple[int, bool]:
         """
-        Standard 11.2.21: Wyznacza deterministyczną wagę ryzyka redakcyjnego linii
+        Standard 11.2.21 / 12.2.2 (U1): Wyznacza deterministyczną wagę ryzyka redakcyjnego linii
         oraz flagę krytycznego zapotrzebowania na MEDIUM CoT (0.00 PLN).
+        Opcjonalnie zapisuje trafione czynniki punktacji do reasons_out.
         """
         score = 0
         critical_cot = False
+        reasons = reasons_out if reasons_out is not None else []
 
         if item.get("is_missing_translation"):
             score += 100
             critical_cot = True
+            reasons.append("missing_translation:+100")
         elif item.get("is_blind_draft"):
             score += 100
+            reasons.append("blind_draft:+100")
         if item.get("is_song"):
             score += 90
             critical_cot = True
+            reasons.append("song:+90")
 
         calque_sc = float(item.get("calque_score", 0.0) or 0.0)
         if calque_sc >= 0.25:
-            score += int(40 + calque_sc * 40)
+            calque_pts = int(40 + calque_sc * 40)
+            score += calque_pts
+            reasons.append(f"calque:+{calque_pts}")
 
         if item.get("condensation_directive") or item.get("cps_warning"):
             score += 45
+            reasons.append("cps_or_condensation:+45")
         if item.get("audio_alert"):
             score += 35
+            reasons.append("audio_alert:+35")
         if item.get("ambiguity_note"):
             score += 35
+            reasons.append("ambiguity_note:+35")
         if item.get("canonical_glossary_term"):
             score += 30
+            reasons.append("canonical_glossary:+30")
 
         spk_conf = item.get("speaker_confidence")
         tgt_conf = item.get("target_confidence")
         if (spk_conf is not None and spk_conf < 0.95) or (tgt_conf is not None and tgt_conf < 0.95):
             score += 30
+            reasons.append("low_confidence:+30")
 
         notes_low = str(item.get("notes") or "").lower()
         word_cnt = len(str(item.get("en") or "").split())
         has_profiler_alert = any(k in notes_low for k in ("pułapka_profilera", "kwestia-wizytówka", "gra słowna"))
         if has_profiler_alert:
             score += 35
+            reasons.append("profiler_alert:+35")
         if "zmiana trybu" in notes_low:
             score += 50
+            reasons.append("mode_shift:+50")
 
         has_rel_pivot = "przełom relacji" in notes_low or "przelom_relacji" in notes_low
         if has_rel_pivot and word_cnt >= 4:
             score += 25
+            reasons.append("rel_pivot:+25")
 
         tone_low = str(item.get("active_scene_tone") or "").lower()
         if word_cnt >= 5 and any(t in tone_low for t in ("komed", "satyr", "iron", "dramat", "emocj", "wzrusz", "napięt")):
             score += 15
+            reasons.append("scene_tone:+15")
 
         if item.get("relation_tag") or item.get("pragmatic_register"):
             score += 20
+            reasons.append("relation_or_register:+20")
 
         if word_cnt >= 9:
-            score += 15 + min(15, word_cnt - 8)
+            long_pts = 15 + min(15, word_cnt - 8)
+            score += long_pts
+            reasons.append(f"long_line:+{long_pts}")
 
         pl_val = str(item.get("pl") or item.get("polish_text") or "")
         has_pl_typo = (not item.get("is_sign")) and _detect_polish_typo_anomaly(pl_val)
         if has_pl_typo:
             score += 40
+            reasons.append("pl_typo:+40")
 
         has_official_announcement = (
             not item.get("is_sign")
@@ -7554,6 +7678,7 @@ class MultimodalTranslator:
         )
         if has_official_announcement:
             score += 30
+            reasons.append("official_announcement:+30")
 
         # D-2 (12.0.0): Suppress trivial <=3-word replies when free of critical/editorial alerts
         is_trivial_short = (
@@ -7572,9 +7697,23 @@ class MultimodalTranslator:
             and not has_official_announcement
         )
         if is_trivial_short:
-            score = max(0, score - 25)
+            new_score = max(0, score - 25)
+            delta = score - new_score
+            score = new_score
+            if delta > 0:
+                reasons.append(f"trivial_short:-{delta}")
 
         return score, critical_cot
+
+    @staticmethod
+    def _score_phase2_editorial_risk_detailed(item: Dict[str, Any]) -> Tuple[int, bool, List[str]]:
+        """
+        Standard 12.2.2 (U1): Wyznacza deterministyczną wagę ryzyka redakcyjnego linii,
+        flagę krytycznego CoT oraz listę trafionych czynników punktacji (0.00 PLN).
+        """
+        reasons: List[str] = []
+        score, critical_cot = MultimodalTranslator._score_phase2_editorial_risk(item, reasons_out=reasons)
+        return score, critical_cot, reasons
 
     @staticmethod
     def _is_speaker_change_lowercase(
@@ -7615,8 +7754,8 @@ class MultimodalTranslator:
         if not pass1_items:
             return []
 
-        base_scores = [self._score_phase2_editorial_risk(it) for it in pass1_items]
-        pos_scores = sorted([sc for sc, _ in base_scores if sc > 0])
+        detailed_scores = [self._score_phase2_editorial_risk_detailed(it) for it in pass1_items]
+        pos_scores = sorted([sc for sc, _, _ in detailed_scores if sc > 0])
         if pos_scores:
             n_pos = len(pos_scores)
             p90_idx = min(n_pos - 1, int(0.90 * (n_pos - 1) + 0.5))
@@ -7624,29 +7763,58 @@ class MultimodalTranslator:
         else:
             p90_weight = 40
 
+        chosen_map: Dict[int, Any] = {}
+        linked_pairs: List[Tuple[int, int]] = []
+        evicted_positions: set = set()
+        added_partner_positions: set = set()
+
         if len(pass1_items) <= 10:
+            eff_batch_cap = len(pass1_items)
             chosen = []
             for pos, it in enumerate(pass1_items):
                 prev_it = pass1_items[pos - 1] if pos > 0 else None
                 is_spk_ch = self._is_speaker_change_lowercase(prev_it, it)
-                is_crit = base_scores[pos][1]
+                base_sc, is_crit, reasons = detailed_scores[pos]
+                final_sc = base_sc + (p90_weight if is_spk_ch else 0)
+                row_reasons = list(reasons)
+                if is_spk_ch:
+                    row_reasons.append(f"speaker_change_lowercase:+{p90_weight}")
+                it["f2_score"] = int(final_sc)
+                it["f2_score_reasons"] = row_reasons
+                it["f2_batch_p90"] = int(p90_weight)
+                it["f2_batch_cap"] = int(eff_batch_cap)
+                it["f2_selected"] = True
+                it["f2_not_selected_reason"] = None
                 chosen.append((0, pos, is_crit, it, is_spk_ch))
         else:
+            per_batch_global_cap = max(8, episode_line_cap // max(1, int(total_batches or 1)))
+            batch_cap = max(8, min(int(len(pass1_items) * 0.50), per_batch_global_cap))
+
             scored_entries: List[Tuple[int, int, bool, Dict[str, Any], bool]] = []
+            final_score_by_pos: Dict[int, int] = {}
+            reasons_by_pos: Dict[int, List[str]] = {}
             for pos, it in enumerate(pass1_items):
                 prev_it = pass1_items[pos - 1] if pos > 0 else None
-                sc, is_crit = base_scores[pos]
+                sc, is_crit, reasons = detailed_scores[pos]
+                row_reasons = list(reasons)
                 is_spk_ch = self._is_speaker_change_lowercase(prev_it, it)
                 if is_spk_ch:
                     sc += p90_weight
+                    row_reasons.append(f"speaker_change_lowercase:+{p90_weight}")
+                final_score_by_pos[pos] = int(sc)
+                reasons_by_pos[pos] = row_reasons
                 if sc > 0:
                     scored_entries.append((sc, pos, is_crit, it, is_spk_ch))
 
             if not scored_entries:
+                for pos, orig_it in enumerate(pass1_items):
+                    orig_it["f2_score"] = int(final_score_by_pos[pos])
+                    orig_it["f2_score_reasons"] = list(reasons_by_pos[pos])
+                    orig_it["f2_batch_p90"] = int(p90_weight)
+                    orig_it["f2_batch_cap"] = int(batch_cap)
+                    orig_it["f2_selected"] = False
+                    orig_it["f2_not_selected_reason"] = "score_zero"
                 return []
-
-            per_batch_global_cap = max(8, episode_line_cap // max(1, int(total_batches or 1)))
-            batch_cap = max(8, min(int(len(pass1_items) * 0.50), per_batch_global_cap))
 
             scored_entries.sort(key=lambda x: (-x[0], x[1]))
             chosen = sorted(scored_entries[:batch_cap], key=lambda x: x[1])
@@ -7656,7 +7824,6 @@ class MultimodalTranslator:
             hard_half_cap = int(len(pass1_items) * 0.50)
             chosen_map = {pos_c: entry_c for entry_c in chosen for pos_c in (entry_c[1],)}
             paired_positions = set()
-            linked_pairs: List[Tuple[int, int]] = []
 
             for anchor_pos in sorted(list(chosen_map.keys()), key=lambda p: (-chosen_map[p][0], p)):
                 if anchor_pos not in chosen_map:
@@ -7681,6 +7848,7 @@ class MultimodalTranslator:
                     if len(chosen_map) < hard_half_cap and len(chosen_map) < min(hard_half_cap, batch_cap + 2):
                         p_it = pass1_items[partner_pos]
                         chosen_map[partner_pos] = (score_by_pos.get(partner_pos, 0), partner_pos, False, p_it, False)
+                        added_partner_positions.add(partner_pos)
                         paired_positions.add(a_p)
                         paired_positions.add(b_p)
                         linked_pairs.append((a_p, b_p))
@@ -7697,13 +7865,34 @@ class MultimodalTranslator:
                             evict_cands.sort(key=lambda x: (x[0], -x[1]))
                             _, evict_pos = evict_cands[0]
                             del chosen_map[evict_pos]
+                            evicted_positions.add(evict_pos)
                             p_it = pass1_items[partner_pos]
                             chosen_map[partner_pos] = (score_by_pos.get(partner_pos, 0), partner_pos, False, p_it, False)
+                            added_partner_positions.add(partner_pos)
                             paired_positions.add(a_p)
                             paired_positions.add(b_p)
                             linked_pairs.append((a_p, b_p))
 
             chosen = [chosen_map[k] for k in sorted(chosen_map.keys())]
+            selected_positions = set(chosen_map.keys())
+            for pos, orig_it in enumerate(pass1_items):
+                row_reasons = list(reasons_by_pos[pos])
+                if pos in added_partner_positions and "a1_pair_partner" not in row_reasons:
+                    row_reasons.append("a1_pair_partner")
+                orig_it["f2_score"] = final_score_by_pos[pos]
+                orig_it["f2_score_reasons"] = row_reasons
+                orig_it["f2_batch_p90"] = int(p90_weight)
+                orig_it["f2_batch_cap"] = int(batch_cap)
+                is_sel = pos in selected_positions
+                orig_it["f2_selected"] = is_sel
+                if is_sel:
+                    orig_it["f2_not_selected_reason"] = None
+                elif pos in evicted_positions:
+                    orig_it["f2_not_selected_reason"] = "evicted_for_a1_pair"
+                elif final_score_by_pos[pos] <= 0:
+                    orig_it["f2_not_selected_reason"] = "score_zero"
+                else:
+                    orig_it["f2_not_selected_reason"] = "below_batch_cap"
 
         pair_notes_by_pos: Dict[int, List[str]] = {}
         if len(pass1_items) > 10:
@@ -7964,6 +8153,7 @@ class MultimodalTranslator:
                 "episode_profile": first_p1.get("episode_profile"),
                 "lookback_history": first_p1.get("lookback_history", []),
                 "lookahead_events": first_p1.get("lookahead_events", []),
+                "combined_glossary": first_p1.get("combined_glossary", {}),
                 "pbar": first_p1.get("pbar"),
             })
 
@@ -8035,6 +8225,20 @@ class MultimodalTranslator:
         p2_cached = p2_tok_usage.get("cached", 0) if p2_tok_usage else 0
         if self.flight_recorder:
             try:
+                _cons_gloss = cons_group.get("combined_glossary")
+                _cons_line_ids = {
+                    str(it.get("id")): int(it.get("orig_idx"))
+                    for it in verifier_items
+                    if isinstance(it, dict) and it.get("id") is not None and it.get("orig_idx") is not None
+                }
+                _cons_p90 = next((it.get("f2_batch_p90") for it in verifier_items if isinstance(it, dict) and it.get("f2_batch_p90") is not None), None)
+                _cons_sel_summary = {
+                    "batch_p90": _cons_p90,
+                    "batch_cap": len(verifier_items),
+                    "selected_count": len(verifier_items),
+                    "total_lines": len(verifier_items),
+                    "selected_ids": [it.get("id") for it in verifier_items if isinstance(it, dict) and it.get("id") is not None],
+                }
                 self.flight_recorder.log_phase2_verifier(
                     batch_id=c_idx,
                     cot_budget=budget_val,
@@ -8045,6 +8249,11 @@ class MultimodalTranslator:
                     ],
                     response_time_sec=elapsed_p2,
                     token_usage=p2_tok_usage,
+                    focused_rules=focused_rules,
+                    locked_glossary_count=len(_cons_gloss) if _cons_gloss else 0,
+                    rendered_characters=sorted(clean_f2_reg.keys()) if isinstance(clean_f2_reg, dict) else [],
+                    line_ids=_cons_line_ids,
+                    f2_selection_summary=_cons_sel_summary,
                 )
             except Exception:
                 logger.debug("Rejestracja skonsolidowanej weryfikacji F2 zakończona wyjątkiem", exc_info=True)
@@ -8104,6 +8313,9 @@ class MultimodalTranslator:
         refined_typesetting_dict: Dict[int, Any] = {it["id"]: it.get("visual_typesetting") for it in pass1_items if it.get("visual_typesetting")}
 
         cot_info_str = ""
+        f2_raw_map: Dict[int, str] = {}
+        f2_changes_map: Dict[int, Optional[str]] = {}
+        post_f2_fixes_map: Dict[int, List[str]] = {}
         if self.enable_verifier and hasattr(self, 'verifier') and self.verifier:
             from model_resolver import is_gemini_4_or_hydrogen_model
             v_model_name = getattr(self.verifier, "model", getattr(self, "model_phase2", self.model))
@@ -8244,13 +8456,43 @@ class MultimodalTranslator:
 
                     if self.flight_recorder:
                         try:
+                            _p2_line_ids = {
+                                str(it.get("id")): int(it.get("orig_idx"))
+                                for it in verifier_batch_items
+                                if isinstance(it, dict) and it.get("id") is not None and it.get("orig_idx") is not None
+                            }
+                            _p2_p90 = next(
+                                (it.get("f2_batch_p90") for it in pass1_items if it.get("f2_batch_p90") is not None),
+                                None,
+                            )
+                            _p2_cap = next(
+                                (it.get("f2_batch_cap") for it in pass1_items if it.get("f2_batch_cap") is not None),
+                                len(pass1_items),
+                            )
+                            _p2_sel_summary = {
+                                "batch_p90": _p2_p90,
+                                "batch_cap": _p2_cap,
+                                "selected_count": len(verifier_batch_items),
+                                "total_lines": len(pass1_items),
+                                "selected_ids": [
+                                    it.get("id")
+                                    for it in verifier_batch_items
+                                    if isinstance(it, dict) and it.get("id") is not None
+                                ],
+                            }
+                            _p2_gloss_cnt = len(combined_glossary) if combined_glossary else len(batch_glossary_items or [])
                             self.flight_recorder.log_phase2_verifier(
                                 batch_id=b_idx,
                                 cot_budget=budget_val if 'budget_val' in locals() else 0,
                                 prompt_dump=getattr(self.verifier, "last_prompt", "") or "",
                                 raw_response=[r.model_dump() if hasattr(r, "model_dump") else (r.dict() if hasattr(r, "dict") else str(r)) for r in refined_lines],
                                 response_time_sec=elapsed_phase2,
-                                token_usage=p2_tok_usage
+                                token_usage=p2_tok_usage,
+                                focused_rules=phase2_focused_rules,
+                                locked_glossary_count=_p2_gloss_cnt,
+                                rendered_characters=sorted(clean_f2_registry.keys()) if isinstance(clean_f2_registry, dict) else [],
+                                line_ids=_p2_line_ids,
+                                f2_selection_summary=_p2_sel_summary,
                             )
                         except Exception:
                             logger.debug("Rejestracja weryfikacji w locie zakończona wyjątkiem", exc_info=True)
@@ -8258,12 +8500,17 @@ class MultimodalTranslator:
                     self._audit_batch_context_cache(b_idx=b_idx, cached_tokens=p2_cached, phase="phase2")
 
             if refined_lines:
+                f2_raw_map = {r.id: str(getattr(r, "refined_pl", "") or "") for r in refined_lines}
+                f2_changes_map = {r.id: getattr(r, "changes_made", None) for r in refined_lines}
                 for r in refined_lines:
                     orig_it = next((it for it in pass1_items if it.get("id") == r.id), None)
                     if orig_it:
                         it_style = str(orig_it.get("style", "")).lower()
                         if any(k in it_style for k in ["italic", "flashback_italic", "thoughts", "internal"]):
+                            _before_it = r.refined_pl
                             r.refined_pl = re.sub(r"\{\\i[01]\}", "", r.refined_pl)
+                            if r.refined_pl != _before_it:
+                                post_f2_fixes_map.setdefault(r.id, []).append("post_f2:italic_style_strip")
 
                         # INC-AVT-044: Bezosobowa ochrona łączności radiowej i meldunków wojskowych
                         en_clean_radio = re.sub(r"[^\w\s]", "", str(orig_it.get("en", "")).lower()).strip()
@@ -8278,27 +8525,35 @@ class MultimodalTranslator:
                                 is_female = (spk_g == "FEMALE")
                                 rep_przyjalem = "Przyjęłam." if is_female else "Przyjęto."
                                 rep_zrozumialem = "Zrozumiałam." if is_female else "Zrozumiano."
+                                _before_rad = r.refined_pl
                                 r.refined_pl = re.sub(r"\bPrzyjąłem[.!]*", rep_przyjalem, r.refined_pl, flags=re.IGNORECASE)
                                 r.refined_pl = re.sub(r"\bZrozumiałem[.!]*", rep_zrozumialem, r.refined_pl, flags=re.IGNORECASE)
+                                if r.refined_pl != _before_rad:
+                                    post_f2_fixes_map.setdefault(r.id, []).append("post_f2:radio_impersonal")
 
+                        _before_obs19 = r.refined_pl
                         r.refined_pl = _restore_phase2_trailing_period(
                             r.refined_pl,
                             orig_pl=str(orig_it.get("pl", "")),
                             orig_en=str(orig_it.get("en", "")),
                             is_sign=bool(orig_it.get("is_sign")),
                         )
+                        if r.refined_pl != _before_obs19:
+                            post_f2_fixes_map.setdefault(r.id, []).append("post_f2:obs19_trailing_period")
 
                 _refined_is_sign = {
                     it.get("id"): bool(it.get("is_sign"))
                     for it in pass1_items
                 }
-                refined_dict.update({
-                    r.id: _expand_spoken_numeric_abbreviations(
-                        sanitize_sub_text(r.refined_pl),
+                for r in refined_lines:
+                    _san_r = sanitize_sub_text(r.refined_pl)
+                    _exp_r = _expand_spoken_numeric_abbreviations(
+                        _san_r,
                         is_sign=_refined_is_sign.get(r.id, False),
                     )
-                    for r in refined_lines
-                })
+                    if _exp_r != _san_r:
+                        post_f2_fixes_map.setdefault(r.id, []).append("post_f2:a5_numeric_expansion")
+                    refined_dict[r.id] = _exp_r
                 refined_region_dict.update({r.id: r.screen_region for r in refined_lines if getattr(r, 'screen_region', None)})
                 refined_typesetting_dict.update({r.id: r.visual_typesetting for r in refined_lines if getattr(r, 'visual_typesetting', None)})
 
@@ -8328,18 +8583,25 @@ class MultimodalTranslator:
                     r_en = orig_item.get("en", "") or ""
                     p1_pl = orig_item.get("pl", "") or ""
                     r_pl = refined_dict.get(r_line.id, p1_pl) or ""
-                    refined_dict[r_line.id] = enforce_locked_glossary_terms(
+                    _enf_pl = enforce_locked_glossary_terms(
                         en_text=r_en,
                         candidate_pl=r_pl,
                         glossary_entries=active_gloss_entries,
                         phase1_pl=p1_pl
                     )
+                    if _enf_pl != r_pl:
+                        post_f2_fixes_map.setdefault(r_line.id, []).append("post_f2:locked_glossary_enforce")
+                    refined_dict[r_line.id] = _enf_pl
 
+                _pre_a1_guard = {r.id: refined_dict.get(r.id) for r in refined_lines}
                 _guard_phase2_split_pair_integrity(
                     pass1_items=pass1_items,
                     refined_dict=refined_dict,
                     verified_ids={r.id for r in refined_lines},
                 )
+                for r in refined_lines:
+                    if refined_dict.get(r.id) != _pre_a1_guard.get(r.id):
+                        post_f2_fixes_map.setdefault(r.id, []).append("post_f2:a1_split_pair_guard")
 
 
                 any_redaction_printed = False
@@ -8512,19 +8774,46 @@ class MultimodalTranslator:
 
             if self.flight_recorder:
                 try:
+                    _lid = item.get("id")
+                    _whisper_parts = [
+                        str(item.get("speaker_voice") or "").strip(),
+                        str(item.get("prosody") or "").strip(),
+                        str(item.get("pragmatic_register") or "").strip(),
+                    ]
+                    _whisper_tags_str = " | ".join(p for p in _whisper_parts if p)
                     self.flight_recorder.log_line_evolution(
-                        line_id=item.get("orig_idx", item["id"]),
+                        line_id=item.get("orig_idx", _lid),
                         start_ms=start_m,
                         end_ms=end_m,
                         actor=item.get("speaker_name") or item.get("speaker") or "",
                         en_text=item.get("en", ""),
                         jp_audio=item.get("audio_jp", ""),
-                        whisper_tags=str(item.get("whisper_disambiguation", "")),
+                        whisper_tags=_whisper_tags_str,
                         telemetry_tag=item.get("telemetry_tag", ""),
                         phase1_pl=item.get("pl", ""),
-                        phase2_pl=refined_dict.get(item["id"], item["pl"]),
+                        phase2_pl=refined_dict.get(_lid, item["pl"]),
                         linter_pl=final_text,
-                        fixes_applied=fixes + gloss_fixes + alias_fixes
+                        fixes_applied=fixes + gloss_fixes + alias_fixes,
+                        batch_id=b_idx,
+                        local_id=_lid,
+                        style=item.get("style"),
+                        is_sign=bool(item.get("is_sign", False)),
+                        is_song=bool(item.get("is_song", False)),
+                        is_internal_monologue=bool(item.get("is_internal_monologue", False)),
+                        notes_meta=_extract_line_observability_meta(item),
+                        f2_score=item.get("f2_score"),
+                        f2_score_reasons=item.get("f2_score_reasons"),
+                        f2_selected=item.get("f2_selected"),
+                        f2_not_selected_reason=item.get("f2_not_selected_reason"),
+                        f2_batch_p90=item.get("f2_batch_p90"),
+                        f2_batch_cap=item.get("f2_batch_cap"),
+                        f2_raw_pl=f2_raw_map.get(_lid),
+                        f2_changes_made=f2_changes_map.get(_lid),
+                        post_f2_fixes=(
+                            post_f2_fixes_map.get(_lid, [])
+                            if _lid in f2_raw_map
+                            else None
+                        ),
                     )
                 except Exception:
                     logger.debug("Rejestracja wyników lintera zakończona wyjątkiem", exc_info=True)
@@ -8682,8 +8971,7 @@ class MultimodalTranslator:
                         "f2": dict(self.verifier.current_episode_tokens) if self.verifier and hasattr(self.verifier, "current_episode_tokens") else None
                     }
                 }
-                with open(checkpoint_path, "w", encoding="utf-8") as cp_file:
-                    json.dump(checkpoint_payload, cp_file, ensure_ascii=False)
+                _write_json_atomic(checkpoint_path, checkpoint_payload)
             except Exception:
                 logger.debug("Zapis punktu kontrolnego zakończony wyjątkiem", exc_info=True)
 
@@ -8834,6 +9122,16 @@ class MultimodalTranslator:
 
         if self.flight_recorder:
             try:
+                has_existing_checkpoint = False
+                for _cp_src in (video_path, subs_path):
+                    if _cp_src:
+                        _cp_p = Path(_cp_src)
+                        if (
+                            _cp_p.with_suffix(".checkpoint.json").exists()
+                            or (_cp_p.parent / f"{_cp_p.stem}.checkpoint.json").exists()
+                        ):
+                            has_existing_checkpoint = True
+                            break
                 self.flight_recorder.log_cli_init(
                     cli_args={
                         "subs_path": subs_path,
@@ -8854,7 +9152,12 @@ class MultimodalTranslator:
                         "phase2_model": getattr(self.verifier, "model", None) if self.verifier else None
                     },
                     context_cache_info={"model": self.model_phase1},
-                    client_pool_info={"active_clients": len(getattr(self.client_pool, "clients", [1])) if getattr(self, "client_pool", None) else 1}
+                    client_pool_info={"active_clients": len(getattr(self.client_pool, "clients", [1])) if getattr(self, "client_pool", None) else 1},
+                    runtime_meta={
+                        "git_head": _get_repo_git_head(),
+                        "consolidate_f2": os.getenv("AVT_CONSOLIDATE_F2", "0"),
+                        "resumed_from_checkpoint": bool(has_existing_checkpoint),
+                    }
                 )
             except Exception:
                 logger.debug("Inicjalizacja rejestratora zdarzeń zakończona wyjątkiem", exc_info=True)
@@ -9127,6 +9430,19 @@ class MultimodalTranslator:
             if restored_f1_tokens:
                 print(f"  Przywrócono telemetrię historyczną (limit 6.00 PLN liczony od nowej sesji).")
             print("═" * 60 + "\n")
+            if self.flight_recorder:
+                try:
+                    self.flight_recorder.log_budget_audit(
+                        event_kind="CHECKPOINT_RESUME",
+                        phase="init",
+                        batch_id=None,
+                        session_net_pln=0.0,
+                        ceiling_pln=6.00,
+                        cached_tokens=0,
+                        detail=f"{found_checkpoint_path.name}:{len(translated_results)}/{total_lines}",
+                    )
+                except Exception:
+                    logger.debug("Rejestracja audytu checkpointu zakończona wyjątkiem", exc_info=True)
         else:
             print("[Autozapis]: Brak wcześniejszego checkpointu. Rozpoczynanie tłumaczenia.")
 
@@ -9388,11 +9704,38 @@ class MultimodalTranslator:
                     "relations_count": len(rel_dict),
                     "declensions_count": len(decl_dict)
                 }
+                ram_notes: List[str] = []
+                raw_sb_notes = (
+                    getattr(self.series_bible, "_ram_sanitization_notes", None)
+                    if hasattr(self, "series_bible") and self.series_bible
+                    else None
+                )
+                if isinstance(raw_sb_notes, (list, tuple)):
+                    ram_notes.extend(str(x) for x in raw_sb_notes if x)
+                if isinstance(char_reg, dict):
+                    verified_cnt = 0
+                    p0_cnt = 0
+                    for _c_rec in char_reg.values():
+                        if isinstance(_c_rec, dict):
+                            if _c_rec.get("has_verified_gender"):
+                                verified_cnt += 1
+                            if (
+                                str(_c_rec.get("priority", "")).upper() == "P0"
+                                or float(_c_rec.get("confidence", 0.0) or 0.0) >= 0.95
+                            ):
+                                p0_cnt += 1
+                    ram_notes.append(
+                        f"characters_total:{len(char_reg)},verified_gender:{verified_cnt},p0_or_high_conf:{p0_cnt}"
+                    )
+                if ep_title_locks:
+                    ram_notes.append(f"episode_title_locks:{len(ep_title_locks)}")
                 self.flight_recorder.log_series_bible(
                     bible_summary=bible_sum,
                     character_registry=char_reg,
                     relations=rel_dict,
-                    declensions=decl_dict
+                    declensions=decl_dict,
+                    locked_glossary=dict(combined_glossary) if combined_glossary else None,
+                    ram_sanitization_notes=ram_notes
                 )
             except Exception:
                 logger.debug("Rejestracja bazy wiedzy serii zakończona wyjątkiem", exc_info=True)
@@ -10270,6 +10613,7 @@ class MultimodalTranslator:
         final_subs.events = apply_simultaneous_dialogue_formatting(final_subs.events)
 
         # 7.1. Visual Sign Detector & OCR for subtitle gaps
+        sign_detector_events: List[Dict[str, Any]] = []
         if video_path and os.path.exists(video_path):
             try:
                 from sign_detector import VisualSignDetector
@@ -10285,6 +10629,15 @@ class MultimodalTranslator:
                         sign_proximity_ms=3000,
                     )
                     if detected_signs:
+                        sign_detector_events = [
+                            {
+                                "start_ms": getattr(sign_ev, "start", 0),
+                                "end_ms": getattr(sign_ev, "end", 0),
+                                "style": getattr(sign_ev, "style", ""),
+                                "text": getattr(sign_ev, "text", ""),
+                            }
+                            for sign_ev in detected_signs
+                        ]
                         for sign_ev in detected_signs:
                             final_subs.events.append(sign_ev)
                         final_subs.events.sort(key=lambda ev: ev.start)
@@ -10307,8 +10660,10 @@ class MultimodalTranslator:
         final_subs.events.sort(key=lambda ev: ev.start)
 
         # 7.3. Global Episode Quality Gate & Human-Eye Common Sense Audit (0.00 PLN)
+        eqg_diffs: List[Dict[str, Any]] = []
         try:
             from avt_linter import EpisodeQualityGate
+            pre_eqg_texts = [ev.text for ev in final_subs.events]
             try:
                 final_subs, qg_fixes = EpisodeQualityGate.audit_and_fix_entire_episode(
                     final_subs,
@@ -10336,6 +10691,16 @@ class MultimodalTranslator:
                     whisper_transcriptions=episode_whisper_transcriptions,
                     enforce_line_split=True
                 )
+            eqg_diffs = [
+                {
+                    "ass_idx": i + 1,
+                    "start_ms": getattr(ev, "start", 0),
+                    "before": pre_t,
+                    "after": ev.text,
+                }
+                for i, (pre_t, ev) in enumerate(zip(pre_eqg_texts, final_subs.events))
+                if pre_t != ev.text
+            ]
             if qg_fixes:
                 en_warnings = [f for f in qg_fixes if "nieprzetłumaczony angielski" in f]
                 if en_warnings:
@@ -10464,8 +10829,14 @@ class MultimodalTranslator:
             try:
                 self.flight_recorder.log_quality_gate_and_pricing(
                     quality_gate_fixes=qg_fixes if 'qg_fixes' in locals() else [],
-                    avt_metrics={"total_lines": total_lines, "events_count": len(final_subs.events)},
-                    pricing_summary=breakdown if 'breakdown' in locals() else {}
+                    avt_metrics={
+                        "total_lines": total_lines,
+                        "events_count": len(final_subs.events),
+                        "ass_events_count": len(final_subs.events),
+                    },
+                    pricing_summary=breakdown if 'breakdown' in locals() else {},
+                    eqg_diffs=eqg_diffs if 'eqg_diffs' in locals() else None,
+                    sign_detector_events=sign_detector_events if 'sign_detector_events' in locals() else None,
                 )
                 self.flight_recorder.finalize()
             except Exception:

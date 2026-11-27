@@ -7,6 +7,7 @@ Zgodny ze Standardem 9.0 (Zero-Literal Pure Positive Domain Invariant & Instance
 
 import os
 import json
+import logging
 import threading
 from datetime import datetime
 from pathlib import Path
@@ -47,6 +48,7 @@ class EpisodeFlightRecorder:
     ) -> None:
         self.enabled: bool = enabled
         self._lock: threading.RLock = threading.RLock()
+        self._io_error_count: int = 0
         self._initialized: bool = False
         self._finalized: bool = False
         self._cli_init_logged: bool = False
@@ -72,8 +74,20 @@ class EpisodeFlightRecorder:
             try:
                 self.trace_dir.mkdir(parents=True, exist_ok=True)
                 self.__initialize_log_file()
-            except Exception:
-                pass
+            except Exception as exc:
+                self._handle_io_error("init", exc)
+
+    def _handle_io_error(self, context: str, exc: Exception) -> None:
+        """Rejestruje błędy I/O rejestratora w sposób bezpieczny dla potoku (ostrzeżenie przy pierwszym błędzie)."""
+        with self._lock:
+            self._io_error_count += 1
+            count = self._io_error_count
+        if count == 1:
+            logging.getLogger("pipeline_logger").warning(
+                "EpisodeFlightRecorder I/O error during %s (suppressed further warnings): %s",
+                context,
+                exc,
+            )
 
     def __initialize_log_file(self) -> None:
         """Inicjalizuje nagłówek w pliku czytelnym dla człowieka (dokładnie raz)."""
@@ -94,8 +108,8 @@ class EpisodeFlightRecorder:
                 with open(self.jsonl_path, "a", encoding="utf-8") as jf:
                     pass
                 self._initialized = True
-            except Exception:
-                pass
+            except Exception as exc:
+                self._handle_io_error("initialize_log_file", exc)
 
     def record_event(
         self,
@@ -124,15 +138,15 @@ class EpisodeFlightRecorder:
                 line_str = json.dumps(event_data, default=_safe_json_default, ensure_ascii=False)
                 with open(self.jsonl_path, "a", encoding="utf-8") as jf:
                     jf.write(line_str + "\n")
-            except Exception:
-                pass
+            except Exception as exc:
+                self._handle_io_error("record_event_jsonl", exc)
 
             if message:
                 try:
                     with open(self.log_path, "a", encoding="utf-8") as lf:
                         lf.write(message + "\n")
-                except Exception:
-                    pass
+                except Exception as exc:
+                    self._handle_io_error("record_event_log", exc)
 
     def write_log_section(self, section_title: str, content: str) -> None:
         """Zapisuje sformatowaną sekcję do pliku tekstowego logu."""
@@ -148,8 +162,8 @@ class EpisodeFlightRecorder:
             try:
                 with open(self.log_path, "a", encoding="utf-8") as lf:
                     lf.write(section_text)
-            except Exception:
-                pass
+            except Exception as exc:
+                self._handle_io_error("write_log_section", exc)
 
     def log_cli_init(
         self,
@@ -157,14 +171,15 @@ class EpisodeFlightRecorder:
         paths: Dict[str, Any],
         models: Dict[str, Any],
         context_cache_info: Optional[Dict[str, Any]] = None,
-        client_pool_info: Optional[Dict[str, Any]] = None
+        client_pool_info: Optional[Dict[str, Any]] = None,
+        runtime_meta: Optional[Dict[str, Any]] = None
     ) -> None:
         """Rejestruje KROK 1: Inicjalizację procesu i parametry CLI (idempotentnie, dokładnie jeden raz)."""
         with self._lock:
             if getattr(self, "_cli_init_logged", False):
                 return
             self._cli_init_logged = True
-            payload = {
+            payload: Dict[str, Any] = {
                 "cli_args": cli_args,
                 "paths": paths,
                 "models": models,
@@ -178,6 +193,11 @@ class EpisodeFlightRecorder:
                 f"Pamięć podręczna kontekstu: {json.dumps(context_cache_info or {}, default=_safe_json_default, ensure_ascii=False)}",
                 f"Pula klientów: {json.dumps(client_pool_info or {}, default=_safe_json_default, ensure_ascii=False)}"
             ]
+            if runtime_meta is not None:
+                payload["runtime_meta"] = runtime_meta
+                text_lines.append(
+                    f"Metadane runtime: {json.dumps(runtime_meta, default=_safe_json_default, ensure_ascii=False)}"
+                )
         self.record_event("cli_init", payload)
         self.write_log_section("[KROK 1: CLI & INICJALIZACJA PROCESU]", "\n".join(text_lines))
 
@@ -234,19 +254,26 @@ class EpisodeFlightRecorder:
     def log_acoustics_and_whisper(
         self,
         f0_metrics: Optional[Dict[str, Any]] = None,
-        whisper_results: Optional[Dict[str, Any]] = None
+        whisper_results: Optional[Dict[str, Any]] = None,
+        batch_id: Optional[int] = None
     ) -> None:
         """Rejestruje KROK 4: Estymację akustyki F0 oraz transkrypcję japońskiego audio."""
-        payload = {
+        payload: Dict[str, Any] = {
             "f0_metrics": f0_metrics or {},
             "whisper_results": whisper_results or {}
         }
+        if batch_id is not None:
+            payload["batch_id"] = batch_id
         text_lines = [
             f"Metryki estymacji akustyki F0: {json.dumps(f0_metrics or {}, default=_safe_json_default, ensure_ascii=False)}",
             f"Transkrypcja japońskiego audio i tagi: {json.dumps(whisper_results or {}, default=_safe_json_default, ensure_ascii=False)}"
         ]
-        self.record_event("acoustics_whisper", payload)
-        self.write_log_section("[KROK 4: AKUSTYKA DSP, ESTYMACJA F0 I WHISPER ASR]", "\n".join(text_lines))
+        self.record_event("acoustics_whisper", payload, batch_id=batch_id)
+        batch_suffix = f" (PACZKA {batch_id})" if batch_id is not None else ""
+        self.write_log_section(
+            f"[KROK 4: AKUSTYKA DSP, ESTYMACJA F0 I WHISPER ASR{batch_suffix}]",
+            "\n".join(text_lines)
+        )
 
     def log_profile_prepass(
         self,
@@ -272,10 +299,12 @@ class EpisodeFlightRecorder:
         bible_summary: Optional[Dict[str, Any]] = None,
         character_registry: Optional[Dict[str, Any]] = None,
         relations: Optional[Dict[str, Any]] = None,
-        declensions: Optional[Dict[str, Any]] = None
+        declensions: Optional[Dict[str, Any]] = None,
+        locked_glossary: Optional[Dict[str, str]] = None,
+        ram_sanitization_notes: Optional[List[str]] = None
     ) -> None:
         """Rejestruje KROK 6: Stan bazy wiedzy serii, rejestru postaci i deklinacji."""
-        payload = {
+        payload: Dict[str, Any] = {
             "bible_summary": bible_summary or {},
             "character_registry": character_registry or {},
             "relations": relations or {},
@@ -287,6 +316,16 @@ class EpisodeFlightRecorder:
             f"Relacje skierowane: {json.dumps(relations or {}, default=_safe_json_default, ensure_ascii=False)}",
             f"Paradygmaty odmiany: {json.dumps(declensions or {}, default=_safe_json_default, ensure_ascii=False)}"
         ]
+        if locked_glossary is not None:
+            payload["locked_glossary"] = locked_glossary
+            text_lines.append(
+                f"Zablokowany glosariusz ({len(locked_glossary)}): {json.dumps(locked_glossary, default=_safe_json_default, ensure_ascii=False)}"
+            )
+        if ram_sanitization_notes is not None:
+            payload["ram_sanitization_notes"] = ram_sanitization_notes
+            text_lines.append(
+                f"Adnotacje sanitacji RAM: {json.dumps(ram_sanitization_notes, default=_safe_json_default, ensure_ascii=False)}"
+            )
         self.record_event("series_bible", payload)
         self.write_log_section("[KROK 6: PAMIĘĆ SERII SERIESBIBLE I PARADYGMATY ODMIANY]", "\n".join(text_lines))
 
@@ -341,16 +380,49 @@ class EpisodeFlightRecorder:
         )
         self.record_event("retry", payload, batch_id=batch_id, message=msg)
 
+    def log_budget_audit(
+        self,
+        event_kind: str,
+        phase: str = "",
+        batch_id: Optional[int] = None,
+        session_net_pln: Optional[float] = None,
+        ceiling_pln: Optional[float] = None,
+        cached_tokens: int = 0,
+        detail: str = ""
+    ) -> None:
+        """Rejestruje zdarzenie audytu pamięci podręcznej kontekstu, budżetu sesji lub wznowienia checkpointu."""
+        payload: Dict[str, Any] = {
+            "event_kind": event_kind,
+            "phase": phase,
+            "batch_id": batch_id,
+            "session_net_pln": session_net_pln,
+            "ceiling_pln": ceiling_pln,
+            "cached_tokens": int(cached_tokens or 0),
+            "detail": detail,
+        }
+        net_str = f"{session_net_pln:.4f}" if isinstance(session_net_pln, (int, float)) else "-"
+        ceil_str = f"{ceiling_pln:.2f}" if isinstance(ceiling_pln, (int, float)) else "-"
+        msg = (
+            f"[BUDGET_AUDIT:{event_kind}] faza={phase or '-'} paczka={batch_id if batch_id is not None else '-'} "
+            f"koszt={net_str}/{ceil_str} PLN cached={int(cached_tokens or 0)}"
+            + (f" | {detail}" if detail else "")
+        )
+        self.record_event("budget_audit", payload, batch_id=batch_id, message=msg)
+
     def log_phase1_batch(
         self,
         batch_id: int,
         prompt_dump: str,
         raw_response: Any,
         response_time_sec: float = 0.0,
-        token_usage: Optional[Dict[str, Any]] = None
+        token_usage: Optional[Dict[str, Any]] = None,
+        focused_rules: Optional[str] = None,
+        locked_glossary_count: Optional[int] = None,
+        rendered_characters: Optional[List[str]] = None,
+        line_ids: Optional[List[int]] = None
     ) -> None:
         """Rejestruje KROK 8: Wykonanie Fazy 1 modelu pierwotnego przekładu."""
-        payload = {
+        payload: Dict[str, Any] = {
             "batch_id": batch_id,
             "response_time_sec": response_time_sec,
             "token_usage": token_usage or {},
@@ -360,9 +432,23 @@ class EpisodeFlightRecorder:
             f"Paczka ID: {batch_id}",
             f"Czas odpowiedzi modelu: {response_time_sec:.2f} s",
             f"Zużycie tokenów: {json.dumps(token_usage or {}, default=_safe_json_default, ensure_ascii=False)}",
+        ]
+        if line_ids is not None:
+            payload["line_ids"] = line_ids
+            text_lines.append(f"Mapa ID linii (orig_idx): {line_ids}")
+        if locked_glossary_count is not None:
+            payload["locked_glossary_count"] = locked_glossary_count
+            text_lines.append(f"Liczba reguł locked_glossary: {locked_glossary_count}")
+        if rendered_characters is not None:
+            payload["rendered_characters"] = rendered_characters
+            text_lines.append(f"Wyrenderowane postacie ({len(rendered_characters)}): {rendered_characters}")
+        if focused_rules is not None:
+            payload["focused_rules"] = focused_rules
+            text_lines.append(f"Aktywne reguły focused_rules:\n{focused_rules[:600]}")
+        text_lines.extend([
             f"Wyrenderowany prompt Fazy 1 (fragment):\n{prompt_dump[:800]}...",
             f"Surowa odpowiedź modelu Fazy 1:\n{json.dumps(raw_response, default=_safe_json_default, ensure_ascii=False)[:1000]}..."
-        ]
+        ])
         self.record_event("phase1_batch", payload, batch_id=batch_id)
         self.write_log_section(f"[KROK 8: FAZA 1 - PIERWOTNE TŁUMACZENIE PRIMARY LLM (PACZKA {batch_id})]", "\n".join(text_lines))
 
@@ -373,10 +459,15 @@ class EpisodeFlightRecorder:
         prompt_dump: str,
         raw_response: Any,
         response_time_sec: float = 0.0,
-        token_usage: Optional[Dict[str, Any]] = None
+        token_usage: Optional[Dict[str, Any]] = None,
+        focused_rules: Optional[str] = None,
+        locked_glossary_count: Optional[int] = None,
+        rendered_characters: Optional[List[str]] = None,
+        line_ids: Optional[Dict[str, int]] = None,
+        f2_selection_summary: Optional[Dict[str, Any]] = None
     ) -> None:
         """Rejestruje KROK 9: Wykonanie Fazy 2 weryfikatora dialogów."""
-        payload = {
+        payload: Dict[str, Any] = {
             "batch_id": batch_id,
             "cot_budget": cot_budget,
             "raw_response": raw_response,
@@ -388,9 +479,30 @@ class EpisodeFlightRecorder:
             f"Budżet myślenia CoT: {cot_budget}",
             f"Czas odpowiedzi Fazy 2: {response_time_sec:.2f}s",
             f"Zużycie tokenów Fazy 2: {json.dumps(token_usage or {}, default=_safe_json_default, ensure_ascii=False)}",
+        ]
+        if f2_selection_summary is not None:
+            payload["f2_selection_summary"] = f2_selection_summary
+            text_lines.append(
+                f"Selektor F2: {json.dumps(f2_selection_summary, default=_safe_json_default, ensure_ascii=False)}"
+            )
+        if line_ids is not None:
+            payload["line_ids"] = line_ids
+            text_lines.append(
+                f"Mapa linii Fazy 2 (local->orig): {json.dumps(line_ids, default=_safe_json_default, ensure_ascii=False)}"
+            )
+        if locked_glossary_count is not None:
+            payload["locked_glossary_count"] = locked_glossary_count
+            text_lines.append(f"Liczba reguł locked_glossary: {locked_glossary_count}")
+        if rendered_characters is not None:
+            payload["rendered_characters"] = rendered_characters
+            text_lines.append(f"Wyrenderowane postacie ({len(rendered_characters)}): {rendered_characters}")
+        if focused_rules is not None:
+            payload["focused_rules"] = focused_rules
+            text_lines.append(f"Aktywne reguły focused_rules:\n{focused_rules[:600]}")
+        text_lines.extend([
             f"Wyrenderowany prompt Fazy 2 (fragment):\n{prompt_dump[:800]}...",
             f"Surowa odpowiedź weryfikatora:\n{json.dumps(raw_response, default=_safe_json_default, ensure_ascii=False)[:1000]}..."
-        ]
+        ])
         self.record_event("phase2_verifier", payload, batch_id=batch_id)
         self.write_log_section(f"[KROK 9: FAZA 2 - WERYFIKACJA DIALOGUEVERIFIER (PACZKA {batch_id})]", "\n".join(text_lines))
 
@@ -407,10 +519,26 @@ class EpisodeFlightRecorder:
         phase1_pl: str,
         phase2_pl: str,
         linter_pl: str,
-        fixes_applied: Optional[List[str]] = None
+        fixes_applied: Optional[List[str]] = None,
+        batch_id: Optional[int] = None,
+        local_id: Optional[int] = None,
+        style: Optional[str] = None,
+        is_sign: Optional[bool] = None,
+        is_song: Optional[bool] = None,
+        is_internal_monologue: Optional[bool] = None,
+        notes_meta: Optional[Dict[str, Any]] = None,
+        f2_score: Optional[int] = None,
+        f2_score_reasons: Optional[List[str]] = None,
+        f2_selected: Optional[bool] = None,
+        f2_not_selected_reason: Optional[str] = None,
+        f2_batch_p90: Optional[int] = None,
+        f2_batch_cap: Optional[int] = None,
+        f2_raw_pl: Optional[str] = None,
+        f2_changes_made: Optional[str] = None,
+        post_f2_fixes: Optional[List[str]] = None
     ) -> None:
         """Rejestruje KROK 10: Pełną ścieżkę ewolucji pojedynczej linii dialogowej."""
-        payload = {
+        payload: Dict[str, Any] = {
             "line_id": line_id,
             "start_ms": start_ms,
             "end_ms": end_ms,
@@ -424,24 +552,59 @@ class EpisodeFlightRecorder:
             "linter_pl": linter_pl,
             "fixes_applied": fixes_applied or []
         }
+        optional_fields: Dict[str, Any] = {
+            "batch_id": batch_id,
+            "local_id": local_id,
+            "style": style,
+            "is_sign": is_sign,
+            "is_song": is_song,
+            "is_internal_monologue": is_internal_monologue,
+            "notes_meta": notes_meta,
+            "f2_score": f2_score,
+            "f2_score_reasons": f2_score_reasons,
+            "f2_selected": f2_selected,
+            "f2_not_selected_reason": f2_not_selected_reason,
+            "f2_batch_p90": f2_batch_p90,
+            "f2_batch_cap": f2_batch_cap,
+            "f2_raw_pl": f2_raw_pl,
+            "f2_changes_made": f2_changes_made,
+            "post_f2_fixes": post_f2_fixes,
+        }
+        for key, val in optional_fields.items():
+            if val is not None or (key == "f2_not_selected_reason" and f2_selected is not None):
+                payload[key] = val
         fixes_str = ", ".join(fixes_applied) if fixes_applied else "BRAK POPRAWEK - IDENTITY PASS-THROUGH"
-        line_report = (
-            f"[ID: {line_id} | Czas: {start_ms}->{end_ms} | Aktor: {actor or 'Brak'}]\n"
-            f"EN:                 \"{en_text}\"\n"
-            f"JP Audio (Whisper): \"{jp_audio}\" [Tagi: {whisper_tags}]\n"
-            f"Telemetria:         {telemetry_tag}\n"
-            f"Faza 1 (Draft PL):  \"{phase1_pl}\"\n"
-            f"Faza 2 (Verifier):  \"{phase2_pl}\"\n"
-            f"AVTLinter (D_pos):  \"{linter_pl}\"\n"
+        report_lines = [
+            f"[ID: {line_id} | Czas: {start_ms}->{end_ms} | Aktor: {actor or 'Brak'}]",
+            f"EN:                 \"{en_text}\"",
+            f"JP Audio (Whisper): \"{jp_audio}\" [Tagi: {whisper_tags}]",
+            f"Telemetria:         {telemetry_tag}",
+            f"Faza 1 (Draft PL):  \"{phase1_pl}\"",
+            f"Faza 2 (Verifier):  \"{phase2_pl}\"",
+        ]
+        if f2_raw_pl is not None and f2_raw_pl != phase2_pl:
+            report_lines.append(f"Faza 2 (Surowe PL): \"{f2_raw_pl}\"")
+        if post_f2_fixes:
+            report_lines.append(f"Etapy post-F2:      [{', '.join(post_f2_fixes)}]")
+        if f2_score is not None:
+            report_lines.append(
+                f"Selektor F2:        score={f2_score} selected={f2_selected} "
+                f"p90={f2_batch_p90} cap={f2_batch_cap} reason={f2_not_selected_reason or '-'}"
+            )
+        report_lines.extend([
+            f"AVTLinter (D_pos):  \"{linter_pl}\"",
             f"Lista poprawek D_pos: [{fixes_str}]"
-        )
-        self.record_event("line_evolution", payload, line_id=line_id, message=line_report)
+        ])
+        line_report = "\n".join(report_lines)
+        self.record_event("line_evolution", payload, batch_id=batch_id, line_id=line_id, message=line_report)
 
     def log_quality_gate_and_pricing(
         self,
         quality_gate_fixes: Optional[List[str]] = None,
         avt_metrics: Optional[Dict[str, Any]] = None,
-        pricing_summary: Optional[Dict[str, Any]] = None
+        pricing_summary: Optional[Dict[str, Any]] = None,
+        eqg_diffs: Optional[List[Dict[str, Any]]] = None,
+        sign_detector_events: Optional[List[Dict[str, Any]]] = None
     ) -> None:
         """Rejestruje KROK 11: Końcowy audyt jakości odcinka oraz podsumowanie kosztów (Standard 9.4, 2C.8, R3.5)."""
         all_fixes = quality_gate_fixes or []
@@ -461,12 +624,16 @@ class EpisodeFlightRecorder:
             "collected": collected_count,
             "status": consistency_status
         }
-        payload = {
+        payload: Dict[str, Any] = {
             "quality_gate_fixes": all_fixes,
             "consistency_check": consistency_check,
             "avt_metrics": avt_metrics or {},
             "pricing_summary": pricing_summary or {}
         }
+        if eqg_diffs is not None:
+            payload["eqg_diffs"] = eqg_diffs
+        if sign_detector_events is not None:
+            payload["sign_detector_events"] = sign_detector_events
         # Pełne wylistowanie poprawek (zniesienie limitu [:15], Operacja 2C.8)
         fixes_summary = "\n".join(f"  ├─ {f}" for f in all_fixes)
         if not fixes_summary:
@@ -477,6 +644,16 @@ class EpisodeFlightRecorder:
             f"Metryki AVT (CPL/CPS): {json.dumps(avt_metrics or {}, default=_safe_json_default, ensure_ascii=False)}",
             f"Podsumowanie finansowe PricingGuard:\n{json.dumps(pricing_summary or {}, default=_safe_json_default, ensure_ascii=False, indent=2)}"
         ]
+        if eqg_diffs is not None:
+            text_lines.append(
+                f"Zmiany EpisodeQualityGate (przed/po: {len(eqg_diffs)}): "
+                f"{json.dumps(eqg_diffs, default=_safe_json_default, ensure_ascii=False)}"
+            )
+        if sign_detector_events is not None:
+            text_lines.append(
+                f"Zdarzenia VisualSignDetector ({len(sign_detector_events)}): "
+                f"{json.dumps(sign_detector_events, default=_safe_json_default, ensure_ascii=False)}"
+            )
         self.record_event("quality_gate_pricing", payload)
         self.write_log_section("[KROK 11: EPISODEQUALITYGATE I ROZLICZENIE FINANSOWE PRICINGGUARD]", "\n".join(text_lines))
 
@@ -501,5 +678,5 @@ class EpisodeFlightRecorder:
                 with open(self.log_path, "a", encoding="utf-8") as lf:
                     lf.write(footer)
                 self._finalized = True
-            except Exception:
-                pass
+            except Exception as exc:
+                self._handle_io_error("finalize", exc)
