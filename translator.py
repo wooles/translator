@@ -7739,6 +7739,9 @@ class MultimodalTranslator:
             long_pts = 15 + min(15, word_cnt - 8)
             score += long_pts
             reasons.append(f"long_line:+{long_pts}")
+            if item.get("is_sign") and word_cnt >= 10 and len(str(item.get("en") or "")) >= 75:
+                score += 60
+                reasons.append("long_sign_banner:+60")
 
         pl_val = str(item.get("pl") or item.get("polish_text") or "")
         has_pl_typo = (not item.get("is_sign")) and _detect_polish_typo_anomaly(pl_val)

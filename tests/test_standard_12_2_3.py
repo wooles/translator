@@ -246,7 +246,26 @@ def test_q3_extreme_cps_above_25_gets_plus60_and_bypasses_trivial_short(tmp_path
     sign_cps_item = dict(high_cps_item, id=12, orig_idx=12, is_sign=True)
     sc_sign, _, reasons_sign = MultimodalTranslator._score_phase2_editorial_risk_detailed(sign_cps_item)
     assert "cps_extreme:+60" not in reasons_sign
+    assert "long_sign_banner:+60" not in reasons_sign
     assert sc_sign == 0
+
+    # Long dense multi-word sign inscription (>= 10 words, >= 75 chars) keeps F2 priority over fast dialogues
+    long_sign_item = {
+        "id": 13,
+        "orig_idx": 13,
+        "start_ms": 1000,
+        "end_ms": 2800,
+        "speaker": "sign",
+        "en": "Northern academy grand hall ancient arcane emblem royal charter inscription banner archive board 13",
+        "pl": "[WIELKA SALA PÓŁNOCNEJ AKADEMII ARCHIWUM 13]",
+        "is_sign": True,
+        "speaker_confidence": 1.0,
+        "target_confidence": 1.0,
+    }
+    sc_long_sign, _, reasons_long_sign = MultimodalTranslator._score_phase2_editorial_risk_detailed(long_sign_item)
+    assert "cps_extreme:+60" not in reasons_long_sign
+    assert "long_sign_banner:+60" in reasons_long_sign
+    assert sc_long_sign >= 80
 
     # Verify high_cps_item wins F2 slot over low-risk candidates in selector
     tr = _make_translator(tmp_path, lambda req: httpx.Response(200, json={}))
