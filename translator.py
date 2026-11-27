@@ -6039,11 +6039,20 @@ class MultimodalTranslator:
         (e.g., Gemini 3.7 Flash and Gemini 3.6 Flash) for optimal throughput and quota distribution,
         while maintaining the absolute highest model version for Phase 2 verification.
         """
-        from model_resolver import resolve_best_models, is_gemini_4_or_hydrogen_model, build_thinking_config
+        from model_resolver import (
+            resolve_best_models,
+            is_gemini_4_or_hydrogen_model,
+            build_thinking_config,
+            resolve_service_tier,
+            apply_service_tier_to_config,
+            extract_response_service_tier_header,
+        )
         active_models = resolve_best_models(self.client)
 
         current_model = self.model
         attempt = 0
+        active_service_tier = resolve_service_tier()
+        consecutive_flex_503 = 0
 
         while True:
             attempt += 1
@@ -6105,6 +6114,7 @@ class MultimodalTranslator:
                         cfg_kwargs["cached_content"] = cached_name
                     else:
                         cfg_kwargs["system_instruction"] = self.system_prompt
+                    cfg_kwargs = apply_service_tier_to_config(cfg_kwargs, active_service_tier, current_model)
                     cfg = types.GenerateContentConfig(**cfg_kwargs)
                     return active_c.models.generate_content(
                         model=current_model,
@@ -6142,6 +6152,11 @@ class MultimodalTranslator:
                         self.current_episode_tokens["cached"] += c_cnt
                         self.current_episode_tokens["output"] += out_cnt
                         self.current_episode_tokens["model"] = current_model
+
+                self._thread_local.last_batch_token_usage["service_tier"] = active_service_tier
+                resp_tier_hdr = extract_response_service_tier_header(response)
+                if resp_tier_hdr:
+                    self._thread_local.last_batch_token_usage["response_service_tier_header"] = resp_tier_hdr
 
                 if hasattr(response, "parsed") and response.parsed is not None:
                     raw_res = response.parsed
@@ -6215,8 +6230,35 @@ class MultimodalTranslator:
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str or "rate" in err_str
                 is_not_found = "404" in err_str or "not found" in err_str
 
+                if active_service_tier == "flex" and (is_unavailable or is_timeout):
+                    consecutive_flex_503 += 1
+                    if consecutive_flex_503 >= 2:
+                        active_service_tier = "standard"
+                        consecutive_flex_503 = 0
+                        print(
+                            f"\n[Flex Fallback Faza 1]: 2x 503/timeout w trybie flex -> "
+                            f"przełączenie na service_tier='standard' (model {current_model} bez zmian)."
+                        )
+                        self._log_retry_telemetry(
+                            batch_id=batch_idx,
+                            phase="F1",
+                            error_type=self._classify_retry_error_type(e),
+                            attempt_number=attempt,
+                            wait_ms=500,
+                            model=current_model,
+                            error_detail=f"{e} -> service_tier_fallback:standard"
+                        )
+                        time.sleep(0.5)
+                        continue
+                else:
+                    consecutive_flex_503 = 0
+
                 if is_gemini_4_or_hydrogen_model(current_model):
-                    if is_not_found or (attempt >= max(2, num_keys * 2) and (is_unavailable or is_timeout)):
+                    if is_not_found or (
+                        active_service_tier != "flex"
+                        and attempt >= max(2, num_keys * 2)
+                        and (is_unavailable or is_timeout)
+                    ):
                         fallback_model = active_models.get("flash", "gemini-3.8-flash")
                         print(f"\n[Fallback Model Faza 1]: Przełączenie z {current_model} na {fallback_model} (próba {attempt})...")
                         self._log_retry_telemetry(
@@ -9199,6 +9241,7 @@ class MultimodalTranslator:
                         ):
                             has_existing_checkpoint = True
                             break
+                from model_resolver import resolve_service_tier
                 self.flight_recorder.log_cli_init(
                     cli_args={
                         "subs_path": subs_path,
@@ -9224,6 +9267,7 @@ class MultimodalTranslator:
                         "git_head": _get_repo_git_head(),
                         "consolidate_f2": os.getenv("AVT_CONSOLIDATE_F2", "0"),
                         "resumed_from_checkpoint": bool(has_existing_checkpoint),
+                        "service_tier": resolve_service_tier(),
                     }
                 )
             except Exception:

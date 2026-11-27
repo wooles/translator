@@ -21,7 +21,12 @@ from PIL import Image
 from google import genai
 from google.genai import types
 from extract import extract_frame_at_timestamp
-from model_resolver import is_gemini_4_or_hydrogen_model, build_thinking_config
+from model_resolver import (
+    is_gemini_4_or_hydrogen_model,
+    build_thinking_config,
+    resolve_service_tier,
+    apply_service_tier_to_config,
+)
 
 logger = logging.getLogger("sign_detector")
 
@@ -268,6 +273,8 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
             )
 
         consecutive_errors = 0
+        active_service_tier = resolve_service_tier()
+        consecutive_flex_503 = 0
 
         for gap_start, gap_end in gaps:
             if consecutive_errors >= 2:
@@ -312,12 +319,15 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
                         if any(k in model.lower() for k in ["3.7", "3.8", "flash", "pro"]) and "lite" not in model.lower():
                             gen_cfg_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
 
+                    gen_cfg_kwargs = apply_service_tier_to_config(gen_cfg_kwargs, active_service_tier, model)
+
                     response = client.models.generate_content(
                         model=model,
                         contents=[prompt, pil_img],
                         config=types.GenerateContentConfig(**gen_cfg_kwargs)
                     )
                     consecutive_errors = 0
+                    consecutive_flex_503 = 0
 
                     if response.text:
                         data = json.loads(response.text)
@@ -358,8 +368,31 @@ Zwróć wynik w formacie JSON zgodnym ze schematem DetectedSign."""
                             detected_events.append(new_ev)
                             logger.info(f"VisualSignDetector: Detected sign at {event_start/1000:.1f}s: '{sign_info.original_text}' -> '[ {clean_pl} ]'")
                 except Exception as e_model:
-                    consecutive_errors += 1
-                    logger.debug(f"VisualSignDetector: Model error: {e_model}")
+                    err_low = str(e_model).lower()
+                    is_transient = (
+                        "503" in err_low
+                        or "unavailable" in err_low
+                        or "high demand" in err_low
+                        or "504" in err_low
+                        or "deadline" in err_low
+                        or "timeout" in err_low
+                        or "timed out" in err_low
+                    )
+                    if active_service_tier == "flex" and is_transient:
+                        consecutive_flex_503 += 1
+                        if consecutive_flex_503 >= 2:
+                            active_service_tier = "standard"
+                            consecutive_flex_503 = 0
+                            consecutive_errors = 0
+                            logger.warning(
+                                f"[Flex Fallback SignDetector]: 2x 503/timeout w trybie flex -> przełączenie na service_tier='standard' (model {model})."
+                            )
+                        else:
+                            logger.debug(f"VisualSignDetector (flex): przejściowy błąd 503/timeout ({consecutive_flex_503}/2): {e_model}")
+                    else:
+                        consecutive_flex_503 = 0
+                        consecutive_errors += 1
+                        logger.debug(f"VisualSignDetector: Model error: {e_model}")
 
             except Exception as e:
                 consecutive_errors += 1

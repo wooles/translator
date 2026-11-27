@@ -6,12 +6,89 @@ Automatically queries Google API to discover and select the highest, latest mode
 guaranteeing the translator always utilizes the most capable models without manual code changes.
 """
 
+import os
 import re
 import logging
 from typing import Dict, Optional, List, Tuple, Any
 from google import genai
 
 logger = logging.getLogger("model_resolver")
+
+
+def resolve_service_tier(explicit_tier: Optional[str] = None) -> str:
+    """Rozstrzyga tryb usługi Gemini (domyślnie 'standard'; opt-in 'flex' przez AVT_SERVICE_TIER)."""
+    raw = explicit_tier if explicit_tier is not None else os.getenv("AVT_SERVICE_TIER", "standard")
+    norm = str(raw or "").strip().lower()
+    return "flex" if norm == "flex" else "standard"
+
+
+def apply_service_tier_to_config(
+    cfg_kwargs: Dict[str, Any],
+    service_tier: Optional[str],
+    model_name: str = "",
+) -> Dict[str, Any]:
+    """Stosuje opt-in Gemini Flex Inference w GenerateContentConfig bez wpływu na tryb standard."""
+    out = dict(cfg_kwargs or {})
+    if resolve_service_tier(service_tier) != "flex":
+        return out
+    try:
+        from google.genai import types
+        cfg_fields = getattr(types.GenerateContentConfig, "model_fields", {}) or {}
+        if "service_tier" in cfg_fields:
+            out["service_tier"] = "flex"
+        if "http_options" in cfg_fields and hasattr(types, "HttpOptions"):
+            existing_ho = out.get("http_options")
+            merged_headers: Dict[str, str] = {}
+            if existing_ho is not None:
+                if isinstance(existing_ho, dict):
+                    merged_headers.update(existing_ho.get("headers") or {})
+                    merged_headers["X-Gemini-Service-Tier"] = "flex"
+                    new_ho = dict(existing_ho)
+                    new_ho["headers"] = merged_headers
+                    out["http_options"] = types.HttpOptions(**new_ho)
+                else:
+                    ex_hdrs = getattr(existing_ho, "headers", None)
+                    if isinstance(ex_hdrs, dict):
+                        merged_headers.update(ex_hdrs)
+                    merged_headers["X-Gemini-Service-Tier"] = "flex"
+                    if hasattr(existing_ho, "model_copy"):
+                        out["http_options"] = existing_ho.model_copy(update={"headers": merged_headers})
+                    else:
+                        out["http_options"] = types.HttpOptions(headers=merged_headers)
+            else:
+                out["http_options"] = types.HttpOptions(headers={"X-Gemini-Service-Tier": "flex"})
+    except Exception as exc:
+        logger.debug("Pominięto wstrzyknięcie konfiguracji Flex Inference (%s): %s", model_name or "-", exc)
+    return out
+
+
+def extract_response_service_tier_header(response: Any) -> Optional[str]:
+    """Bezpiecznie odczytuje nagłówek X-Gemini-Service-Tier z odpowiedzi SDK."""
+    if response is None:
+        return None
+    header_sources = []
+    sdk_resp = getattr(response, "sdk_http_response", None)
+    if sdk_resp is not None:
+        header_sources.append(getattr(sdk_resp, "headers", None))
+    header_sources.append(getattr(response, "headers", None))
+    for hdrs in header_sources:
+        if isinstance(hdrs, dict) or hasattr(hdrs, "items"):
+            try:
+                for k, v in hdrs.items():
+                    if str(k).strip().lower() == "x-gemini-service-tier":
+                        val = str(v or "").strip().lower()
+                        if val:
+                            return val
+            except Exception as exc:
+                logger.debug("Błąd odczytu nagłówków odpowiedzi HTTP: %s", exc)
+    direct_tier = getattr(response, "service_tier", None)
+    if direct_tier is not None:
+        if hasattr(direct_tier, "value"):
+            direct_tier = direct_tier.value
+        val = str(direct_tier or "").strip().lower()
+        if val:
+            return val
+    return None
 
 
 def _extract_model_score(model_name: str) -> Tuple[int, int, int]:

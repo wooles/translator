@@ -20,7 +20,12 @@ from google.genai import types
 from client_factory import format_friendly_api_error, patch_google_genai_schema_sanitizer
 from metadata import normalize_ascii_diacritics, normalize_actor_tag
 from series_memory import is_valid_anthroponymic_phonotactics
-from model_resolver import is_gemini_4_or_hydrogen_model, build_thinking_config
+from model_resolver import (
+    is_gemini_4_or_hydrogen_model,
+    build_thinking_config,
+    resolve_service_tier,
+    apply_service_tier_to_config,
+)
 
 patch_google_genai_schema_sanitizer()
 
@@ -783,6 +788,8 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
 
         import time
         attempt = 0
+        active_service_tier = resolve_service_tier()
+        consecutive_flex_503 = 0
 
         while True:
             attempt += 1
@@ -797,6 +804,7 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                     gen_config_kwargs["temperature"] = 0.2
                     if any(k in self.model.lower() for k in ["3.7", "3.8", "flash", "pro"]) and "lite" not in self.model.lower():
                         gen_config_kwargs["thinking_config"] = types.ThinkingConfig(thinking_budget=0)
+                gen_config_kwargs = apply_service_tier_to_config(gen_config_kwargs, active_service_tier, self.model)
 
                 active_client = self.client_pool.get_client() if self.client_pool else self.client
                 response = active_client.models.generate_content(
@@ -841,6 +849,19 @@ Zwróć wynik w formacie JSON zgodnym ze schematem EpisodeProfile."""
                 is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
+
+                if active_service_tier == "flex" and (is_unavailable or is_timeout):
+                    consecutive_flex_503 += 1
+                    if consecutive_flex_503 >= 2:
+                        active_service_tier = "standard"
+                        consecutive_flex_503 = 0
+                        logger.warning(
+                            f"[Flex Fallback Profiler]: 2x 503/timeout w trybie flex -> przełączenie na service_tier='standard' (model {self.model})."
+                        )
+                        time.sleep(0.5)
+                        continue
+                else:
+                    consecutive_flex_503 = 0
                 
                 friendly_msg = format_friendly_api_error(e)
                 if attempt == 1:
