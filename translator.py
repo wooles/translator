@@ -7632,7 +7632,25 @@ class MultimodalTranslator:
             score += calque_pts
             reasons.append(f"calque:+{calque_pts}")
 
-        if item.get("condensation_directive") or item.get("cps_warning"):
+        raw_cps = item.get("cps")
+        if raw_cps is not None:
+            cps_val = float(raw_cps or 0.0)
+        else:
+            pl_cps_src = str(item.get("pl") or item.get("polish_text") or "")
+            vis_cps = re.sub(r"\{[^}]*\}", "", pl_cps_src).replace(r"\N", " ").replace("\n", " ").strip()
+            dur_s = item.get("duration_s")
+            if dur_s is None and item.get("start_ms") is not None and item.get("end_ms") is not None:
+                dur_s = (float(item["end_ms"]) - float(item["start_ms"])) / 1000.0
+            if vis_cps and dur_s is not None and float(dur_s) > 0:
+                cps_val = len(vis_cps) / max(0.2, float(dur_s))
+            else:
+                cps_val = 0.0
+
+        is_extreme_cps = (not item.get("is_sign")) and (cps_val > 25.0)
+        if is_extreme_cps:
+            score += 60
+            reasons.append("cps_extreme:+60")
+        elif item.get("condensation_directive") or item.get("cps_warning"):
             score += 45
             reasons.append("cps_or_condensation:+45")
         if item.get("audio_alert"):
@@ -7704,6 +7722,7 @@ class MultimodalTranslator:
             and not item.get("is_blind_draft")
             and not item.get("is_song")
             and calque_sc < 0.25
+            and not is_extreme_cps
             and not item.get("condensation_directive")
             and not item.get("cps_warning")
             and not item.get("audio_alert")
@@ -7738,16 +7757,32 @@ class MultimodalTranslator:
         curr_item: Dict[str, Any]
     ) -> bool:
         """
-        Standard 11.2.23 (DEF-03): Wykrywa wejście nowego mówcy rozpoczynające się
-        małą literą po wielokropku lub innej pauzie poprzedniego mówcy.
+        Standard 11.2.23 / 12.2.3 (DEF-03 + Q4/OBS-18): Wykrywa wejście nowego mówcy
+        rozpoczynające się małą literą (zmiana znanego aktora lub pauza sceniczna >= 3500 ms bez aktora).
         """
-        if not prev_item or not curr_item:
+        if not prev_item or not curr_item or curr_item.get("is_sign"):
             return False
-        # Hotfix 11.2.23a (DEF-03): Odczyt produkcyjnego klucza speaker_name z zachowaniem zgodności wstecznej
+        _UNKNOWN_SPK = frozenset({"", "unknown", "/", "postać"})
         spk_prev = (prev_item.get("speaker_name") or prev_item.get("speaker") or prev_item.get("actor") or "").strip().lower()
         spk_curr = (curr_item.get("speaker_name") or curr_item.get("speaker") or curr_item.get("actor") or "").strip().lower()
-        if not spk_prev or not spk_curr or spk_prev == spk_curr:
-            return False
+        has_known_pair = bool(
+            spk_prev and spk_curr
+            and spk_prev not in _UNKNOWN_SPK
+            and spk_curr not in _UNKNOWN_SPK
+        )
+        if has_known_pair:
+            if spk_prev == spk_curr:
+                return False
+        else:
+            raw_gap = curr_item.get("time_gap_ms")
+            if raw_gap is not None:
+                gap_ms = max(0, int(raw_gap))
+            elif prev_item.get("end_ms") is not None and curr_item.get("start_ms") is not None:
+                gap_ms = max(0, int(curr_item["start_ms"]) - int(prev_item["end_ms"]))
+            else:
+                gap_ms = 0
+            if gap_ms < 3500:
+                return False
 
         pl_text = str(curr_item.get("pl") or "")
         clean_text = re.sub(r"^(?:\{[^}]*\}|\s)+", "", pl_text)
