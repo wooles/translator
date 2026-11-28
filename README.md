@@ -2,7 +2,7 @@
 
 [![Python 3.10+ | 3.13](https://img.shields.io/badge/Python-3.10%2B%20%7C%203.13-blue.svg)](https://www.python.org/)
 [![Gemini 4 Hydrogen](https://img.shields.io/badge/Flagship%20LLM-Gemini%204%20Hydrogen%20(Zero--Cache%20Lean%201%3A1)-orange.svg)](https://ai.google.dev/)
-![Billing Tier](https://img.shields.io/badge/Billing%20Tier-Opt--In%20Gemini%20Flex%20(-50%25)-teal.svg)
+![Billing Tier](https://img.shields.io/badge/Billing%20Tier-Opt--In%20Gemini%20Flex%20(--50%25)-teal.svg)
 [![Acoustic ASR](https://img.shields.io/badge/Acoustic%20ASR-Kotoba--Whisper%20v2.0%20CTranslate2-green.svg)](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-faster)
 ![Architecture](https://img.shields.io/badge/Architecture-Standard%2012.2.4%20(Z16--Locked)-purple.svg)
 ![Test Suite](https://img.shields.io/badge/Test%20Suite-619%20Fast%20CI%20Passing%20(549%20tests%2F%20%2B%2070%20system)-brightgreen.svg)
@@ -86,7 +86,7 @@ flowchart TD
    - **Discourse, Typography & OCR Safeguards:** `Q4` actorless scene-cut lowercase guard (`>= 3.5 s`), `A-1` split-sentence & echo pairing, `A-3` directed T-V register control, `C-1` read-only neighbor context, `C-2` genre-adaptive F2 tone, `OBS-13` Z2 addressee confidence threshold (`>= 0.90`), `OBS-19/20` ASS trailing-period and multiline italic hygiene, `OBS-22` Sign OCR `3000 ms` proximity filter with locked glossary enforcement, and `OBS-23` Profiler catchphrase resolution priority.
 
 5. **Full Black-Box Observability (`EpisodeFlightRecorder` — `12.2.2 + 12.2.2a`):**
-   - Emits structured machine-readable telemetry to `events.jsonl` alongside human-readable diagnostics in `full_trace.log` (`U1–U8`) via [pipeline_logger.py](pipeline_logger.py) and [flight_recorder.py](flight_recorder.py).
+   - Emits structured machine-readable telemetry to `events.jsonl` alongside human-readable diagnostics in `full_trace.log` (`U1–U8`) via [pipeline_logger.py](pipeline_logger.py).
    - Captures per-line Phase 2 risk scores and reasons (`f2_score`, `f2_score_reasons`, `f2_not_selected_reason`), FBF-safe `line_ids` mappings, `notes_meta` (`A-1`/`A-3`/`C-1`/`OBS-13c`), raw Phase 2 drafts (`f2_raw_pl`), post-F2 fixes (`post_f2_fixes`), `EpisodeQualityGate` diffs (`eqg_diffs`), F1 `thoughts` tokens, `budget_audit` lifecycle events, API retry telemetry, and crash-safe atomic `.checkpoint.json` updates (`.tmp` + `fsync` + `os.replace`).
 
 ---
@@ -140,7 +140,7 @@ Configured via CLI (`--profile`) or interactive live cluster health probe in [ma
 
 | Context & Raw Inputs | Naive MT / Generic LLM | Multimodal AVT Engine Output | Codified Heuristic |
 | :--- | :--- | :--- | :--- |
-| **Scene:** Two female knights in private tent<br>**EN Script:** *„We were ready and we arrived on time.”* | ❌ *„Byliśmy gotowi i przybyliśmy na czas.”*<br>*(Default virile masculine bias)* | ✅ **„Byłyśmy gotowe i przybyliśmy na czas.”**<br>*(Strict non-virile group concordance)* | **Layer 2 & 4 Calculus**<br>(*$We\_Group$ Tri-State Virility*) |
+| **Scene:** Two female knights in private tent<br>**EN Script:** *„We were ready and we arrived on time.”* | ❌ *„Byliśmy gotowi i przybyliśmy na czas.”*<br>*(Default virile masculine bias)* | ✅ **„Byłyśmy gotowe i przybyłyśmy na czas.”**<br>*(Strict non-virile group concordance)* | **Layer 2 & 4 Calculus**<br>(*$We\_Group$ Tri-State Virility*) |
 
 ### 4. Official Manga Publishing Canon Invariance
 * **Challenge:** Fan translations and generic MT invent ad-hoc variants for signature techniques, titles, and factions across seasons.
@@ -208,10 +208,10 @@ translator/
 ├── client_factory.py                 # Multi-key client rotation pool & schema sanitizer
 ├── context_cache.py                  # Implicit & explicit Context Cache management & floor padding
 ├── pricing_guard.py                  # 0.5x Flex / Standard cost breakdown & 6.00 PLN Fail-Closed guard
-├── flight_recorder.py / pipeline_logger.py  # U1-U8 events.jsonl & full_trace.log black-box telemetry
+├── pipeline_logger.py                # U1-U8 events.jsonl & full_trace.log black-box telemetry
 ├── sign_detector.py / scene_snapper.py / typesetting_matcher.py / style_matrix.py  # Visual & ASS modules
 ├── whisper_engine.py / whisper_disambiguator.py  # Kotoba-Whisper v2.0 CTranslate2 ASR grounding
-├── extract.py / extract_subtitles.py # Subtitle track inspection & FFmpeg media extraction
+├── extract.py                        # Subtitle track inspection & FFmpeg media extraction
 ├── translate_drag_and_drop.bat / extract_subs_drag_and_drop.bat  # Windows drag-and-drop entrypoints
 ├── verify_purity.py / verify_8_fixes.py / verify_12_fixes.py / verify_ultimate_pipeline.py / audit_diff.ps1
 ├── manga_canon/                      # 108 official manga publisher canon JSON files
@@ -287,7 +287,7 @@ AVT_SERVICE_TIER=flex
 
 **Windows Drag-and-Drop Workflow:**
 * Drag and drop an `.mkv` / `.mp4` / `.ass` / `.srt` file or an entire season directory directly onto [`translate_drag_and_drop.bat`](translate_drag_and_drop.bat) to run automated translation inside `.venv`.
-* Drag and drop a video container onto [`extract_subs_drag_and_drop.bat`](extract_subs_drag_and_drop.bat) to inspect and extract embedded subtitle tracks via `extract_subtitles.py`.
+* Drag and drop a video container onto [`extract_subs_drag_and_drop.bat`](extract_subs_drag_and_drop.bat) to inspect and extract embedded subtitle tracks.
 
 ---
 
