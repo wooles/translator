@@ -609,25 +609,35 @@ class EpisodeProfiler:
             chars_present = chars_present or []
 
             verified_genders = []
+            unverified_count = 0
             for ch_name in chars_present:
+                ch_clean = str(ch_name or "").strip()
+                if not ch_clean:
+                    continue
                 ch_entry = None
                 if hasattr(series_bible, "get_character"):
-                    ch_entry = series_bible.get_character(ch_name)
-                elif hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
-                    ch_entry = series_bible.characters.get(ch_name)
+                    ch_entry = series_bible.get_character(ch_clean)
+                if ch_entry is None and hasattr(series_bible, "resolve_character_record"):
+                    ch_entry = series_bible.resolve_character_record(ch_clean)
+                if ch_entry is None and hasattr(series_bible, "characters") and isinstance(series_bible.characters, dict):
+                    ch_entry = series_bible.characters.get(ch_clean)
 
+                resolved_verified = False
                 if ch_entry:
                     g = getattr(ch_entry, "gender", None) or (ch_entry.get("gender") if isinstance(ch_entry, dict) else None)
                     prio = getattr(ch_entry, "priority", None) or (ch_entry.get("priority") if isinstance(ch_entry, dict) else None)
                     has_v = getattr(ch_entry, "has_verified_gender", False) if hasattr(ch_entry, "has_verified_gender") else (ch_entry.get("has_verified_gender", False) if isinstance(ch_entry, dict) else False)
                     if g in ("MALE", "FEMALE") and (has_v or prio in ("P0", "P1")):
                         verified_genders.append(g)
+                        resolved_verified = True
+                if not resolved_verified:
+                    unverified_count += 1
 
-            if verified_genders:
+            if verified_genders or unverified_count > 0:
                 fem_count = sum(1 for g in verified_genders if g == "FEMALE")
                 male_count = sum(1 for g in verified_genders if g == "MALE")
-                new_fem_only = (fem_count > 0 and male_count == 0)
-                new_male_only = (male_count > 0 and fem_count == 0)
+                new_fem_only = (fem_count > 0 and male_count == 0 and unverified_count == 0)
+                new_male_only = (male_count > 0 and fem_count == 0 and unverified_count == 0)
                 if is_model:
                     setattr(seq, "female_only_scene", new_fem_only)
                     setattr(seq, "male_only_scene", new_male_only)
@@ -702,7 +712,7 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza całego skryptu odcinka, a
 7. MOSTY CIĄGŁOŚCI (continuity_bridge_alerts): Wskaż terminy i wątki wymagające ścisłej spójności w skali całej serii.
 8. CHRONOLOGICZNA MAPA SEKWENCJI DRAMATURGICZNYCH (dramatic_sequences): Podziel odcinek na akty czasowe z określeniem dynamiki napięcia i tonu.
    - Dla każdej sekwencji wskaż postacie biorące udział w dialogu, rekonstruując brakujące dane aktora.
-   - Prymat rzeczywistości scenicznej i audio nad etykietami technicznymi: weryfikuj tożsamość i płeć na podstawie dialogu i ścieżki dźwiękowej. Flaga female_only_scene przyjmuje wartość True wyłącznie przy pełnej obsadzie kobiecej (min. 2 uczestniczki) i braku męskich głosów w scenie. Kwestie pojedyncze i monologi zachowują stan neutralny.
+   - Prymat rzeczywistości scenicznej i audio nad etykietami technicznymi: weryfikuj tożsamość i płeć na podstawie dialogu i ścieżki dźwiękowej. Ustawiaj female_only_scene na true wyłącznie wtedy, gdy w całej sekwencji występują i odzywają się potwierdzone postacie kobiece, bez udziału postaci męskich, nieznanych głosów zza kadru (off-screen) ani mówiących bytów nieludzkich (konstrukty, potwory, duchy, istoty magiczne, głos z obiektu). W razie najmniejszej wątpliwości ustawiaj female_only_scene na false; kwestie pojedyncze i monologi zachowują stan neutralny.
    - W scenach o potwierdzonym, wyłącznie kobiecym składzie uczestników formy 1. osoby liczby mnogiej podlegają rygorowi form niemęskoosobowych.
    - W scenach o potwierdzonym składzie męskim lub mieszanym formy 1. osoby liczby mnogiej przyjmują formy męskoosobowe. Brak pełnej pewności zachowuje stan neutralny.
 9. KARTOTEKA OBSADY I IDIOLEKTY (character_dossiers): Określ wiek, status, zaimki podmiotowe, dialekt oraz indywidualny rejestr polszczyzny dla każdej postaci.
@@ -770,6 +780,7 @@ Twoim zadaniem jest dogłębna, wszechstronna analiza całego skryptu odcinka, a
    - Zestawienie tytułu z nazwiskiem w podmiocie zachowuje formę mianownikową ([Tytuł] [Imię Nazwisko] nie zdążył). # Standard 9.0 Invariant
 20. TOŻSAMOŚĆ PODMIOTOWA I BYTY ZBIOROWE:
    - Klasyfikacja tożsamości podmiotu: byty pojedyncze, byty kolektywne męskoosobowe lub niemęskoosobowe, formy majestatyczne.
+   - Mówiące byty nieludzkie oraz nieznane głosy spoza potwierdzonej obsady zachowują pełną autonomię tożsamości: ich płeć gramatyczna wynika wyłącznie z barwy głosu i kontekstu danej wypowiedzi, bez przypisywania domyślnej płci głównej obsady odcinka.
 21. ELIMINACJA INTERFERENCJI SKŁADNIOWEJ:
    - Eliminacja nadmiaru zaimków dzierżawczych przy częściach ciała i relacjach inalienabilnych.
    - Stosowanie naturalnej polskiej elipsy orzeczeniowej w odpowiedziach potwierdzających i przeczących.
