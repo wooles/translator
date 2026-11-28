@@ -333,10 +333,11 @@ class EpisodeFlightRecorder:
         self,
         scene_boundaries: Optional[List[Any]] = None,
         turns: Optional[List[Any]] = None,
-        batches_summary: Optional[List[Dict[str, Any]]] = None
+        batches_summary: Optional[List[Dict[str, Any]]] = None,
+        episode_scene_genders_summary: Optional[Dict[str, Any]] = None
     ) -> None:
         """Rejestruje KROK 7: Graf dyskursu scenicznego, tury i podział na paczki."""
-        payload = {
+        payload: Dict[str, Any] = {
             "scene_boundaries": scene_boundaries or [],
             "turns": turns or [],
             "batches_summary": batches_summary or []
@@ -346,6 +347,11 @@ class EpisodeFlightRecorder:
             f"Liczba wyznaczonych tur i pod-tur: {len(turns or [])}",
             f"Podział na paczki adaptacyjne: {json.dumps(batches_summary or [], default=_safe_json_default, ensure_ascii=False)}"
         ]
+        if episode_scene_genders_summary is not None:
+            payload["episode_scene_genders_summary"] = episode_scene_genders_summary
+            text_lines.append(
+                f"Podsumowanie płci scenicznych odcinka: {json.dumps(episode_scene_genders_summary, default=_safe_json_default, ensure_ascii=False)}"
+            )
         self.record_event("scene_discourse", payload)
         self.write_log_section("[KROK 7: GRAF DYSKURSU SCENICZNEGO I ADAPTACYJNE PACZKI]", "\n".join(text_lines))
 
@@ -535,7 +541,9 @@ class EpisodeFlightRecorder:
         f2_batch_cap: Optional[int] = None,
         f2_raw_pl: Optional[str] = None,
         f2_changes_made: Optional[str] = None,
-        post_f2_fixes: Optional[List[str]] = None
+        post_f2_fixes: Optional[List[str]] = None,
+        raw_actor: Optional[str] = None,
+        speaker_gender_source: Optional[str] = None
     ) -> None:
         """Rejestruje KROK 10: Pełną ścieżkę ewolucji pojedynczej linii dialogowej."""
         payload: Dict[str, Any] = {
@@ -569,13 +577,20 @@ class EpisodeFlightRecorder:
             "f2_raw_pl": f2_raw_pl,
             "f2_changes_made": f2_changes_made,
             "post_f2_fixes": post_f2_fixes,
+            "raw_actor": raw_actor,
+            "speaker_gender_source": speaker_gender_source,
         }
         for key, val in optional_fields.items():
             if val is not None or (key == "f2_not_selected_reason" and f2_selected is not None):
                 payload[key] = val
         fixes_str = ", ".join(fixes_applied) if fixes_applied else "BRAK POPRAWEK - IDENTITY PASS-THROUGH"
+        actor_hdr = actor or "Brak"
+        if raw_actor is not None or speaker_gender_source is not None:
+            raw_disp = raw_actor if raw_actor not in (None, "") else "''"
+            src_disp = speaker_gender_source or "none"
+            actor_hdr = f"{actor_hdr} (raw: {raw_disp} | źródło płci: {src_disp})"
         report_lines = [
-            f"[ID: {line_id} | Czas: {start_ms}->{end_ms} | Aktor: {actor or 'Brak'}]",
+            f"[ID: {line_id} | Czas: {start_ms}->{end_ms} | Aktor: {actor_hdr}]",
             f"EN:                 \"{en_text}\"",
             f"JP Audio (Whisper): \"{jp_audio}\" [Tagi: {whisper_tags}]",
             f"Telemetria:         {telemetry_tag}",

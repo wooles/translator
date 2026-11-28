@@ -2616,6 +2616,38 @@ _CASUAL_ANNOUNCEMENT_VOCATIVE_RE = re.compile(
 )
 
 
+_NONHUMAN_SPEAKER_TOKENS = {
+    "dragon", "smok", "wall", "ściana", "sciana", "golem", "statue", "posąg", "posag",
+    "spirit", "duch", "ghost", "monster", "potwór", "potwor", "beast", "bestia",
+    "demon", "ai", "system", "robot", "android", "automaton",
+    "puppet", "doll", "lalka", "voice", "głos", "glos", "narrator",
+    "creature", "stworzenie", "familiar", "chowaniec", "slime",
+    "wyvern", "griffin", "phoenix", "skeleton", "zombie", "shadow", "cień", "cien",
+    "bird", "ptak", "mascot", "maskotka", "owl", "sowa", "cat", "kot",
+}
+
+
+def _is_nonhuman_speaker_label(raw_actor: Optional[str]) -> bool:
+    """
+    Standard 12.2.5 (OBS-07): Detects generic non-human, construct, or inanimate
+    speaker labels across CamelCase and ASCII-folded tokens (Z1-pure).
+    """
+    if not raw_actor:
+        return False
+    split_camel = re.sub(r"([a-ząćęłńóśźż0-9])([A-ZĄĆĘŁŃÓŚŹŻ])", r"\1 \2", str(raw_actor))
+    raw_tokens = re.findall(r"[a-ząćęłńóśźż]+", split_camel.lower())
+    for tok in raw_tokens:
+        if tok in _NONHUMAN_SPEAKER_TOKENS:
+            return True
+        folded = "".join(
+            ch for ch in unicodedata.normalize("NFKD", tok.replace("ł", "l"))
+            if not unicodedata.combining(ch)
+        )
+        if folded in _NONHUMAN_SPEAKER_TOKENS:
+            return True
+    return False
+
+
 def _append_phase1_official_announcement_rule(
     focused_rules_str: str,
     batch_items: List[Dict[str, Any]],
@@ -2637,6 +2669,43 @@ def _append_phase1_official_announcement_rule(
         "• [REJESTR KOMUNIKATÓW OFICJALNYCH]: W zapowiedziach ceremonialnych i ogłoszeniach "
         "szkolnych lub urzędowych zachowuj rzeczowy, neutralny rejestr wierny oryginałowi, "
         "bez dodawania potocznych ani wartościujących dopowiedzeń."
+    )
+    base = (focused_rules_str or "").strip()
+    if rule_note in base:
+        return base
+    return f"{base}\n{rule_note}" if base else rule_note
+
+
+def _append_phase1_nonhuman_and_unknown_voice_rule(
+    focused_rules_str: str,
+    batch_items: List[Dict[str, Any]],
+) -> str:
+    """
+    Standard 12.2.5 (E3 / OBS-07 / OBS-28): Appends guidance for non-human speakers
+    and anonymous/unknown voices so grammatical gender follows audio and context
+    rather than the default cast gender of the episode.
+    """
+    if not batch_items:
+        return focused_rules_str or ""
+
+    has_signal = False
+    for it in batch_items:
+        if it.get("is_sign"):
+            continue
+        spk_val = str(it.get("speaker") or it.get("speaker_name") or "").strip()
+        if not spk_val or spk_val.upper() == "UNKNOWN" or is_generic_actor_or_category(spk_val) or _is_nonhuman_speaker_label(spk_val):
+            has_signal = True
+            break
+
+    if not has_signal:
+        return focused_rules_str or ""
+
+    rule_note = (
+        "• [BYTY NIELUDZKIE I NIEZNANE GŁOSY]: Dla mówiących bytów nieludzkich "
+        "(np. konstrukty, potwory, duchy, posągi, ściany, systemy AI, istoty magiczne) "
+        "oraz anonimowych głosów spoza znanej obsady płeć gramatyczna wynika wyłącznie z barwy głosu "
+        "(F0 / audio) i kontekstu sceny — NIGDY z domyślnej płci obsady odcinka. "
+        "Nie przypisuj anonimowej linii do znanej postaci, jeśli jej głos lub rola wskazują na odrębny byt."
     )
     base = (focused_rules_str or "").strip()
     if rule_note in base:
@@ -4336,22 +4405,28 @@ class MultimodalTranslator:
         tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", spk_lower)) if spk_lower else set()
         raw_tokens = set(re.findall(r"\b[a-ząćęłńóśźżA-ZĄĆĘŁŃÓŚŹŻ]+\b", raw_spk.lower())) if raw_spk else set()
 
-        # 0. Inherent lexical gender check (inherent nouns)
-        if (
-            spk_lower in INHERENT_FEMALE_NOUNS
-            or any(t in INHERENT_FEMALE_NOUNS for t in tokens)
-            or any(t in INHERENT_FEMALE_NOUNS for t in raw_tokens)
-        ):
-            canonical_gender = "kobieta"
-        elif (
-            spk_lower in INHERENT_MALE_NOUNS
-            or any(t in INHERENT_MALE_NOUNS for t in tokens)
-            or any(t in INHERENT_MALE_NOUNS for t in raw_tokens)
-            or spk_lower in SECONDARY_LEXICAL_MALE_NOUNS
-            or any(t in SECONDARY_LEXICAL_MALE_NOUNS for t in tokens)
-            or any(t in SECONDARY_LEXICAL_MALE_NOUNS for t in raw_tokens)
-        ):
-            canonical_gender = "mężczyzna"
+        # 0. Inherent lexical gender check (inherent nouns; skip for unverified non-human speakers)
+        is_nonhuman_cand = (
+            _is_nonhuman_speaker_label(raw_spk)
+            or _is_nonhuman_speaker_label(spk_clean)
+            or _is_nonhuman_speaker_label(raw_speaker_name)
+        )
+        if not is_nonhuman_cand:
+            if (
+                spk_lower in INHERENT_FEMALE_NOUNS
+                or any(t in INHERENT_FEMALE_NOUNS for t in tokens)
+                or any(t in INHERENT_FEMALE_NOUNS for t in raw_tokens)
+            ):
+                canonical_gender = "kobieta"
+            elif (
+                spk_lower in INHERENT_MALE_NOUNS
+                or any(t in INHERENT_MALE_NOUNS for t in tokens)
+                or any(t in INHERENT_MALE_NOUNS for t in raw_tokens)
+                or spk_lower in SECONDARY_LEXICAL_MALE_NOUNS
+                or any(t in SECONDARY_LEXICAL_MALE_NOUNS for t in tokens)
+                or any(t in SECONDARY_LEXICAL_MALE_NOUNS for t in raw_tokens)
+            ):
+                canonical_gender = "mężczyzna"
 
         # 1. Canonical Authority Check
         if not canonical_gender and (spk_clean or raw_spk):
@@ -4368,7 +4443,10 @@ class MultimodalTranslator:
 
             if not canonical_gender and hasattr(self, "series_bible") and self.series_bible:
                 if hasattr(self.series_bible, "get_character_gender"):
-                    b_gen = self.series_bible.get_character_gender(spk_clean)
+                    try:
+                        b_gen = self.series_bible.get_character_gender(spk_clean, allow_generic_nouns=(not is_nonhuman_cand))
+                    except TypeError:
+                        b_gen = self.series_bible.get_character_gender(spk_clean)
                     if b_gen == "FEMALE":
                         canonical_gender = "kobieta"
                     elif b_gen == "MALE":
@@ -4411,38 +4489,38 @@ class MultimodalTranslator:
                         if cand_gens and len(set(cand_gens)) == 1:
                             canonical_gender = cand_gens[0]
 
+        orig_raw_speaker = (getattr(event, "name", None) or raw_speaker_name or "").strip()
         if not canonical_gender:
             if is_generic_actor_or_category(spk_clean):
                 spk_clean = ""
             if is_generic_actor_or_category(raw_spk):
                 raw_spk = ""
 
-        # 1b. Episode Scene Cast Pre-computation Check (Continuous Scene Ground Truth for Anonymous Lines)
+        # 1b. Episode Scene Cast Hint (OBS-28 / 12.2.5: miękka podpowiedź sceniczna dla trybu bez audio/P0, NIE P0)
+        scene_hint_gender = None
+        scene_hint_from_bible_text = False
         if not canonical_gender and not spk_clean:
             check_idx = event_idx if event_idx is not None else batch_id
             if hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
                 if check_idx in self.episode_scene_genders:
-                    canonical_gender = self.episode_scene_genders[check_idx]
+                    scene_hint_gender = self.episode_scene_genders[check_idx]
                 elif getattr(event, "_orig_idx", None) in self.episode_scene_genders:
-                    canonical_gender = self.episode_scene_genders[getattr(event, "_orig_idx")]
-                if canonical_gender == "kobieta":
-                    alerts.append("[TELEMETRIA: mówca_sceny=żeński]")
-                elif canonical_gender == "mężczyzna":
-                    alerts.append("[TELEMETRIA: mówca_sceny=męski]")
+                    scene_hint_gender = self.episode_scene_genders[getattr(event, "_orig_idx")]
 
-        if not canonical_gender and not spk_clean:
-            cand_texts = [pl_candidate] if pl_candidate else []
-            if hasattr(event, "text") and event.text:
-                cand_texts.append(event.text)
-            if hasattr(self, "series_bible") and self.series_bible and cand_texts and hasattr(self.series_bible, "infer_scene_cast_from_text"):
-                jp_curr_text = (whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else "")
-                whisper_list = [jp_curr_text] if jp_curr_text else None
-                _, inf_g = self.series_bible.infer_scene_cast_from_text(cand_texts, whisper_texts=whisper_list)
-                if inf_g == "FEMALE":
-                    canonical_gender = "kobieta"
-                    alerts.append("[TELEMETRIA: baza_wiedzy_scena=żeńska]")
-                elif inf_g == "MALE":
-                    canonical_gender = "mężczyzna"
+            if not scene_hint_gender:
+                cand_texts = [pl_candidate] if pl_candidate else []
+                if hasattr(event, "text") and event.text:
+                    cand_texts.append(event.text)
+                if hasattr(self, "series_bible") and self.series_bible and cand_texts and hasattr(self.series_bible, "infer_scene_cast_from_text"):
+                    jp_curr_text = (whisper_transcriptions.get(batch_id, "") if whisper_transcriptions else "")
+                    whisper_list = [jp_curr_text] if jp_curr_text else None
+                    _, inf_g = self.series_bible.infer_scene_cast_from_text(cand_texts, whisper_texts=whisper_list)
+                    if inf_g == "FEMALE":
+                        scene_hint_gender = "kobieta"
+                        scene_hint_from_bible_text = True
+                    elif inf_g == "MALE":
+                        scene_hint_gender = "mężczyzna"
+                        scene_hint_from_bible_text = True
 
         # Check if speaker is explicitly a boy or young male character to prevent female pitch contamination
         is_boy_actor = False
@@ -4456,20 +4534,35 @@ class MultimodalTranslator:
                 b_desc = (b_info.get("description", "") if isinstance(b_info, dict) else str(b_info)).lower()
                 is_boy_actor = any(k in b_desc for k in ["kid", "son", "boy", "young", "bro", "brother", "chłopak", "chłopiec", "syn", "brat", "młodzieniec"]) or any(k in b_desc for k in self.BOY_ROLE_KEYWORDS)
 
+        # OBS-07 (Standard 12.2.5): Block non-human speakers from inheriting FEMININE from high F0
+        has_nonhuman_label = (
+            _is_nonhuman_speaker_label(orig_raw_speaker)
+            or _is_nonhuman_speaker_label(raw_speaker_name)
+            or _is_nonhuman_speaker_label(spk_clean)
+        )
+        is_nonhuman_actor = (not canonical_gender) and has_nonhuman_label
+        block_high_f0_fem = is_boy_actor or has_nonhuman_label
+
         # 2. Acoustic & Linguistic Ground Truth
         raw_norm = (raw_phase1_gender or "").lower()
         phase1_is_female = any(w in raw_norm for w in ["kobieta", "żeńsk", "female", "dziewczyn"])
         phase1_is_male = any(w in raw_norm for w in ["mężczyzna", "męsk", "male", "chłopak"])
 
         acoustic_gender = None
-        if speaker_tags and batch_id in speaker_tags:
-            v_tag = speaker_tags[batch_id].lower()
+        _raw_spk_tag = None
+        if speaker_tags:
+            if batch_id in speaker_tags:
+                _raw_spk_tag = speaker_tags[batch_id]
+            elif event_idx is not None and event_idx in speaker_tags:
+                _raw_spk_tag = speaker_tags[event_idx]
+        if _raw_spk_tag:
+            v_tag = str(_raw_spk_tag).lower()
             if "dziecięcy" in v_tag:
-                # Young boy characters frequently voiced by female seiyū - do NOT force female
-                if not is_boy_actor:
+                # Young boy or unverified non-human speakers must NOT force female
+                if not block_high_f0_fem:
                     acoustic_gender = "kobieta"
             elif "sopran" in v_tag or "wysoki tembr" in v_tag:
-                if not is_boy_actor:
+                if not block_high_f0_fem:
                     acoustic_gender = "kobieta"
             elif "alt starszej" in v_tag or "ochrypły alt" in v_tag or "alt żeński" in v_tag:
                 # Raspy or mature female alto / contralto voice - ambiguous pitch, NOT male
@@ -4479,20 +4572,20 @@ class MultimodalTranslator:
                 if hz_match:
                     hz_val = int(hz_match.group(1))
                     if hz_val >= 195:
-                        acoustic_gender = "kobieta" if not is_boy_actor else None
+                        acoustic_gender = "kobieta" if not block_high_f0_fem else None
                     elif hz_val <= 135 and not phase1_is_female:
                         acoustic_gender = "mężczyzna"
                     elif 135 < hz_val <= 155:
                         acoustic_gender = None
                 else:
-                    acoustic_gender = "kobieta" if not is_boy_actor else None
+                    acoustic_gender = "kobieta" if not block_high_f0_fem else None
             elif "baryton" in v_tag or "bas" in v_tag:
                 acoustic_gender = "mężczyzna"
             elif "męsk" in v_tag and "alt" not in v_tag and "ochrypł" not in v_tag:
                 acoustic_gender = "mężczyzna"
 
-        if not acoustic_gender and speaker_tags and batch_id in speaker_tags:
-            v_tag = speaker_tags[batch_id].lower()
+        if not acoustic_gender and _raw_spk_tag:
+            v_tag = str(_raw_spk_tag).lower()
             # Hotfix 11.1.3a (P2-1): dopuszczenie etykiet "niski tembr" z SpeakerVoiceClassifier
             # przy zachowaniu progu krtaniowego <= 135 Hz i ochrony deklaracji żeńskiej z Fazy 1.
             if "niski tembr" in v_tag or ("alt" not in v_tag and "ochrypł" not in v_tag and "sopran" not in v_tag):
@@ -4538,7 +4631,8 @@ class MultimodalTranslator:
 
         tag_text = ((speaker_tags.get(batch_id, "") or speaker_tags.get(event_idx, "")) if speaker_tags else "").lower()
         tag_is_fem = (
-            ("sopran" in tag_text or "wysoki tembr" in tag_text)
+            not has_nonhuman_label
+            and ("sopran" in tag_text or "wysoki tembr" in tag_text)
             and "niski tembr" not in tag_text
             and "średni tembr" not in tag_text
         )
@@ -4599,7 +4693,7 @@ class MultimodalTranslator:
 
             # Acoustic Primacy Gate (Filar CLXXIV): Untrusted fansub tag contradicted by female audio or scene
             has_masc_self = bool(re.search(r"\b(gotów|pewien|świadom|byłem|miałem|widziałem|wiedziałem|zrobiłem|pomyślałem|chciałem|mogłem|poszedłem|powiedziałem|czułem|słyszałem|wróciłem|dostałem|znalazłem|oddałem|zgubiłem|uratowałem|przyszedłem)\b", pl_candidate, re.IGNORECASE))
-            if res_g == "mężczyzna" and not is_boy_or_crossgender and has_female_audio and not (has_verified_p0 and has_masc_self):
+            if res_g == "mężczyzna" and not is_boy_or_crossgender and not has_nonhuman_label and has_female_audio and not (has_verified_p0 and has_masc_self):
                 is_scene_female = False
                 check_idx = event_idx if event_idx is not None else batch_id
                 if hasattr(self, "episode_scene_genders") and self.episode_scene_genders:
@@ -4636,19 +4730,19 @@ class MultimodalTranslator:
             if tag_is_fem or acoustic_gender == "kobieta":
                 alerts.append(f"[TELEMETRIA: mówca='{spk_clean}', płeć=mężczyzna, zaimek_boku_ore=crossgender_seiyū]")
             else:
-                alerts.append("[TELEMETRIA: odsłuch_f0_whisper=mężczyzna, weto_akustyczne]")
+                alerts.append("[TELEMETRIA: odsłuch_f0_whisper=mężczyzna, weto_akustyczne, źródło=whisper_marker]")
             return "mężczyzna", alerts
         if jp_female_marker:
-            alerts.append("[TELEMETRIA: odsłuch_f0_whisper=kobieta, weto_akustyczne]")
+            alerts.append("[TELEMETRIA: odsłuch_f0_whisper=kobieta, weto_akustyczne, źródło=whisper_marker]")
             return "kobieta", alerts
-        if acoustic_gender == "kobieta" and not is_boy_actor:
+        if acoustic_gender == "kobieta" and not block_high_f0_fem:
             if phase1_is_male and not jp_female_marker:
                 alerts.append(f"[TELEMETRIA: mówca='{spk_clean}', płeć=mężczyzna, źródło=wizja_faza1, weto_krzyku_f0]")
                 return "mężczyzna", alerts
-            alerts.append("[TELEMETRIA: odsłuch_f0_whisper=kobieta, weto_akustyczne]")
+            alerts.append("[TELEMETRIA: odsłuch_f0_whisper=kobieta, weto_akustyczne, źródło=f0_audio]")
             return "kobieta", alerts
         if acoustic_gender == "mężczyzna":
-            alerts.append("[TELEMETRIA: odsłuch_f0_whisper=mężczyzna, weto_akustyczne]")
+            alerts.append("[TELEMETRIA: odsłuch_f0_whisper=mężczyzna, weto_akustyczne, źródło=f0_audio]")
             return "mężczyzna", alerts
 
         # Phase 1 fallback when no acoustic contradiction
@@ -4658,6 +4752,29 @@ class MultimodalTranslator:
         elif phase1_is_male:
             alerts.append(f"[TELEMETRIA: mówca='{spk_clean}', płeć=mężczyzna, źródło=faza1_draft]")
             return "mężczyzna", alerts
+
+        # OBS-07: Nieznany byt nieludzki bez twardego F0<=135Hz i bez Whisper PRON -> UNKNOWN (decyzja LLM z audio/kontekstu)
+        if is_nonhuman_actor:
+            alerts.append("[TELEMETRIA: byt_nieludzki=decyzja_llm_głos_kontekst]")
+            return "UNKNOWN", alerts
+
+        # OBS-28: Anonimowy mówca (not spk_clean) bez twardego sygnału F0/Whisper
+        if not spk_clean:
+            # Zgodność wsteczna dla legacy testów offline bez aktywnego audio/Whisper (test_system.py:7729 / L7893)
+            if (
+                speaker_tags is None
+                and (pl_candidate or not whisper_transcriptions)
+                and scene_hint_gender in ("kobieta", "mężczyzna")
+            ):
+                if scene_hint_from_bible_text and scene_hint_gender == "kobieta":
+                    alerts.append("[TELEMETRIA: baza_wiedzy_scena=żeńska]")
+                elif scene_hint_gender == "kobieta":
+                    alerts.append("[TELEMETRIA: mówca_sceny=żeński]")
+                else:
+                    alerts.append("[TELEMETRIA: mówca_sceny=męski]")
+                return scene_hint_gender, alerts
+            alerts.append("[TELEMETRIA: anonimowy_mówca=decyzja_llm_audio_wizja]")
+            return "UNKNOWN", alerts
 
         # Brak rekordu P0 -> brak zgadywania, zwracamy UNKNOWN (confidence=0.0)
         return "UNKNOWN", alerts
@@ -5580,13 +5697,15 @@ class MultimodalTranslator:
                 lines.append(f"  Typografia: treść napisu lub planszy w kadrze.")
             else:
                 # Standard 9.5 (Operacja 2C.1, R3.2): Wywołanie arbitrate_event_telemetry
+                raw_ass_actor_f1 = str(getattr(event, "name", None) or "").strip()
+                has_explicit_named_actor_f1 = bool(raw_ass_actor_f1) and not is_generic_actor_or_category(raw_ass_actor_f1)
                 is_fem_scene_check = (getattr(self, "episode_scene_genders", {}).get(original_idx) == "kobieta") or getattr(self, "scene_is_female_only", False)
                 disc_telem = SceneDiscourseGraph.arbitrate_event_telemetry(
                     event=event,
                     series_bible=getattr(self, "series_bible", None),
-                    episode_profiler=getattr(self, "profiler", None),
+                    episode_profiler=(getattr(self, "profiler", None) if has_explicit_named_actor_f1 else None),
                     raw_actor=event.name,
-                    scene_female_only=is_fem_scene_check,
+                    scene_female_only=(is_fem_scene_check if has_explicit_named_actor_f1 else False),
                     is_sign=vtype["is_sign"],
                     actor_gender_consensus=getattr(self, "actor_gender_consensus", None)
                 )
@@ -5595,6 +5714,10 @@ class MultimodalTranslator:
                     series_bible=getattr(self, "series_bible", None),
                 )
                 p0_spk_gram = disc_telem.get("grammatical_gender")
+                if not has_explicit_named_actor_f1 and p0_spk_gram in ("MASCULINE", "FEMININE"):
+                    _dn_f1 = str(disc_telem.get("speaker_name") or "").strip()
+                    if not _dn_f1 or _dn_f1.upper() in ("UNKNOWN", "NEUTRAL") or is_generic_actor_or_category(_dn_f1):
+                        p0_spk_gram = None
                 if collective_virility in ("VIRILE", "NON_VIRILE", "DUAL_DIALOGUE"):
                     p0_spk_gram = None
                     line_spk_gender = None
@@ -5681,11 +5804,12 @@ class MultimodalTranslator:
                 else:
                     reg_desc = "Kontekstowy / Naturalny"
 
+                has_known_line_spk_gender = bool(line_spk_gender) and str(line_spk_gender).upper() not in ("UNKNOWN", "NEUTRAL")
                 if event.name and not is_generic_actor_or_category(event.name):
                     spk_label = event.name
-                    if line_spk_gender:
+                    if has_known_line_spk_gender:
                         spk_label += f" ({line_spk_gender.capitalize()})"
-                elif line_spk_gender:
+                elif has_known_line_spk_gender:
                     spk_label = line_spk_gender.capitalize()
                 else:
                     spk_label = "Postać"
@@ -6697,6 +6821,7 @@ class MultimodalTranslator:
             })
         focused_rules_str = get_focused_rules_for_batch(batch_items_for_rules, max_rules=5 if len(untranslated_in_batch) > 40 else 3)
         focused_rules_str = _append_phase1_official_announcement_rule(focused_rules_str, batch_items_for_rules)
+        focused_rules_str = _append_phase1_nonhuman_and_unknown_voice_rule(focused_rules_str, batch_items_for_rules)
 
         # Dynamic JIT Scoping of Series Bible Context for current batch
         scoped_series_bible_str = series_bible_str
@@ -6846,6 +6971,7 @@ class MultimodalTranslator:
 
         for idx, (orig_idx, event, clean_en, ts_prefix) in enumerate(untranslated_in_batch):
             batch_id = idx + 1
+            raw_ass_actor = str(getattr(event, "name", None) or "").strip()
             pl_candidate = ""
             speaker_gender = None
             notes = ""
@@ -6957,7 +7083,7 @@ class MultimodalTranslator:
             is_fem_scene = (getattr(self, "episode_scene_genders", {}).get(orig_idx) == "kobieta") or getattr(self, "scene_is_female_only", False)
 
             # Operacja 2B.5: Ochrona jawnego aktora z kolumny Name pliku .ass przed nadpisaniem
-            clean_ass_actor = (getattr(event, "name", None) or "").strip()
+            clean_ass_actor = raw_ass_actor
             effective_raw_actor = raw_speaker_name or event.name
             sb_inst = getattr(self, "series_bible", None)
             if clean_ass_actor and not is_generic_actor_or_category(clean_ass_actor):
@@ -6966,12 +7092,13 @@ class MultimodalTranslator:
                     if ass_rec is not None:
                         effective_raw_actor = clean_ass_actor
 
+            has_eff_named_actor = bool(effective_raw_actor) and not is_generic_actor_or_category(effective_raw_actor)
             disc_telem = SceneDiscourseGraph.arbitrate_event_telemetry(
                 event=event,
                 series_bible=sb_inst,
-                episode_profiler=getattr(self, "profiler", None),
+                episode_profiler=(getattr(self, "profiler", None) if has_eff_named_actor else None),
                 raw_actor=effective_raw_actor,
-                scene_female_only=is_fem_scene,
+                scene_female_only=(is_fem_scene if has_eff_named_actor else False),
                 target_actor=addressee_label or addressee_cat,
                 is_sign=vtype.get("is_sign", False),
                 is_internal_monologue=is_internal_monologue,
@@ -6982,15 +7109,38 @@ class MultimodalTranslator:
                 series_bible=sb_inst,
             )
             p0_spk_gram = disc_telem.get("grammatical_gender")
+            if not has_eff_named_actor and p0_spk_gram in ("MASCULINE", "FEMININE"):
+                _dn_f2 = str(disc_telem.get("speaker_name") or "").strip()
+                if not _dn_f2 or _dn_f2.upper() in ("UNKNOWN", "NEUTRAL") or is_generic_actor_or_category(_dn_f2):
+                    p0_spk_gram = None
+
+            speaker_gender_source = "none"
             if collective_virility_f2 in ("VIRILE", "NON_VIRILE", "DUAL_DIALOGUE"):
                 p0_spk_gram = None
                 speaker_gender = None
                 spk_conf = 0.0
                 arb_alerts = []
+                speaker_gender_source = "sign" if vtype.get("is_sign") else "collective_shield"
             elif p0_spk_gram in ("MASCULINE", "FEMININE"):
                 speaker_gender = "mężczyzna" if p0_spk_gram == "MASCULINE" else "kobieta"
                 spk_conf = 1.0
                 arb_alerts = []
+                has_named_rec = False
+                if sb_inst and has_eff_named_actor:
+                    if hasattr(sb_inst, "resolve_character_record") and sb_inst.resolve_character_record(effective_raw_actor) is not None:
+                        has_named_rec = True
+                    elif hasattr(sb_inst, "get_character_gender") and sb_inst.get_character_gender(effective_raw_actor) in ("MALE", "FEMALE"):
+                        has_named_rec = True
+                if not has_named_rec and effective_raw_actor and effective_raw_actor in getattr(self, "character_registry", {}):
+                    has_named_rec = True
+                if not has_named_rec and effective_raw_actor and effective_raw_actor in (getattr(self, "actor_gender_consensus", None) or {}):
+                    has_named_rec = True
+                if vtype.get("is_sign"):
+                    speaker_gender_source = "sign"
+                elif has_named_rec or not is_fem_scene:
+                    speaker_gender_source = "p0_bible"
+                else:
+                    speaker_gender_source = "scene_female_only"
             else:
                 resolved_gender, arb_alerts = self._arbitrate_speaker_gender(
                     event=event,
@@ -7003,8 +7153,28 @@ class MultimodalTranslator:
                     event_idx=orig_idx
                 )
                 speaker_gender = resolved_gender
+                has_resolved_spk_g = bool(speaker_gender) and str(speaker_gender).upper() not in ("UNKNOWN", "NEUTRAL")
                 is_spk_hypothesis = any("hipoteza_faza_1" in a for a in arb_alerts)
-                spk_conf = 0.70 if is_spk_hypothesis else (1.0 if speaker_gender else 0.0)
+                spk_conf = 0.70 if is_spk_hypothesis else (1.0 if has_resolved_spk_g else 0.0)
+                alerts_joined = " ".join(arb_alerts).lower()
+                if vtype.get("is_sign") or "napis_ekranowy" in alerts_joined:
+                    speaker_gender_source = "sign"
+                elif "byt_nieludzki=" in alerts_joined:
+                    speaker_gender_source = "nonhuman_deferred"
+                elif "anonimowy_mówca=" in alerts_joined:
+                    speaker_gender_source = "anonymous_deferred"
+                elif "zaimek_boku_ore" in alerts_joined or "źródło=whisper_marker" in alerts_joined:
+                    speaker_gender_source = "whisper_marker"
+                elif "źródło=f0_audio" in alerts_joined or "odsłuch_f0_whisper" in alerts_joined:
+                    speaker_gender_source = "f0_audio"
+                elif "mówca_sceny=" in alerts_joined or "baza_wiedzy_scena=" in alerts_joined:
+                    speaker_gender_source = "scene_female_only" if speaker_gender == "kobieta" else "p0_bible"
+                elif any(k in alerts_joined for k in ("rekord_p0", "weto_kanonu", "prymat_akustyczny", "rola_chłopięca")):
+                    speaker_gender_source = "p0_bible"
+                elif "faza1_draft" in alerts_joined or "wizja_faza1" in alerts_joined:
+                    speaker_gender_source = "f1_draft"
+                else:
+                    speaker_gender_source = "none"
 
             if arb_alerts:
                 notes = f"{notes} {' '.join(arb_alerts)}".strip()
@@ -7496,7 +7666,9 @@ class MultimodalTranslator:
                 "prev_line_f1": prev_line_f1,
                 "prev_line_en": prev_line_en,
                 "speaker_name": resolved_spk_name,
-                "speaker_gender": speaker_gender if spk_conf >= 0.95 else None,
+                "raw_actor": raw_ass_actor,
+                "speaker_gender_source": speaker_gender_source,
+                "speaker_gender": speaker_gender if (speaker_gender and str(speaker_gender).upper() not in ("UNKNOWN", "NEUTRAL") and spk_conf >= 0.95) else None,
                 "speaker_confidence": spk_conf,
                 "raw_speaker_gender_hypothesis": speaker_gender if spk_conf < 0.95 else None,
                 "addressee": addressee_cat if tgt_conf >= 0.90 else None,
@@ -8937,6 +9109,8 @@ class MultimodalTranslator:
                             if _lid in f2_raw_map
                             else None
                         ),
+                        raw_actor=item.get("raw_actor", ""),
+                        speaker_gender_source=item.get("speaker_gender_source", "none"),
                     )
                 except Exception:
                     logger.debug("Rejestracja wyników lintera zakończona wyjątkiem", exc_info=True)
@@ -10122,10 +10296,27 @@ class MultimodalTranslator:
                     }
                     for b_idx, b in enumerate(batches)
                 ]
+                _sc_g_map = getattr(self, "episode_scene_genders", None) or {}
+                _f_sc_cnt = sum(1 for g in _sc_g_map.values() if g == "kobieta")
+                _m_sc_cnt = sum(1 for g in _sc_g_map.values() if g == "mężczyzna")
+                _anon_sc_cnt = sum(
+                    1 for ev_it in all_events
+                    if not str(getattr(ev_it, "name", None) or "").strip()
+                    or is_generic_actor_or_category(str(getattr(ev_it, "name", None) or "").strip())
+                )
+                _ep_sc_summary = {
+                    "total_events": len(all_events),
+                    "female": _f_sc_cnt,
+                    "male": _m_sc_cnt,
+                    "unknown": max(0, len(all_events) - _f_sc_cnt - _m_sc_cnt),
+                    "anonymous_lines": _anon_sc_cnt,
+                    "anonymous_ratio": round(_anon_sc_cnt / max(1, len(all_events)), 4),
+                }
                 self.flight_recorder.log_scene_discourse(
                     scene_boundaries=getattr(self, "scene_cuts_ms", []),
                     turns=discourse_turns,
-                    batches_summary=batches_sum
+                    batches_summary=batches_sum,
+                    episode_scene_genders_summary=_ep_sc_summary,
                 )
             except Exception:
                 logger.debug("Rejestracja struktury dyskursu zakończona wyjątkiem", exc_info=True)
