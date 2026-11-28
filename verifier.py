@@ -1051,7 +1051,14 @@ class DialogueVerifier:
             return []
 
         import time
+        from model_resolver import (
+            resolve_service_tier,
+            apply_service_tier_to_config,
+            extract_response_service_tier_header,
+        )
         attempt = 0
+        active_service_tier = resolve_service_tier()
+        consecutive_flex_503 = 0
 
         # Determine adaptive CoT thinking budget based on batch complexity (Elastic Multi-Tier Budget)
         effective_budget = self.calculate_effective_budget(batch_items)
@@ -1113,6 +1120,7 @@ class DialogueVerifier:
                                 )
                         if "cached_content" not in cfg_kwargs and "system_instruction" not in cfg_kwargs:
                             cfg_kwargs["system_instruction"] = self.system_prompt
+                    cfg_kwargs = apply_service_tier_to_config(cfg_kwargs, active_service_tier, self.model)
                     cfg = types.GenerateContentConfig(**cfg_kwargs)
                     return active_c.models.generate_content(
                         model=self.model,
@@ -1125,6 +1133,13 @@ class DialogueVerifier:
                     fut = ex.submit(_single_generate)
                     response = fut.result(timeout=150.0)
 
+                _tl = getattr(self, "_thread_local", None)
+                if _tl is None:
+                    import threading
+                    _tl = self._thread_local = threading.local()
+                _tl.last_batch_token_usage = {}
+                resp_tier_hdr = extract_response_service_tier_header(response)
+                effective_tier = resp_tier_hdr if resp_tier_hdr in ("flex", "standard") else active_service_tier
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata
                     p_cnt = getattr(um, "prompt_token_count", 0) or 0
@@ -1133,21 +1148,24 @@ class DialogueVerifier:
                     thoughts = getattr(um, "thoughts_token_count", 0) or 0
                     out_cnt = cands + thoughts
                     with self.lock:
-                        self.current_episode_tokens["prompt"] += p_cnt
-                        self.current_episode_tokens["cached"] += c_cnt
-                        self.current_episode_tokens["output"] += out_cnt
+                        self.current_episode_tokens["prompt"] = self.current_episode_tokens.get("prompt", 0) + p_cnt
+                        self.current_episode_tokens["cached"] = self.current_episode_tokens.get("cached", 0) + c_cnt
+                        self.current_episode_tokens["output"] = self.current_episode_tokens.get("output", 0) + out_cnt
+                        if effective_tier == "flex":
+                            self.current_episode_tokens["flex_prompt"] = self.current_episode_tokens.get("flex_prompt", 0) + p_cnt
+                            self.current_episode_tokens["flex_cached"] = self.current_episode_tokens.get("flex_cached", 0) + c_cnt
+                            self.current_episode_tokens["flex_output"] = self.current_episode_tokens.get("flex_output", 0) + out_cnt
                         self.current_episode_tokens["model"] = self.model
 
-                    _tl = getattr(self, "_thread_local", None)
-                    if _tl is None:
-                        import threading
-                        _tl = self._thread_local = threading.local()
                     _tl.last_batch_token_usage = {
                         "prompt": p_cnt,
                         "cached": c_cnt,
                         "output": out_cnt,
                         "model": self.model
                     }
+                _tl.last_batch_token_usage["service_tier"] = active_service_tier
+                if resp_tier_hdr:
+                    _tl.last_batch_token_usage["response_service_tier_header"] = resp_tier_hdr
 
                 # Retrieve parsed structured output
                 result_lines: List[RefinedLine] = []
@@ -1314,13 +1332,38 @@ class DialogueVerifier:
                         f"Ostatni status awarii: {e}. Proces wstrzymano w celu ochrony budżetu przed niekontrolowanymi zapytaniami."
                     )
 
-                is_timeout = "504" in err_str or "deadline" in err_str or "timeout" in err_str or "timed out" in err_str
+                import concurrent.futures as _cf
+                is_timeout = (
+                    isinstance(e, (TimeoutError, _cf.TimeoutError))
+                    or "504" in err_str
+                    or "deadline" in err_str
+                    or "timeout" in err_str
+                    or "timed out" in err_str
+                )
                 is_unavailable = "503" in err_str or "unavailable" in err_str or "high demand" in err_str
                 is_rate_limit = "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str
                 is_not_found = "404" in err_str or "not found" in err_str
 
+                if active_service_tier == "flex" and (is_unavailable or is_timeout):
+                    consecutive_flex_503 += 1
+                    if consecutive_flex_503 >= 2:
+                        active_service_tier = "standard"
+                        consecutive_flex_503 = 0
+                        print(
+                            f"\n[Flex Fallback Faza 2]: 2x 503/timeout w trybie flex -> "
+                            f"przełączenie na service_tier='standard' (model {self.model} bez zmian)."
+                        )
+                        time.sleep(0.5)
+                        continue
+                else:
+                    consecutive_flex_503 = 0
+
                 if is_gemini_4_or_hydrogen_model(self.model):
-                    if is_not_found or (attempt >= max(2, num_keys * 2) and (is_unavailable or is_timeout)):
+                    if is_not_found or (
+                        active_service_tier != "flex"
+                        and attempt >= max(2, num_keys * 2)
+                        and (is_unavailable or is_timeout)
+                    ):
                         fallback_model = "gemini-3.8-flash"
                         print(f"\n[Fallback Model Verifier]: Przełączenie z {self.model} na {fallback_model} (próba {attempt})...")
                         self.model = fallback_model
