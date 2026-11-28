@@ -324,59 +324,57 @@ class PricingGuard:
         """
         Calculates exact actual session cost breakdown (net, gross with VAT, standard rate without cache, and savings).
         """
+        def _resolve_model_rate(model_name: Any) -> Dict[str, float]:
+            m_low = str(model_name or "flash").lower()
+            if "hydrogen" in m_low:
+                return GOOGLE_API_RATES["hydrogen"]
+            if "pro" in m_low or "argon" in m_low or "carbon" in m_low:
+                return GOOGLE_API_RATES["pro"]
+            if "lite" in m_low:
+                return GOOGLE_API_RATES["flash_lite"]
+            return GOOGLE_API_RATES["flash"]
+
+        def _calc_phase_cost_usd(stats: Dict[str, Any], rate: Dict[str, float]) -> Tuple[float, float]:
+            prompt = max(0, int(stats.get("prompt", 0) or 0))
+            cached = min(prompt, max(0, int(stats.get("cached", 0) or 0)))
+            out = max(0, int(stats.get("output", 0) or 0))
+
+            if any(k in stats for k in ("flex_prompt", "flex_cached", "flex_output")):
+                flex_prompt = min(prompt, max(0, int(stats.get("flex_prompt", 0) or 0)))
+                flex_cached = min(cached, flex_prompt, max(0, int(stats.get("flex_cached", 0) or 0)))
+                flex_output = min(out, max(0, int(stats.get("flex_output", 0) or 0)))
+            elif str(stats.get("service_tier") or "").strip().lower() == "flex":
+                flex_prompt, flex_cached, flex_output = prompt, cached, out
+            else:
+                flex_prompt = flex_cached = flex_output = 0
+
+            flex_uncached = max(0, flex_prompt - flex_cached)
+            std_cached = max(0, cached - flex_cached)
+            std_uncached = max(0, (prompt - cached) - flex_uncached)
+            std_output = max(0, out - flex_output)
+
+            actual_usd = (
+                ((std_cached + 0.5 * flex_cached) / 1_000_000) * rate["input_cached"] +
+                ((std_uncached + 0.5 * flex_uncached) / 1_000_000) * rate["input_uncached"] +
+                ((std_output + 0.5 * flex_output) / 1_000_000) * rate["output"]
+            )
+            standard_baseline_usd = (
+                (prompt / 1_000_000) * rate["input_uncached"] +
+                (out / 1_000_000) * rate["output"]
+            )
+            return actual_usd, standard_baseline_usd
+
         # Phase 1
-        m1 = f1_stats.get("model", "flash")
-        rate1 = GOOGLE_API_RATES["flash"]
-        if "hydrogen" in str(m1).lower():
-            rate1 = GOOGLE_API_RATES["hydrogen"]
-        elif "pro" in str(m1).lower() or "argon" in str(m1).lower() or "carbon" in str(m1).lower():
-            rate1 = GOOGLE_API_RATES["pro"]
-        elif "lite" in str(m1).lower():
-            rate1 = GOOGLE_API_RATES["flash_lite"]
-
-        cached1 = f1_stats.get("cached", 0)
-        prompt1 = f1_stats.get("prompt", 0)
-        uncached1 = max(0, prompt1 - cached1)
-        out1 = f1_stats.get("output", 0)
-
-        cost1_usd = (
-            (cached1 / 1_000_000) * rate1["input_cached"] +
-            (uncached1 / 1_000_000) * rate1["input_uncached"] +
-            (out1 / 1_000_000) * rate1["output"]
-        )
-        cost1_without_cache_usd = (
-            (prompt1 / 1_000_000) * rate1["input_uncached"] +
-            (out1 / 1_000_000) * rate1["output"]
-        )
+        rate1 = _resolve_model_rate(f1_stats.get("model", "flash"))
+        cost1_usd, cost1_without_cache_usd = _calc_phase_cost_usd(f1_stats, rate1)
 
         cost2_usd = 0.0
         cost2_without_cache_usd = 0.0
 
         # Phase 2 (if active)
         if f2_stats:
-            m2 = f2_stats.get("model") or f1_stats.get("model", "flash")
-            rate2 = GOOGLE_API_RATES["flash"]
-            if "hydrogen" in str(m2).lower():
-                rate2 = GOOGLE_API_RATES["hydrogen"]
-            elif "pro" in str(m2).lower() or "argon" in str(m2).lower() or "carbon" in str(m2).lower():
-                rate2 = GOOGLE_API_RATES["pro"]
-            elif "lite" in str(m2).lower():
-                rate2 = GOOGLE_API_RATES["flash_lite"]
-
-            cached2 = f2_stats.get("cached", 0)
-            prompt2 = f2_stats.get("prompt", 0)
-            uncached2 = max(0, prompt2 - cached2)
-            out2 = f2_stats.get("output", 0)
-
-            cost2_usd = (
-                (cached2 / 1_000_000) * rate2["input_cached"] +
-                (uncached2 / 1_000_000) * rate2["input_uncached"] +
-                (out2 / 1_000_000) * rate2["output"]
-            )
-            cost2_without_cache_usd = (
-                (prompt2 / 1_000_000) * rate2["input_uncached"] +
-                (out2 / 1_000_000) * rate2["output"]
-            )
+            rate2 = _resolve_model_rate(f2_stats.get("model") or f1_stats.get("model", "flash"))
+            cost2_usd, cost2_without_cache_usd = _calc_phase_cost_usd(f2_stats, rate2)
 
         total_net_usd = cost1_usd + cost2_usd
         total_without_cache_usd = cost1_without_cache_usd + cost2_without_cache_usd

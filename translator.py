@@ -3911,12 +3911,18 @@ class MultimodalTranslator:
                     "prompt": max(0, int(f1_raw.get("prompt", 0) or 0) - int(b1.get("prompt", 0) or 0)),
                     "cached": max(0, int(f1_raw.get("cached", 0) or 0) - int(b1.get("cached", 0) or 0)),
                     "output": max(0, int(f1_raw.get("output", 0) or 0) - int(b1.get("output", 0) or 0)),
+                    "flex_prompt": max(0, int(f1_raw.get("flex_prompt", 0) or 0) - int(b1.get("flex_prompt", 0) or 0)),
+                    "flex_cached": max(0, int(f1_raw.get("flex_cached", 0) or 0) - int(b1.get("flex_cached", 0) or 0)),
+                    "flex_output": max(0, int(f1_raw.get("flex_output", 0) or 0) - int(b1.get("flex_output", 0) or 0)),
                     "model": f1_raw.get("model", self.model),
                 }
                 f2_st = {
                     "prompt": max(0, int(f2_raw.get("prompt", 0) or 0) - int(b2.get("prompt", 0) or 0)),
                     "cached": max(0, int(f2_raw.get("cached", 0) or 0) - int(b2.get("cached", 0) or 0)),
                     "output": max(0, int(f2_raw.get("output", 0) or 0) - int(b2.get("output", 0) or 0)),
+                    "flex_prompt": max(0, int(f2_raw.get("flex_prompt", 0) or 0) - int(b2.get("flex_prompt", 0) or 0)),
+                    "flex_cached": max(0, int(f2_raw.get("flex_cached", 0) or 0) - int(b2.get("flex_cached", 0) or 0)),
+                    "flex_output": max(0, int(f2_raw.get("flex_output", 0) or 0) - int(b2.get("flex_output", 0) or 0)),
                     "model": f2_raw.get("model") or f1_st["model"],
                 }
                 if f1_st["prompt"] == 0 and f2_st["prompt"] == 0:
@@ -6131,6 +6137,8 @@ class MultimodalTranslator:
                 if not hasattr(self, "_thread_local") or self._thread_local is None:
                     self._thread_local = threading.local()
                 self._thread_local.last_batch_token_usage = {}
+                resp_tier_hdr = extract_response_service_tier_header(response)
+                effective_tier = resp_tier_hdr if resp_tier_hdr in ("flex", "standard") else active_service_tier
                 if hasattr(response, "usage_metadata") and response.usage_metadata:
                     um = response.usage_metadata
                     p_cnt = getattr(um, "prompt_token_count", 0) or 0
@@ -6151,10 +6159,13 @@ class MultimodalTranslator:
                         self.current_episode_tokens["prompt"] += p_cnt
                         self.current_episode_tokens["cached"] += c_cnt
                         self.current_episode_tokens["output"] += out_cnt
+                        if effective_tier == "flex":
+                            self.current_episode_tokens["flex_prompt"] = self.current_episode_tokens.get("flex_prompt", 0) + p_cnt
+                            self.current_episode_tokens["flex_cached"] = self.current_episode_tokens.get("flex_cached", 0) + c_cnt
+                            self.current_episode_tokens["flex_output"] = self.current_episode_tokens.get("flex_output", 0) + out_cnt
                         self.current_episode_tokens["model"] = current_model
 
                 self._thread_local.last_batch_token_usage["service_tier"] = active_service_tier
-                resp_tier_hdr = extract_response_service_tier_header(response)
                 if resp_tier_hdr:
                     self._thread_local.last_batch_token_usage["response_service_tier_header"] = resp_tier_hdr
 
@@ -9520,7 +9531,7 @@ class MultimodalTranslator:
                     logger.debug("Odczyt punktu kontrolnego zakończony wyjątkiem", exc_info=True)
 
         if restored_f1_tokens and isinstance(restored_f1_tokens, dict):
-            for k in ["prompt", "cached", "output"]:
+            for k in ["prompt", "cached", "output", "flex_prompt", "flex_cached", "flex_output"]:
                 val_f1 = int(restored_f1_tokens.get(k, 0) or 0)
                 self.current_episode_tokens[k] = self.current_episode_tokens.get(k, 0) + val_f1
                 self._checkpoint_baseline_f1[k] = val_f1
@@ -9528,7 +9539,7 @@ class MultimodalTranslator:
                 self.current_episode_tokens["model"] = restored_f1_tokens["model"]
                 self._checkpoint_baseline_f1["model"] = restored_f1_tokens["model"]
         if restored_f2_tokens and isinstance(restored_f2_tokens, dict) and self.verifier:
-            for k in ["prompt", "cached", "output"]:
+            for k in ["prompt", "cached", "output", "flex_prompt", "flex_cached", "flex_output"]:
                 val_f2 = int(restored_f2_tokens.get(k, 0) or 0)
                 self.verifier.current_episode_tokens[k] = self.verifier.current_episode_tokens.get(k, 0) + val_f2
                 self._checkpoint_baseline_f2[k] = val_f2
