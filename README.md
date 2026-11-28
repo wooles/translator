@@ -1,169 +1,118 @@
 # Multimodal Audiovisual Translation (AVT) Engine (EN/JP → PL)
 
-[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B%20%7C%203.13-blue.svg)](https://www.python.org/)
-[![Google GenAI SDK](https://img.shields.io/badge/LLM%20Orchestration-Gemini%202.5%20Flash%20%7C%202.5%20Pro-orange.svg)](https://ai.google.dev/)
-[![Acoustic Ingestion](https://img.shields.io/badge/Acoustic%20ASR-Kotoba--Whisper%20v2.0%20CTranslate2-green.svg)](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-faster)
-[![Architecture](https://img.shields.io/badge/Architecture-Standard%2011.2.27%20%7C%20Glossary%20Variant%20Guard%20(DEF--05)-purple.svg)]()
-[![CI/Test Suite](https://img.shields.io/badge/Test%20Harness-452%2F452%20Passing%20(70s%20Fast%20CI)-brightgreen.svg)]()
-[![Forensic Audit](https://img.shields.io/badge/AST%20Purity-100%25%20Zero--Literal-blueviolet.svg)]()
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.10+ | 3.13](https://img.shields.io/badge/Python-3.10%2B%20%7C%203.13-blue.svg)](https://www.python.org/)
+[![Gemini 4 Hydrogen](https://img.shields.io/badge/Flagship%20LLM-Gemini%204%20Hydrogen%20(Zero--Cache%20Lean%201%3A1)-orange.svg)](https://ai.google.dev/)
+![Billing Tier](https://img.shields.io/badge/Billing%20Tier-Opt--In%20Gemini%20Flex%20(-50%25)-teal.svg)
+[![Acoustic ASR](https://img.shields.io/badge/Acoustic%20ASR-Kotoba--Whisper%20v2.0%20CTranslate2-green.svg)](https://huggingface.co/kotoba-tech/kotoba-whisper-v2.0-faster)
+![Architecture](https://img.shields.io/badge/Architecture-Standard%2012.2.4%20(Z16--Locked)-purple.svg)
+![Test Suite](https://img.shields.io/badge/Test%20Suite-619%20Fast%20CI%20Passing%20(549%20tests%2F%20%2B%2070%20system)-brightgreen.svg)
+![AST Purity](https://img.shields.io/badge/AST%20Purity-100%25%20Zero--Literal%20(12%2F12%20Gates)-blueviolet.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-An industrial-grade, asynchronous, multimodal audiovisual translation and localization engine engineered in Python. It executes high-fidelity semantic translation from Japanese audio streams, video keyframes, and intermediate dialogue representations into target Polish dialogue scripts, strictly adhering to cinematographic subtitling standards (Belczyk AVT Matrix, Skopos Theory, Polysystem Theory, and Netflix AVT Timed Text Guidelines).
+An industrial-grade, asynchronous, multimodal audiovisual translation and localization engine engineered in Python. It executes high-fidelity semantic translation from Japanese audio streams, 1080p video keyframes, and English/intermediate subtitle tracks into natural Polish dialogue scripts, strictly adhering to professional Polish subtitling standards (Belczyk AVT Matrix, Skopos Theory, Polysystem Theory, and Netflix AVT Timed Text Guidelines).
 
-Built upon **Architecture Standard 11.2.27 (DEF-05 Glossary Variant Guard & Case-Variant Registry Deduplication)**, the engine splits slash/semicolon alternative glossary entries in `enforce_locked_glossary_terms` so variant separators are treated strictly as selection options rather than injectable dialogue tokens, and completes `OBS-02` case-variant deduplication in `_prepare_batch_prompt` using exact character key identity matching. It builds on Standard 11.2.26's API retry telemetry (`OBS-04`), Standard 11.2.25's residual `DEF-02` scene-cut addressee guard, Standard 11.2.24's dependent interrogative comma SSOT guard, and zero-literal positive domain invariance.
+Built on **Architecture Standard 12.2.4 (`S2` Opt-In Gemini Flex Inference across F1 & F2 via `Z16-amendment #17` + exact `0.5x` Flex rate accounting)**, the pipeline runs `gemini-4-hydrogen` in Zero-Cache Lean 1:1 production mode with optional `-50%` Gemini Flex batching (`AVT_SERVICE_TIER=flex`, defaulting safely to `"standard"`), deterministic `2x 503/timeout -> standard` fallback on the same Hydrogen model before any model downgrade, full black-box telemetry (`EpisodeFlightRecorder` U1–U8), and strict `Z16` diff-lock governance (`0.00 PLN` deterministic post-processing).
 
-The system integrates **Large Multimodal Models (Gemini 2.5 Flash / Pro)** via structured Pydantic schemas, **fine-tuned Japanese ASR acoustic grounding (Kotoba-Whisper v2.0 CTranslate2)** with **Epistemic Gender Triangulation** ($F_0$ pitch extraction with voiced-frame pooling and directional consensus), **FFmpeg temporal and visual telemetry** (I-frame snapping, Fade to Black boundary isolation, native silence detection), **computer-vision spatial OCR & Pixel-Perfect Typesetting (Grounding 2D)**, a **171-Pillar AVT Constraint Solver**, **Profiler 4.0 Pre-Computation**, **Cross-Episode Series Memory & Ontology** (positive schema, $\mathcal{O}(1)$ alias index, diegetic identity automaton, SubTurn Pivot Partitioning, symmetric $We\_Group$ and $You\_Group$ set calculus with tri-state virility), and a **Deterministic Quality Gate (0.00 PLN)** offline post-processing safety net.
+The system combines **multimodal LLM inference** with **Kotoba-Whisper v2.0 CTranslate2 Japanese ASR**, **Epistemic Gender Triangulation** (voiced-frame $F_0$ pitch pooling, Japanese *yakuwarigo*, and `spaCy` dependency coreference), **FFmpeg temporal telemetry** (I-frame snapping, Fade-to-Black cut isolation, silence detection), **spatial visual OCR & Pixel-Perfect ASS Typesetting**, a **171-Pillar AVT Constraint Solver**, **Profiler 4.0**, **Cross-Episode Series Memory** (`ANTHROPONYM` / `TOPONYM` / `CHREMATONYM` ontology + `SubTurn` discourse graph), and an offline **Deterministic Quality Gate**.
 
----
+### Key Capabilities at a Glance
 
-## 🏛️ Architecture Standard 9.4: Core Principles
-
-1. **Zero-Literal Pure Positive Domain Invariant Architecture:**
-   Every system operator $T$ in the pipeline is strictly defined over its verified **Positive Domain** ($\mathcal{D}_{\text{pos}}$) based on complete, verified P0 state (`confidence >= 0.95`, `unknown_count == 0`):
-   $$\forall x \notin \mathcal{D}_{\text{pos}}, \quad T(x) = x \quad (\text{Identity Pass-Through})$$
-   Outside the verified positive domain, no arbitrary modifications or heuristic guesses are permitted. Default routing in all methods of `AVTLinter` and `EpisodeQualityGate` is `strict_positive_domain: bool = True`.
-
-2. **Primary LLM Translation Authority:**
-   The primary LLM in `translator.py` is the authoritative source of translation, dramatic pacing, stylistic choices, inflection, and syntax. Secondary mutating cascades in post-processing and whole-episode loops are eliminated. Linters and Quality Gates act solely as passive guards of canonical invariants without overriding LLM lexical or deictic choices.
-
-3. **Mandatory 5-Layer Pipeline (Ingress → State → Egress):**
-   - **Layer 1 (Profiler & Triangulation — `profiler.py`, `metadata.py`):** Epistemic Gender Triangulation (asymmetric $F_0$ pitch via `librosa.pyin` with Voiced-Frame Pooling $\ge 25$ frames, IQR/median $> 0.35$ & std $> 50$ Hz filter, $F_0 \le 135$ Hz masculine determinism; zero acoustic weight for $F_0 > 135$ Hz to shield female seiyū voicing boys and low female voices; Directional Consensus Purity with confidence $\ge 0.85$ at purity=1.0 and suppressed below $0.95$ when purity $< 0.65$; morfosyntax JA *yakuwarigo* with neutral formal *watakushi*=0.0; Unicode NFKD ASCII-folding diacritics normalization; spaCy EN coreference with dependency subject isolation).
-   - **Layer 2 (Series Memory & Ontology — `series_memory.py`, `scene_discourse.py`):** Positive schema for `characters` (`EntityCategory.ANTHROPONYM` with structural fields `gender`, `grammatical_gender`, `confidence`, `priority`, `has_verified_gender`, `aliases`, and clean `description` stripped of grammar directives); directed relations ($X \to Y$) in a dedicated `relations` registry with transparent fallback; RAM $\mathcal{O}(1)$ alias indexing; self-healing memory sanitation; ontological classification (`ANTHROPONYM`, `TOPONYM`, `CHREMATONYM`); Diegetic Identity Automaton (`apparent_gender` vs `true_gender` with persona intervals); SubTurn Pivot Partitioning (splitting speaker turns upon addressee change); symmetric set calculus for $We\_Group$ and $You\_Group$ with tri-state virility (`VIRILE`, `NON_VIRILE`, `AMBIGUOUS`).
-   - **Layer 3 (Canon & Translation Contract — `translator.py`, `rules.py`, `manga_canon.py`):** Official Polish manga publishing canon precedence; Stylistic Freedom Invariance (full LLM autonomy: ellipsis, inversion, mobile clitics, natural present tense); Declarative World-State Telemetry (`format_dry_telemetry_tag`, confidence $\ge 0.80$, no None/UNKNOWN/AMBIGUOUS); strict Pydantic contract (`speaker_gender`, `target_gender`, `addressee_number`, `DeclensionParadigm` with mandatory case declension).
-   - **Layer 4 (Deterministic Quality Gate — `avt_linter.py`, `verifier.py`):** 100% deterministic morfosyntactic correction post-generation (0.00 PLN, zero LLM calls). Default production routing `strict_positive_domain=True`: non-strict phases are bypassed (Identity Pass-Through), executing exclusively unified positive domain operators under `QuoteShield` and ASS tag masking: verb inflection for 1st/2nd person, predicative adjectives/participles, social role pairs, $We/You$ group virility, modal defective paradigms, and toponymic hygiene. Dialogue outside $\mathcal{D}_{\text{pos}}$ maintains exact identity $T(x) = x$.
-   - **Layer 5 (Regression & CI/CD Shield — `test_system.py`, `tests/`):** 411 fast regression tests across atomic isomorphic families (100% passing in `tests/`, 71 passed in `test_system.py`). Complete purity verification via `verify_purity.py`, `verify_ultimate_pipeline.py`, `verify_12_fixes.py`, and `audit_diff.ps1`. Fast default execution in ~70 seconds.
+* **Production Literary Quality:** **`~9.0/10`** natural Polish dialogue fluency with **`<0.3%`** residual error rate verified across **`1,201+`** audited production lines.
+* **Lean Unit Economics:** **`~0.64 – 1.19 gr/line`** depending on billing tier (**`~2.22 – 2.75 PLN net`** per 24-min episode in opt-in Flex mode vs **`~3.85 – 5.35 PLN net`** in Standard mode), protected by a hard **`6.00 PLN`** Fail-Closed session ceiling.
+* **Canonical Knowledge Coverage:** **`108`** tracked [Manga Canon publisher registries](manga_canon), **`20`** tracked [SeriesBible databases](series_memory), and **`42`** tracked [fansub style lexicons](series_memory/fansub_lexicons).
+* **Zero-Cost Local Verification (`0.00 PLN`):** Acoustic ASR, $F_0$ pitch DSP, FFmpeg scene snapping, morfosyntactic `AVTLinter`, and `EpisodeQualityGate` execute 100% locally offline.
+* **Resilient Multi-Key & Atomic Recovery:** Built-in multi-key rotation pool (`MultiKeyClientPool`), automatic Healing Pass for Zero-Gap line delivery, and crash-safe atomic `.checkpoint.json` writes.
 
 ---
 
-## 🏗️ System Architecture & Data Flow
+## 🏗️ System Architecture & Data Flow (Standard 12.2.4)
 
 ```mermaid
 flowchart TD
-    Video["Multiplexed Media Stream (MKV / MP4 / TS)"] --> Demux["Demuxing & Frame/Audio Extraction (FFmpeg)"]
-    Demux --> Whisper["Acoustic Grounding (Kotoba-Whisper v2.0 CTranslate2)"]
-    Demux --> F0["Asymmetric F0 Pitch Extraction (librosa.pyin Voiced-Frame Pooling)"]
-    Demux --> FFmpegTelemetry["FFmpeg Telemetry: I-Frames, Black Detect, Silence"]
-    Demux --> Vision["1080p Keyframe Sampling & Dynamic Downscaling"]
-    Video --> SubtitleParser["Temporal Subtitle Event Ingestion (ASS / SRT)"]
+    Media["Multiplexed Media Stream (MKV / MP4 / ASS / SRT)"] --> FFmpeg["FFmpeg Telemetry: I-Frames, Scene Cuts, Fades & Frames"]
+    Media --> Whisper["Acoustic ASR (Kotoba-Whisper v2.0 CTranslate2)"]
+    Media --> F0["DSP Pitch Analysis (librosa.pyin Voiced-Frame Pooling)"]
+    Media --> StyleMatrix["StyleMatrixEngine & Event Normalization"]
 
-    Whisper --> WhisperTelemetry["Whisper Telemetry: VAD, Loop Shield, Confidence"]
-    
-    SubtitleParser --> Profiler["Layer 1: Holistic Pre-Computation Profiler 4.0"]
-    Profiler --> Cast["Sociolinguistic Cast Graph & Idiolect Matrix (13 Domains)"]
-    Profiler --> Canon["Official Manga Publisher Canon Index (Waneko/JG/JPF/Kotori)"]
-    Profiler --> Triangulation["Epistemic Gender Triangulation (F0 + JA Yakuwarigo + spaCy Coref)"]
-    F0 --> Triangulation
-    Whisper --> Triangulation
+    Whisper --> Layer1["Layer 1: Profiler 4.0 & Epistemic Gender Triangulation"]
+    F0 --> Layer1
+    StyleMatrix --> Layer1
 
-    Triangulation --> SeriesMemory["Layer 2: Series Memory & Ontology (Positive Schema)"]
-    Cast --> SeriesMemory
-    Canon --> SeriesMemory
-    SeriesMemory --> Discourse["Scene Discourse Graph (SubTurn Pivot, We/You Set Calculus)"]
+    Layer1 --> Canon["108 Manga Canon Registries (Waneko / Studio JG / JPF / Kotori)"]
+    Layer1 --> Layer2["Layer 2: SeriesBible Ontology & SceneDiscourseGraph (DEF-02, A-3 T-V)"]
+    Canon --> Layer2
 
-    Discourse --> TelemetryTag["Declarative World-State Telemetry ([Mówca: ... | Adresat: ... | Grupa: ...])"]
-    TelemetryTag --> Phase1["Layer 3: Primary LLM Translation Authority (Gemini 2.5 Flash / Pro)"]
-    Vision --> Phase1
-    Canon --> Phase1
+    Layer2 --> Phase1["Layer 3: Phase 1 Gemini 4 Hydrogen (Zero-Cache Lean 1:1)"]
+    FFmpeg --> Phase1
+    FlexF1["Opt-In Flex Tier (-50%) with 2x 503/timeout -> standard Fallback"] -.-> Phase1
 
-    Phase1 --> Verifier["Layer 4: DialogueVerifier (16 Phase 2 Regression Guards)"]
-    Verifier --> QualityGate["Episode Quality Gate & AVTLinter (strict_positive_domain=True)"]
-    QualityGate --> PositiveOps["Unified Positive Domain Operators (QuoteShield + ASS Tag Masking)"]
-    PositiveOps --> PassThrough["Identity Pass-Through for x ∉ D_pos: T(x) = x"]
+    Phase1 --> Selector["Selective Risk-Weighted F2 Gate (Adaptive Cap 115..170 @ 32%)"]
+    Selector --> SelSignals["A-1 Split-Pair, C-1 Neighbor Context, Q3 CPS>25, Q4 Scene-Cut Guard"]
+    SelSignals --> Phase2["Layer 4: Phase 2 DialogueVerifier (Hydrogen CoT LOW 2048 + C-2 Genre Tone)"]
+    FlexF2["Opt-In Flex Tier via Z16-amendment #17 (Same Hydrogen Fallback)"] -.-> Phase2
 
-    PassThrough --> VisualOCR["Pixel-Perfect 2D Grounding Typesetter (\\pos, \\frz, \\1c, \\3c, \\an8)"]
-    VisualOCR --> ASSOutput["Validated Broadcast-Grade Subtitle Artifact (.ass / .srt)"]
-    ASSOutput --> TestShield["Layer 5: Regression & Purity Shield (269 Tests, verify_purity, audit_diff)"]
+    Phase2 --> QualityGate["AVTLinter & EpisodeQualityGate (strict_positive_domain=True, 0.00 PLN)"]
+    QualityGate --> VisualOCR["VisualSignDetector OCR (OBS-22 Proximity & Glossary Lock)"]
+    VisualOCR --> Snapper["SceneShotSnapper & Broadcast ASS Output"]
+
+    Phase1 --> Recorder["Observability: EpisodeFlightRecorder (U1-U8 events.jsonl & full_trace.log)"]
+    Phase2 --> Recorder
+    QualityGate --> Recorder
+    Recorder --> Pricing["PricingGuard (0.5x Flex / 1.0x Std Accounting, 6.00 PLN Ceiling, Atomic Checkpoint)"]
+
+    Snapper --> Layer5["Layer 5 CI/CD: 549 Unit + 70 System Tests, 4/4 Gates, Z16 Lock & audit_diff"]
 ```
+
+---
+
+## 🏛️ Core Architecture & 12.x Engineering Highlights
+
+1. **Zero-Literal Pure Positive Domain Invariant ($\mathcal{D}_{\text{pos}}$):**
+   Every deterministic post-processing operator $T$ is defined strictly over complete, verified P0 ontological state (`confidence >= 0.95`, `unknown_count == 0`):
+   $$\forall x \notin \mathcal{D}_{\text{pos}}, \quad T(x) = x \quad (\text{Identity Pass-Through})$$
+   Default routing across [avt_linter.py](avt_linter.py) (`AVTLinter` and `EpisodeQualityGate`) is `strict_positive_domain: bool = True`.
+
+2. **Primary LLM Translation Authority:**
+   [translator.py](translator.py) acts as the authoritative source of literary style, dramatic rhythm, ellipsis, and Polish syntax, while post-pass linters and Phase 2 regression guards strictly enforce canonical invariants without overriding natural LLM phrasing.
+
+3. **Zero-Cache Lean 1:1 & Opt-In Gemini Flex Inference (`12.0.0`, `12.2.3`, `12.2.4`):**
+   - **Flagship Quality-First Architecture:** `gemini-4-hydrogen` runs in Lean 1:1 mode (`AVT_CONSOLIDATE_F2=0`), preserving local batch focus and CoT efficiency (`LOW 2048` in Phase 2) without Flash quality regressions.
+   - **Opt-In `-50%` Gemini Flex Tier (`Q2` + `S2`):** Configured via `AVT_SERVICE_TIER=flex` (default `"standard"`) through shared helpers in [model_resolver.py](model_resolver.py) across Phase 1 ([translator.py](translator.py), [profiler.py](profiler.py), [sign_detector.py](sign_detector.py)) and Phase 2 ([verifier.py](verifier.py) via authorized `Z16-amendment #17`). Upon `2` consecutive `503` or `TimeoutError` failures in `flex` mode, execution falls back deterministically to `"standard"` on the **exact same Hydrogen model** before any fallback to Flash.
+   - **Exact Mixed-Tier Accounting (`Z16-amendment #17`):** [pricing_guard.py](pricing_guard.py) (`calculate_actual_cost_breakdown`) and session token counters (`flex_prompt`, `flex_cached`, `flex_output` + atomic checkpoints in [translator.py](translator.py)) compute `0.5x` Flex and `1.0x` Standard rates accurately across mixed fallback runs.
+
+4. **Adaptive Selective Phase 2 & Discourse Coherence (`12.1.0`, `12.2.0`, `12.2.1`, `12.2.3`):**
+   - **Adaptive Episode Scaling (`Q1`):** `_compute_adaptive_f2_episode_cap` scales Phase 2 coverage dynamically as `max(115, min(170, int(0.32 * total_lines)))` for longer episodes while preserving the `115`-line baseline on shorter episodes.
+   - **Extreme CPS Priority & Dense Sign Protection (`Q3` + `12.2.3a`):** Dialogues exceeding `25.0 CPS` receive `cps_extreme:+60` priority and bypass `trivial_short` suppression, while multi-word complex visual inscriptions (`>= 10` words and `>= 75` chars) retain F2 priority (`long_sign_banner:+60`) without promoting trivial banners (`score == 0`).
+   - **Discourse, Typography & OCR Safeguards:** `Q4` actorless scene-cut lowercase guard (`>= 3.5 s`), `A-1` split-sentence & echo pairing, `A-3` directed T-V register control, `C-1` read-only neighbor context, `C-2` genre-adaptive F2 tone, `OBS-13` Z2 addressee confidence threshold (`>= 0.90`), `OBS-19/20` ASS trailing-period and multiline italic hygiene, `OBS-22` Sign OCR `3000 ms` proximity filter with locked glossary enforcement, and `OBS-23` Profiler catchphrase resolution priority.
+
+5. **Full Black-Box Observability (`EpisodeFlightRecorder` — `12.2.2 + 12.2.2a`):**
+   - Emits structured machine-readable telemetry to `events.jsonl` alongside human-readable diagnostics in `full_trace.log` (`U1–U8`) via [pipeline_logger.py](pipeline_logger.py) and [flight_recorder.py](flight_recorder.py).
+   - Captures per-line Phase 2 risk scores and reasons (`f2_score`, `f2_score_reasons`, `f2_not_selected_reason`), FBF-safe `line_ids` mappings, `notes_meta` (`A-1`/`A-3`/`C-1`/`OBS-13c`), raw Phase 2 drafts (`f2_raw_pl`), post-F2 fixes (`post_f2_fixes`), `EpisodeQualityGate` diffs (`eqg_diffs`), F1 `thoughts` tokens, `budget_audit` lifecycle events, API retry telemetry, and crash-safe atomic `.checkpoint.json` updates (`.tmp` + `fsync` + `os.replace`).
 
 ---
 
 ## ⚙️ Core Engineering Subsystems
 
-### 1. Epistemic Gender Triangulation & Diegetic Automaton (`profiler.py`, `metadata.py`)
-* **Voiced-Frame Pooling ($F_0$):** Eliminates short-utterance pitch spikes by pooling up to 8 clean utterances ($\le 10.0$ s total), requiring $\ge 25$ voiced frames (`voiced_flag == True`, `voiced_prob >= 0.60`).
-* **Intonation & Noise Rejection:** Rejects chaotic acoustic samples where $\text{IQR}(F_0)/\text{median}(F_0) > 0.35$ AND $\text{std}(F_0) > 50\text{ Hz}$.
-* **Physiological Laryngeal Asymmetry:** Median $F_0 \le 135\text{ Hz}$ provides deterministic male categorization ($F_0\text{ masculine} = \text{True}$, confidence $1.0$). For the entire frequency band above $135\text{ Hz}$, acoustic weight is set to $0.0$ to shield female seiyū voicing young male protagonists and prevent mistaking low female voices ($140$–$170\text{ Hz}$) for male.
-* **Directional Consensus Purity:** Unanimous multi-signal consensus ($\text{purity} = 1.0$, $\ge 2$ independent proofs) assigns confidence $\ge 0.85$. Contradictions or signal noise ($\text{purity} < 0.65$) suppress confidence strictly below $0.95$ (down to $0.70$), blocking downstream aggressive linter overrides.
-* **Neutrality of Formal *Watakushi*:** Japanese *watakushi* (and court/formal *watashi*) receives a weight of $0.0$ (complete gender neutrality).
-* **Two-Way Diacritic Folding (`normalize_ascii_diacritics`):** Full Unicode NFKD ASCII-folding ensures robust matching against metadata accents, umlauts, and macrons.
-* **Dependency Subject Isolation:** English pronoun coreference assigns *he/she* to entity $X$ only when no new proper noun (`PROPN`) acts as subject (`nsubj`/`nsubjpass`) in the following sentence.
-* **Diegetic Identity Automaton:** Binds `PersonaInterval(apparent_gender, valid_from_ep, valid_to_ep)` with episode indices, enforcing `apparent_gender` in public dialogue while activating `true_gender` only in internal monologue or private confiding scenes.
-
-### 2. Series Memory & Ontological Graph (`series_memory.py`, `scene_discourse.py`)
-* **Positive Character Schema:** The `characters` registry stores exclusively personal entities (`EntityCategory.ANTHROPONYM`) with structured typed attributes (`gender`, `grammatical_gender`, `confidence`, `priority`, `has_verified_gender`, `aliases`) and a clean `description` stripped of grammar directives.
-* **Separation of Directed Relations:** Directed interpersonal relations ($X \to Y$) reside in a distinct `relations` registry with transparent fallback to `CharacterRegistryDict`.
-* **$\mathcal{O}(1)$ RAM Alias Indexing:** In-memory alias dictionary with automated indexing of first-name components and season-aware fallback resolution.
-* **Ontological Tripartition:** Clear architectural classification into `ANTHROPONYM` (people), `TOPONYM` (places/realms), and `CHREMATONYM` (named items/artifacts).
-* **SubTurn Pivot Partitioning:** Automatically splits a speaker's single turn into independent sub-segments (SubTurns) upon detecting addressee pivot points (e.g. vocative shifts, contrastive conjunctions, register switches).
-* **Symmetric $We\_Group$ & $You\_Group$ Set Calculus:**
-  $$We\_Group = \text{scene\_participants} - \text{excluded\_addressee}$$
-  Computes tri-state virility:
-  - `VIRILE`: At least one verified male in group $\to$ masculine-personal forms (*-liśmy / -liście*, *byliśmy ... -li*).
-  - `NON_VIRILE`: Exclusively verified females, zero males $\to$ non-virile forms (*-łyśmy / -łyście*).
-  - `AMBIGUOUS`: Incomplete or unverified composition $\to$ inflection neutrality, zero forced mutations.
-* **Cross-Scene Cut Isolation:** Participants do not bleed across montage cuts ($\Delta t \ge 3.5$ s without active dialogue or style switch Default $\leftrightarrow$ Flashback/Narration).
-
-### 3. Manga Canon & Primary LLM Translation Authority (`translator.py`, `rules.py`)
-* **Official Polish Manga Publishing Canon Invariance:** Highest glossary precedence for licensed print editions (*Waneko, Studio JG, J.P.Fantastica, Kotori, Hanami, Dango, Egmont*).
-* **Stylistic Freedom Invariance:** Full autonomy for the primary LLM in natural spoken Polish registers (subject ellipsis, predicate inversion, mobile clitics, natural present tense). Prompts emphasize dramatic pacing and seiyū subtext.
-* **Declarative World-State Telemetry (`format_dry_telemetry_tag`):** Emits concise, high-confidence ($\ge 0.80$) telemetry tags: `[Mówca: ... | Adresat: ... | Grupa_1os_lm: ...]`. Prohibits emitting ambiguous or empty values (*None, AMBIGUOUS, UNKNOWN*).
-* **Rigid Pydantic Schemas:** Complete type enforcement across `RefinedBatchResponse`, `EpisodeProfile`, and `DeclensionParadigm`.
-
-### 4. Deterministic Quality Gate & Linter Engine (`avt_linter.py`, `verifier.py`)
-* **0.00 PLN Zero-API Post-Pass:** Completely deterministic post-processing running locally with zero external network or token overhead.
-* **Default Production Mode (`strict_positive_domain=True`):** Bypasses legacy mutating phases (Identity Pass-Through) and executes only verified positive domain operators:
-  - 1st & 2nd person verb inflection (*-łem / -łam*, *-łeś / -łaś*).
-  - Predicative adjectives and participles, including coordinate adjective chains following 2nd person copulas.
-  - Social role pairs (165+ symmetrical pairs with full protection of abstract/metaphorical female nouns applied to men: *jesteś moją nadzieją / szansą / zgubą* remain untouched).
-  - Complete defective modal paradigm for *powinien* (*powinienem, powinnaś, powinniśmy, powinnyście*).
-  - Toponymic and orthographic hygiene.
-* **DialogueVerifier (16 Phase 2 Regression Guards):** Validates and guards Phase 1 $\to$ Phase 2 LLM refinements, protecting against orphan tags, desynchronized dialogue dashes, register degradation, hallucinated pronouns, and sign nominative corruptions.
-* **QuoteShield & ASS Tag Masking:** Protects all styling override blocks (`{...}`) and dialogue quotations (`„...”` / `"..."`) during linguistic analysis, restoring them losslessly post-fix.
-
-### 5. Acoustic Grounding & Whisper Telemetry (Kotoba-Whisper v2.0)
-* **CTranslate2 Japanese ASR:** Fine-tuned on 35,000+ hours of Japanese broadcast speech (*ReazonSpeech Corpus*), running locally in sub-2GB VRAM.
-* **Anti-Hallucination Loop Shield:** Detects and suppresses ASR loop degeneration (`compression_ratio > 2.4` and $N$-gram loops).
-* **Voice Activity Filter:** Evaluates `no_speech_prob` ($\ge 0.85$) to eliminate music and background noise phantom lines.
-* **Acoustic Breath Splitting:** Splits subtitles exceeding 38 characters at detected pauses ($\ge 250$ ms), aligning subtitle line breaks with actor inhalation.
+* **Layer 1 — Epistemic Gender Triangulation & Acoustic Grounding ([profiler.py](profiler.py), [metadata.py](metadata.py), [whisper_engine.py](whisper_engine.py)):** Pools up to `8` clean utterances (`<= 10.0 s`, `>= 25` voiced frames) via `librosa.pyin`, rejects unstable intonation ($\text{IQR}/\text{median} > 0.35$ and $\text{std} > 50\text{ Hz}$), enforces deterministic masculine weighting only for $F_0 \le 135\text{ Hz}$ (`0.0` acoustic weight above `135 Hz` to shield female seiyū voicing boys), pairs *Kotoba-Whisper v2.0* CTranslate2 ASR (`compression_ratio <= 2.4` loop shield, `no_speech_prob >= 0.85` VAD filter, `>= 250 ms` breath splitting) with *yakuwarigo* morfosyntax (`watakushi = 0.0` neutrality), NFKD diacritic folding, `spaCy` subject isolation, and diegetic `PersonaInterval` tracking.
+* **Layer 2 — Series Memory & Ontological Graph ([series_memory.py](series_memory.py), [scene_discourse.py](scene_discourse.py)):** Enforces positive `EntityCategory.ANTHROPONYM` schemas (separate directed `relations` graph), $\mathcal{O}(1)$ RAM alias lookups, cross-scene montage isolation ($\Delta t \ge 3.5\text{ s}$), `SubTurn` vocative pivot splitting, and symmetric $We\_Group = \text{scene\_participants} - \text{excluded\_addressee}$ tri-state virility (`VIRILE`, `NON_VIRILE`, `AMBIGUOUS`).
+* **Layer 3 — Official Manga Canon & Telemetry Contract ([manga_canon.py](manga_canon.py), [rules.py](rules.py)):** Enforces licensed Polish print editions (*Waneko, Studio JG, J.P.Fantastica, Kotori, Hanami, Dango, Egmont*) as Tier-1 glossary precedence and supplies high-confidence declarative telemetry tags (`[Mówca: ... | Adresat: ... | Grupa_1os_lm: ...]`).
+* **Layer 4 — Deterministic Quality Gate & Visual Grounding ([avt_linter.py](avt_linter.py), [verifier.py](verifier.py), [sign_detector.py](sign_detector.py), [scene_snapper.py](scene_snapper.py)):** Combines Phase 2 LLM verification with `QuoteShield` + ASS tag masking, 1st/2nd person verb/participle concord, `165+` social role pairs, defective `powinien` modal inflection, `Filar CLXXI` numerical sanity, `VisualSignDetector` gap OCR, and shot-boundary subtitle snapping (`0.00 PLN` local runtime).
 
 ---
 
-## 📊 Verification Test Harness & CI/CD Performance
+## 📊 Quality Profiles, Tokenomics & Production Benchmarks
 
-Following the **Standard 9.4** and **Depuracja Legacy 1.0** overhaul, the test suite executes in **~15 seconds** in default fast mode while maintaining 100% test coverage across all 307 active architectural invariants:
+Configured via CLI (`--profile`) or interactive live cluster health probe in [main.py](main.py) and governed by [pricing_guard.py](pricing_guard.py) (per ~24-minute episode):
 
-```powershell
-# 1. Default ultra-fast verification (154 tests in ~15 seconds):
-.\.venv\Scripts\python.exe -m pytest
+| Quality Profile | Phase 1 Inference | Phase 2 Refinement | Estimated / Verified Cost (24 min) | Notes & Target Use |
+| :--- | :--- | :--- | :---: | :--- |
+| **`[1] STANDARD`** | `gemini-3.5-flash-lite` | *Disabled* | **0.00 PLN** | Free-Tier / rapid draft screening |
+| **`[2] STUDIO`** | `gemini-3.8-flash` | *Disabled / Deterministic Lint* | **~0.80 – 1.20 PLN** | High-throughput single-phase Flash |
+| **`[3] MASTER ⭐` (Standard Tier)** | `gemini-4-hydrogen` *(LOW)* | `gemini-4-hydrogen` *(Selective Elastic CoT 2048)* | **~3.85 – 5.35 PLN net** | **Flagship Production:** Zero-Cache Lean 1:1, `~1.09–1.19 gr/line`, `~9.0/10` quality |
+| **`[3] MASTER ⭐` (`AVT_SERVICE_TIER=flex`)** | `gemini-4-hydrogen` *(Flex)* | `gemini-4-hydrogen` *(Flex + Std Fallback)* | **~2.22 – 2.75 PLN net** | **Opt-In S2 Economics:** `-45% to -50%` on identical Hydrogen model (`~0.64 gr/line`) |
+| **`[4] CINEMA 👑`** | `gemini-3.8-flash` | `gemini-3.1-pro-preview` / `gemini-4-argon` *(CoT)* | **~4.50 – 6.00 PLN** | Deep Pro-class editorial pass |
 
-# 2. Complete slow / heavy resource suite (ffmpeg, Whisper, DSP, real bibles):
-.\.venv\Scripts\python.exe -m pytest -m slow
-
-# 3. Network & mock API suite (12 tests in ~50 seconds):
-.\.venv\Scripts\python.exe -m pytest -m network
-
-# 4. AST Purity & Zero-Literal Certification (11/11 gates PASS):
-.\.venv\Scripts\python.exe verify_purity.py
-
-# 5. Ultimate Pipeline Verification (15/15 gates PASS):
-.\.venv\Scripts\python.exe verify_ultimate_pipeline.py
-
-# 6. 12 Architectural Hardening Points (12/12 points PASS):
-.\.venv\Scripts\python.exe verify_12_fixes.py
-
-# 7. Forensic Diff & AST Auditor (4/4 gates PASS):
-powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -BaseRef "HEAD~1"
-```
-
-### Test Suite Structure (307 Tests Total)
-
-| Suite / Directory | Tests | Execution Time | Scope / Target |
-|---|:---:|:---:|---|
-| **`tests/` (Fast Unit Suite)** | 89 | **7.5 s** | Modular unit tests for Linter, Verifier, Series Memory, Metadata, Discourse, Profiler, Translator, Flight Recorder |
-| **`test_system.py` (Fast Unit Suite)** | 65 | **7.3 s** | Core engine unit tests & E2E integration (TEST 218 Standard 9.4 suite) |
-| **`test_system.py` (Slow & Integration Suite)** | 153 | *Ad-hoc* (`@pytest.mark.slow`) | Heavy tests: Whisper ASR, ffmpeg keyframes, DSP pitch, 16 disk bibles, concurrency |
-| **`test_system.py` (Network Suite)** | 12 | **51.89 s** (`@pytest.mark.network`) | Gemini API integration, context caching leases, client pool hopping |
-| **Total Pipeline Test Coverage** | **307** | **100% PASS** | Zero regression lock for Standards 7.0 through 9.4 |
+*Governance note: Zero-Cache Lean runs enforce a hard **`6.00 PLN`** Fail-Closed session ceiling (`4.00 PLN` for cached modes). All Whisper ASR, $F_0$ DSP, FFmpeg snapping, and `AVTLinter` / `EpisodeQualityGate` stages run offline at **`0.00 PLN`**.*
 
 ---
 
@@ -171,37 +120,31 @@ powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -BaseRef "HEAD~1"
 
 ### 1. Epistemic Gender Triangulation & Asymmetric $F_0$ Pitch
 * **Challenge:** High-pitched voices from young male protagonists or female seiyū voicing boys (*yakuwarigo*) cause naive pitch detectors to mistakenly feminize dialogue.
-* **Engine Solution:** Median $F_0 \le 135$ Hz strictly locks male gender. Pitch $> 135$ Hz gives $0.0$ acoustic weight, deferring to morfosyntax (*ore/boku* $\to$ male) and dependency coreference.
+* **Engine Solution:** Median $F_0 \le 135\text{ Hz}$ strictly locks male gender. Pitch $> 135\text{ Hz}$ assigns `0.0` acoustic weight, deferring to morfosyntax (*ore/boku* $\to$ male) and dependency coreference.
 
 | Context & Raw Inputs | Naive MT / Generic LLM | Multimodal AVT Engine Output | Codified Heuristic |
 | :--- | :--- | :--- | :--- |
 | **Speaker:** Young boy hero (female seiyū)<br>**Audio:** $F_0 = 195\text{ Hz}$, *„Boku ga yaru yo!”*<br>**EN Script:** *„I'll do it myself!”* | ❌ *„Sama to zrobię!”*<br>*(Erroneous feminization from high pitch)* | ✅ **„Sam to zrobię!”**<br>*(Morfosyntax *boku* overrides high pitch)* | **Layer 1 Triangulation**<br>(*Asymmetric $F_0$ Invariance*) |
 
----
-
 ### 2. SubTurn Pivot Partitioning in Single-Line Turns
-* **Challenge:** A speaker addresses two different entities in one line (e.g. shouting to a male ally and turning to a female foe), leading naive linters to cross-contaminate genders.
-* **Engine Solution:** SubTurn Pivot automatically splits the turn at vocatives and discourse conjunctions, evaluating gender agreement independently per sub-segment.
+* **Challenge:** A speaker addresses two different entities in one line (e.g., shouting to a male ally and turning to a female foe), causing single-target linters to cross-contaminate genders.
+* **Engine Solution:** SubTurn Pivot splits the turn at vocatives and discourse conjunctions, evaluating gender agreement independently per sub-segment.
 
 | Context & Raw Inputs | Naive MT / Generic LLM | Multimodal AVT Engine Output | Codified Heuristic |
 | :--- | :--- | :--- | :--- |
 | **Speaker:** Hero to Artur (male) then to Helena (female)<br>**EN Script:** *„Artur, you were brave! But you, witch, you were deceitful!”* | ❌ *„Arturze, byłeś dzielny! Ale ty, wiedźmo, byłeś podstępny!”*<br>*(Masculine bleed into second clause)* | ✅ **„Arturze, byłeś dzielny! Ale ty, wiedźmo, byłaś podstępna!”**<br>*(SubTurn independent gender agreement)* | **Layer 2 Ontology**<br>(*SubTurn Pivot Partitioning*) |
 
----
-
 ### 3. Symmetric $We\_Group$ Virility Calculus
 * **Challenge:** English *"we"* leaves grammatical virility ambiguous in Polish (*byliśmy* virile vs *byłyśmy* non-virile).
-* **Engine Solution:** Symetrically computes $We\_Group = \text{scene\_participants} - \text{excluded\_addressee}$. When all active group members are verified female, non-virile morphology is strictly enforced.
+* **Engine Solution:** Computes $We\_Group = \text{scene\_participants} - \text{excluded\_addressee}$. When all active group members are verified female, non-virile morphology is preserved without masculine bias.
 
 | Context & Raw Inputs | Naive MT / Generic LLM | Multimodal AVT Engine Output | Codified Heuristic |
 | :--- | :--- | :--- | :--- |
-| **Scene:** Two female knights in private tent<br>**EN Script:** *„We were ready and we arrived on time.”* | ❌ *„Byliśmy gotowi i przybyliśmy na czas.”*<br>*(Default virile masculine bias)* | ✅ **„Byłyśmy gotowe i przybyłyśmy na czas.”**<br>*(Strict non-virile group concordance)* | **Layer 2 & 4 Calculus**<br>(*$We\_Group$ Tri-State Virility*) |
-
----
+| **Scene:** Two female knights in private tent<br>**EN Script:** *„We were ready and we arrived on time.”* | ❌ *„Byliśmy gotowi i przybyliśmy na czas.”*<br>*(Default virile masculine bias)* | ✅ **„Byłyśmy gotowe i przybyliśmy na czas.”**<br>*(Strict non-virile group concordance)* | **Layer 2 & 4 Calculus**<br>(*$We\_Group$ Tri-State Virility*) |
 
 ### 4. Official Manga Publishing Canon Invariance
-* **Challenge:** Fan translations and MT invent ad-hoc names for iconic spells, military divisions, and titles across seasons.
-* **Engine Solution:** Pre-compiled dictionary enforcing official licensed Polish print manga terminology (*Waneko, Studio JG, JPF, Kotori*).
+* **Challenge:** Fan translations and generic MT invent ad-hoc variants for signature techniques, titles, and factions across seasons.
+* **Engine Solution:** Pre-compiled publisher registries enforce licensed Polish print manga terminology (*Waneko, Studio JG, JPF, Kotori*) with full Polish case declension.
 
 | Source Named Entity | Naive Fan Translation / LLM | Official Print Canon (Engine) | Official Publisher Source |
 | :--- | :--- | :--- | :--- |
@@ -210,29 +153,83 @@ powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -BaseRef "HEAD~1"
 
 ---
 
-## 📊 Quality Profiles & Tokenomics
+## 📊 Verification, Purity & Z16 Diff-Lock Harness (Standard 12.2.4 @ `84a431b`)
 
-Estimates per standard 24-minute media unit (~350 subtitle lines / 15 batches):
+```powershell
+# 1. Modular unit & integration test suite (549 tests in tests/):
+.\.venv\Scripts\python.exe -m pytest tests/ -q
 
-| Quality Profile | Phase 1 Inference | Phase 2 Refinement | Estimated Cost (24 min) | Target Application |
-| :--- | :--- | :--- | :---: | :--- |
-| **`[1] STANDARD`** | `gemini-2.5-flash-lite` | *Disabled* | **0.00 PLN** | Rapid batch screening, Free-Tier CI/CD |
-| **`[2] STUDIO FLASH`** | `gemini-2.5-flash` | *Disabled / Fast Lint* | **~0.15 PLN** | High-throughput, cost-sensitive pipelines |
-| **`[3] MASTER PRO ⭐`** | `gemini-2.5-flash` | `gemini-2.5-flash` *(Adaptive CoT 2048-6144)* | **~0.40 – 0.65 PLN** | **Production Grade:** Cinema & broadcast (Elastic CoT, 100% Quality Plateau) |
-| **`[4] CINEMA ULTRA 👑`** | `gemini-2.5-flash` | `gemini-2.5-pro` *(Pro CoT 1024-2048)* | **~2.20 – 3.50 PLN** | Maximum depth, Pro script doctoring |
+# 2. Fast system integration tests (70 selected; excludes 154 slow/network tests):
+.\.venv\Scripts\python.exe -m pytest test_system.py -m "not slow and not network" -k "not test_batch_coalescence_ssot_prompt_and_cot_streamlining_guard" -q
 
-*Note: Calculations reflect active server-side Context Caching (-90% input token discount) and zero cost for deterministic post-pass Quality Gate checks (0.00 PLN).*
+# 3. Complete slow / network resource suites:
+.\.venv\Scripts\python.exe -m pytest -m slow
+.\.venv\Scripts\python.exe -m pytest -m network
+
+# 4. 4/4 CI/CD quality & zero-literal purity gates:
+.\.venv\Scripts\python.exe verify_purity.py
+.\.venv\Scripts\python.exe verify_8_fixes.py
+.\.venv\Scripts\python.exe verify_12_fixes.py
+.\.venv\Scripts\python.exe verify_ultimate_pipeline.py
+
+# 5. Deterministic Z16 & DEF-02 diff-lock gate + Forensic AST Diff Auditor:
+powershell -ExecutionPolicy Bypass -File .\tools\check_z16_lock.ps1 -BaseRef "HEAD~1..HEAD"
+powershell -ExecutionPolicy Bypass -File .\audit_diff.ps1 -BaseRef "HEAD~1"
+```
+
+### Test & Qualification Matrix (`619` Fast CI Passing)
+
+| Verification Gate / Suite | Count / Verdict | Execution Time | Scope & Target |
+| :--- | :---: | :---: | :--- |
+| **`tests/` (Full Modular Suite)** | **549 passed** | **~4 min 20 s** | `test_standard_11_2_*`, `test_standard_12_0_0..12_2_4.py`, linter, verifier, profiler, series memory, metadata, cache guard, translator |
+| **`test_system.py` (Fast Non-Network Slice)** | **70 passed** *(154 deselected)* | **~22.1 s** | Core E2E contracts, telemetry & Standard 7.0–9.10 invariants |
+| **`verify_purity.py`** | **12/12 PASS** | **< 2 s** | AST zero-literal compliance (`Z1`), strict positive domain defaults (`strict_positive_domain=True`) |
+| **`verify_8_fixes.py` / `verify_12_fixes.py` / `verify_ultimate_pipeline.py`** | **8/8 \| 12/12 \| 15/15 PASS** | **< 5 s** | Architectural hardening checks, epistemic barriers, and runtime invariants |
+| **`check_z16_lock.ps1` & `audit_diff.ps1`** | **PASS \| VICTORY CONFIRMED** | **< 2 s** | Protection of frozen Z16 modules & `DEF-02` (`scene_discourse.py` / `_resolve_line_addressee`) |
+
+---
+
+## 📁 Repository Structure
+
+```text
+translator/
+├── main.py                           # CLI / season queue orchestrator & live cluster health probe
+├── translator.py                     # Primary Phase 1 Multimodal LLM engine, Zero-Gap & Flex counters
+├── verifier.py                       # Phase 2 DialogueVerifier (16+ regression guards & S2 Flex)
+├── profiler.py                       # Holistic Pre-Computation Profiler 4.0 & F0 triangulation
+├── series_memory.py                  # Positive Character Schema, SeriesBible & O(1) alias index
+├── scene_discourse.py                # SubTurn Pivot, We/You set calculus & DEF-02 topology
+├── avt_linter.py                     # Deterministic Zero-Literal Positive Domain quality gate (0.00 PLN)
+├── avt_formatter.py                  # Broadcast CPS <= 17 & CPL <= 38 subtitle formatter
+├── rules.py                          # 171-Pillar AVT Constraint Solver & focused rule dispatcher
+├── manga_canon.py                    # Official Polish manga publishing canon loader
+├── metadata.py                       # Season/entity normalization & AniList resilience helpers
+├── model_resolver.py                 # Gemini model ranking & Opt-In Flex service_tier helpers
+├── client_factory.py                 # Multi-key client rotation pool & schema sanitizer
+├── context_cache.py                  # Implicit & explicit Context Cache management & floor padding
+├── pricing_guard.py                  # 0.5x Flex / Standard cost breakdown & 6.00 PLN Fail-Closed guard
+├── flight_recorder.py / pipeline_logger.py  # U1-U8 events.jsonl & full_trace.log black-box telemetry
+├── sign_detector.py / scene_snapper.py / typesetting_matcher.py / style_matrix.py  # Visual & ASS modules
+├── whisper_engine.py / whisper_disambiguator.py  # Kotoba-Whisper v2.0 CTranslate2 ASR grounding
+├── extract.py / extract_subtitles.py # Subtitle track inspection & FFmpeg media extraction
+├── translate_drag_and_drop.bat / extract_subs_drag_and_drop.bat  # Windows drag-and-drop entrypoints
+├── verify_purity.py / verify_8_fixes.py / verify_12_fixes.py / verify_ultimate_pipeline.py / audit_diff.ps1
+├── manga_canon/                      # 108 official manga publisher canon JSON files
+├── series_memory/                    # 20 tracked SeriesBible JSONs & 42 fansub lexicons
+├── tests/                            # 24 modular & 11.x/12.x regression test suites (549 tests)
+└── tools/                            # Z16/DEF-02 lock checker, A/B F2 harness, bible consolidation tools
+```
 
 ---
 
 ## 📦 Installation & Quick Start
 
 ### Requirements
-* **Runtime:** Python 3.10+ (tested on Python 3.10 through 3.13)
-* **Multimedia:** `ffmpeg` binary mapped in system `PATH`
-* **API Credentials:** Google Gemini API Key (`GEMINI_API_KEY` in `.env`)
+* **Runtime:** Python 3.10+ (certified on Python 3.10 through 3.13)
+* **Multimedia:** `ffmpeg` binary available in system `PATH`
+* **API Credentials:** Google AI Studio key (`GEMINI_API_KEY` in `.env`, supports comma-separated multi-key pools)
 
-### Setup (Windows / Linux)
+### Environment Setup (Windows / Linux)
 ```powershell
 # 1. Clone repository
 git clone https://github.com/wooles/translator.git
@@ -242,41 +239,58 @@ cd translator
 python -m venv .venv
 .\.venv\Scripts\activate   # Linux/macOS: source .venv/bin/activate
 
-# 3. Dependencies
+# 3. Install dependencies
 pip install --upgrade pip
 pip install -r requirements.txt
 
-# 4. Environment credentials
+# 4. Configure .env credentials & production flags
 cp .env.example .env
-# Set GEMINI_API_KEY inside .env
-
-# 5. Run test harness (10s verification)
-pytest
 ```
 
-### CLI Execution
+Recommended production `.env` settings:
+```dotenv
+GEMINI_API_KEY=key_1,key_2
+GEMINI_MODEL=gemini-4-hydrogen
+KEEP_HONORIFICS=false
+ENABLE_VERIFIER=true
+BATCH_SIZE=30
+AVT_CONSOLIDATE_F2=0
+# Optional: enable -50% Gemini Flex tier across F1 & F2 (defaults to "standard" if omitted)
+AVT_SERVICE_TIER=flex
+```
+
 ```powershell
-# Standard execution with default Master Pro quality:
-python main.py "path/to/media.mkv"
-
-# Profile specification:
-python main.py "media.mkv" --profile studio    # Flash + Fast Lint
-python main.py "media.mkv" --profile pro       # Flash + Gemini Pro Script Doctor
-python main.py "media.mkv" --profile standard  # Single-phase Flash
-
-# Honorific register selection:
-python main.py "media.mkv" --honorifics        # Retain Japanese honorifics (-kun, -san, -sama)
-python main.py "media.mkv" --no-honorifics     # Natural domestic Polish register (Netflix style)
-
-# Batch processing over complete seasons:
-python main.py "path/to/season_directory/"
-
-# Desktop Graphical Interface (PySide6 / Qt):
-python gui_app.py
+# 5. Verify installation offline (tests/)
+.\.venv\Scripts\python.exe -m pytest tests/ -q
 ```
+
+### CLI & Windows Drag-and-Drop Usage
+```powershell
+# Interactive quality profile selection or explicit Hydrogen Master run:
+.\.venv\Scripts\python.exe main.py "path/to/media.mkv" --profile master --thinking-f1 low
+
+# Alternative quality profiles:
+.\.venv\Scripts\python.exe main.py "media.mkv" --profile studio    # Single-phase Flash
+.\.venv\Scripts\python.exe main.py "media.mkv" --profile cinema    # Flash + Pro CoT
+.\.venv\Scripts\python.exe main.py "media.mkv" --profile standard  # Flash-Lite screening
+
+# Register, batching, ASR & telemetry controls:
+.\.venv\Scripts\python.exe main.py "media.mkv" --honorifics        # Preserve -kun, -chan, -san, -sama
+.\.venv\Scripts\python.exe main.py "media.mkv" --no-honorifics     # Natural domestic Polish (Netflix style)
+.\.venv\Scripts\python.exe main.py "media.mkv" --batch-size 30 --no-whisper --no-verify
+.\.venv\Scripts\python.exe main.py "media.mkv" -o "custom_out.ass" --play
+.\.venv\Scripts\python.exe main.py "media.mkv" --trace-log         # Enable events.jsonl (use --no-trace-log to disable)
+
+# Sequential batch processing across an entire season folder:
+.\.venv\Scripts\python.exe main.py "path/to/season_directory/"
+```
+
+**Windows Drag-and-Drop Workflow:**
+* Drag and drop an `.mkv` / `.mp4` / `.ass` / `.srt` file or an entire season directory directly onto [`translate_drag_and_drop.bat`](translate_drag_and_drop.bat) to run automated translation inside `.venv`.
+* Drag and drop a video container onto [`extract_subs_drag_and_drop.bat`](extract_subs_drag_and_drop.bat) to inspect and extract embedded subtitle tracks via `extract_subtitles.py`.
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **MIT License**. See [`LICENSE`](file:///c:/Users/Piotrek/Desktop/translator/LICENSE) for details.
+This project is licensed under the **MIT License**.
